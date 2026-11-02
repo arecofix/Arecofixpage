@@ -49,8 +49,8 @@
                          <i class="fas fa-search text-gray-400"></i>
                      </div>
                      <input 
-                         [defaultValue]="searchQuery()" 
-                         (input)="onSearch($any($event.target).value)"
+                         [ngModel]="searchQuery()" 
+                         (ngModelChange)="onSearch($event)"
                          type="text" 
                          [placeholder]="'Buscar en ' + (currentCategory()?.name || 'esta sección') + '...'" 
                          class="input input-bordered input-sm rounded-full pl-9 w-64 max-w-full focus:ring-2 focus:ring-indigo-500 bg-white dark:bg-gray-800"
@@ -73,8 +73,8 @@
                      <i class="fas fa-search text-gray-400"></i>
                  </div>
                  <input 
-                     [defaultValue]="searchQuery()" 
-                     (input)="onSearch($any($event.target).value)"
+                     [ngModel]="searchQuery()" 
+                     (ngModelChange)="onSearch($event)"
                      type="text" 
                      placeholder="Buscar en esta categoría..." 
                      class="input input-bordered w-full rounded-2xl pl-10"

@@ -8,9 +8,9 @@ import {
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { rxResource, toObservable } from '@angular/core/rxjs-interop';
+import { rxResource, toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map, switchMap, debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { Subject, combineLatest, of, take } from 'rxjs';
+import { Subject, combineLatest, of } from 'rxjs';
 import { TenantService } from '@app/core/services/tenant.service';
 import { ProductService } from '@app/public/products/services';
 import { SeoService } from '@app/core/services/seo.service';
@@ -71,7 +71,8 @@ export class ProductsAllPage {
 
     this.searchSubject.pipe(
       debounceTime(400),
-      distinctUntilChanged()
+      distinctUntilChanged(),
+      takeUntilDestroyed()
     ).subscribe(q => {
       this.updateQueryParams({ q: q || null, _page: 1 });
     });
@@ -82,7 +83,6 @@ export class ProductsAllPage {
       this.route.queryParams,
       this.tenant$,
     ]).pipe(
-      take(1),
       switchMap(([params, tenant]) => {
         if (!tenant) {
           return of({
@@ -96,10 +96,12 @@ export class ProductsAllPage {
         const max_price = params['max_price'] ? +params['max_price'] : undefined;
         const q = params['q'] || undefined;
 
-        // Sync local signals with URL params (useful for direct URL access)
+        // Sync local signals with URL params (useful for direct URL access and reactive updates)
         if (this.searchQuery() !== (q || '')) this.searchQuery.set(q || '');
-        if (this.minPriceInput() === null && min_price) this.minPriceInput.set(min_price);
-        if (this.maxPriceInput() === null && max_price) this.maxPriceInput.set(max_price);
+        const minP = min_price ?? null;
+        if (this.minPriceInput() !== minP) this.minPriceInput.set(minP);
+        const maxP = max_price ?? null;
+        if (this.maxPriceInput() !== maxP) this.maxPriceInput.set(maxP);
 
         return this.productService.getData({
           _page: currentPage,

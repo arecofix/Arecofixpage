@@ -7,9 +7,9 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { combineLatest, map, switchMap, Subject, of, take } from 'rxjs';
+import { combineLatest, map, switchMap, Subject, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { rxResource, toObservable } from '@angular/core/rxjs-interop';
+import { rxResource, toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { TenantService } from '@app/core/services/tenant.service';
 
@@ -75,7 +75,8 @@ export class ProductsFeaturedPage {
   constructor() {
     this.searchSubject.pipe(
       debounceTime(400),
-      distinctUntilChanged()
+      distinctUntilChanged(),
+      takeUntilDestroyed()
     ).subscribe(q => {
       this.updateQueryParams({ q: q || null, _page: 1 });
     });
@@ -116,7 +117,6 @@ export class ProductsFeaturedPage {
         this.route.queryParams,
         this.tenant$
       ]).pipe(
-        take(1),
         switchMap(([slug, params, tenant]) => {
            if (!tenant) {
              return of({
