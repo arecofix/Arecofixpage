@@ -478,6 +478,7 @@
         ) || window.location.hostname.endsWith(".local");
       var isNonMarketingRoute =
         window.location.pathname.includes("/admin") ||
+        window.location.pathname.includes("/dashboard") ||
         window.location.pathname.includes("/login") ||
         window.location.pathname.includes("/auth");
       if (!isLocalDev && !isNonMarketingRoute) {

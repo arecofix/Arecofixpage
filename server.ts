@@ -245,7 +245,10 @@ export function app(): express.Express {
         }
         res.send(html);
       })
-      .catch((err) => next(err));
+      .catch((err) => {
+        console.error('[SSR Render Error] Falling back to client-side rendering for URL:', fullUrl, err?.message || err);
+        res.sendFile(join(browserDistFolder, 'index.html'));
+      });
   });
 
   return server;
