@@ -225,7 +225,7 @@
                                     <div class="space-y-2">
                                         <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Color Principal (Marca)</label>
                                         <div class="flex gap-4 items-center p-2 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-                                            <input type="color" [ngModel]="sanitizeColor(currentForm().branding_settings?.primary_color)" (ngModelChange)="onPrimaryColorChange($event)" class="h-10 w-10 rounded-lg cursor-pointer bg-transparent border-none">
+                                            <input type="color" [value]="sanitizeColor(currentForm().branding_settings?.primary_color)" (input)="onPrimaryColorChange($any($event.target).value)" class="h-10 w-10 rounded-lg cursor-pointer bg-transparent border-none">
                                             <span class="font-mono font-bold text-slate-600">{{ currentForm().branding_settings?.primary_color || '#0d9488' }}</span>
                                         </div>
                                     </div>
