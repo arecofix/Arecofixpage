@@ -12,7 +12,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { combineLatest, map, switchMap, of, take } from 'rxjs';
+import { combineLatest, map, switchMap, of } from 'rxjs';
 import { rxResource, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { Location, NgOptimizedImage, CommonModule, DecimalPipe, isPlatformBrowser } from '@angular/common';
 import { environment } from '@env/environment';
@@ -419,7 +419,6 @@ export class ProductsDetailsPage {
    */
   categoryRs = rxResource({
     stream: () => toObservable(this.product, { injector: this.injector }).pipe(
-      take(1),
       switchMap(product => {
         if (!product?.category_id) return of(null);
         return combineLatest({

@@ -90,21 +90,40 @@
           if (!isNoise(a)) _log.apply(console, a);
         };
 
-        // Immediately unregister stale service workers when debugging on local host
-        if (
-          ["localhost", "127.0.0.1", "0.0.0.0"].includes(
-            window.location.hostname,
-          ) &&
-          "serviceWorker" in navigator
-        ) {
-          navigator.serviceWorker
-            .getRegistrations()
-            .then(function (regs) {
+        // Immediately unregister stale service workers (localhost or legacy v=2 with restrictive cached CSP)
+        if ("serviceWorker" in navigator) {
+          if (["localhost", "127.0.0.1", "0.0.0.0"].includes(window.location.hostname)) {
+            navigator.serviceWorker.getRegistrations().then(function (regs) {
               for (var i = 0; i < regs.length; i++) {
                 regs[i].unregister();
               }
-            })
-            .catch(function () {});
+            }).catch(function () {});
+          } else if (!sessionStorage.getItem("sw_migrated_v3")) {
+            navigator.serviceWorker.getRegistrations().then(function (regs) {
+              var needsPurge = false;
+              for (var i = 0; i < regs.length; i++) {
+                var scriptURL = (regs[i].active && regs[i].active.scriptURL) || "";
+                if (scriptURL.includes("v=2") || (scriptURL.includes("ngsw-worker.js") && !scriptURL.includes("v=3"))) {
+                  needsPurge = true;
+                  regs[i].unregister();
+                }
+              }
+              if (needsPurge) {
+                sessionStorage.setItem("sw_migrated_v3", "1");
+                if ("caches" in window) {
+                  caches.keys().then(function (names) {
+                    Promise.all(names.map(function (n) { return caches.delete(n); })).then(function () {
+                      window.location.reload();
+                    });
+                  });
+                } else {
+                  window.location.reload();
+                }
+              } else {
+                sessionStorage.setItem("sw_migrated_v3", "1");
+              }
+            }).catch(function () {});
+          }
         }
 
         // Catch-all for browser-level logs that might not go through console.warn/error directly

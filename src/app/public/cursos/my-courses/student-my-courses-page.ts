@@ -147,6 +147,7 @@ import { firstValueFrom } from 'rxjs';
                             [src]="course.image_url"
                             [alt]="course.title"
                             class="w-full h-full object-cover"
+                            (error)="onImgError($event)"
                           />
                         } @else {
                           <div
@@ -459,5 +460,13 @@ export class StudentMyCoursesPage implements OnInit {
         this.toastService.show('Error al iniciar suscripción', 'error');
       }
     });
+  }
+
+  /** Fallback graceful cuando una imagen del CDN falla al cargar */
+  onImgError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    if (img && !img.src.includes('assets/img/branding/inicio.jpg')) {
+      img.src = 'assets/img/branding/inicio.jpg';
+    }
   }
 }

@@ -189,9 +189,9 @@ export const appConfig: ApplicationConfig = {
         authInterceptor,
       ]),
     ),
-    provideServiceWorker('ngsw-worker.js?v=2', {
+    provideServiceWorker('ngsw-worker.js?v=3', {
       enabled: !isDevMode() && !isTauri,
-      registrationStrategy: 'registerWhenStable:30000',
+      registrationStrategy: 'registerImmediately',
     }),
 
     // Repositories

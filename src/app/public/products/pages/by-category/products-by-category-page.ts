@@ -8,9 +8,9 @@ import {
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { combineLatest, map, switchMap, of, tap, Subject, firstValueFrom, take } from 'rxjs';
+import { combineLatest, map, switchMap, of, tap, Subject, firstValueFrom } from 'rxjs';
 import { debounceTime, distinctUntilChanged, catchError } from 'rxjs/operators';
-import { rxResource, toObservable } from '@angular/core/rxjs-interop';
+import { rxResource, toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SeoService } from '@app/core/services/seo.service';
 import { TenantService } from '@app/core/services/tenant.service';
 
@@ -76,7 +76,6 @@ export class ProductsByCategoryPage {
 
   categoriesListRs = rxResource({
     stream: () => this.tenant$.pipe(
-      take(1),
       switchMap(tenant => {
         if (!tenant) return of({ first: 1, prev: null, next: null, last: 1, pages: 1, items: 0, data: [] });
         return this.categoryService.getFeaturedData();
@@ -159,17 +158,22 @@ export class ProductsByCategoryPage {
   constructor() {
     this.searchSubject.pipe(
       debounceTime(400),
-      distinctUntilChanged()
+      distinctUntilChanged(),
+      takeUntilDestroyed()
     ).subscribe(q => {
       this.updateQueryParams({ q: q || null, _page: 1 });
     });
 
     // Subscribe to route changes to sync signals
     this.routeParams$.pipe(
+      takeUntilDestroyed(),
       tap(([slugPath, queryParams]) => {
-        if (this.searchQuery() !== (queryParams['q'] || '')) this.searchQuery.set(queryParams['q'] || '');
-        if (this.minPriceInput() === null && queryParams['min_price']) this.minPriceInput.set(+queryParams['min_price']);
-        if (this.maxPriceInput() === null && queryParams['max_price']) this.maxPriceInput.set(+queryParams['max_price']);
+        const q = queryParams['q'] || '';
+        if (this.searchQuery() !== q) this.searchQuery.set(q);
+        const minP = queryParams['min_price'] ? +queryParams['min_price'] : null;
+        if (this.minPriceInput() !== minP) this.minPriceInput.set(minP);
+        const maxP = queryParams['max_price'] ? +queryParams['max_price'] : null;
+        if (this.maxPriceInput() !== maxP) this.maxPriceInput.set(maxP);
       })
     ).subscribe();
   }
@@ -177,7 +181,6 @@ export class ProductsByCategoryPage {
   productsRs = rxResource({
     stream: () =>
       combineLatest([this.routeParams$, this.tenant$]).pipe(
-        take(1),
         switchMap(([routeParams, tenant]) => {
           const [slugPath, queryParams] = routeParams;
           
