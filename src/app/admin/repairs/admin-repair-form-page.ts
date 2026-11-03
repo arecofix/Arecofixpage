@@ -267,6 +267,10 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
 
   readonly TAX_RATE = 0.21;
   searchQuery = signal('');
+  manualPartName = signal('');
+  manualPartPrice = signal<number>(0);
+  manualPartCost = signal<number>(0);
+  manualPartStock = signal<number>(1);
   parts = signal<
     RepairPart[]
   >([]);
@@ -284,6 +288,7 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
   // This will be triggered whenever searchQuery changes from UI
   onSearchChange(query: string) {
     this.searchQuery.set(query);
+    this.manualPartName.set(query);
     this.productSearch$.next(query);
   }
 
@@ -295,16 +300,17 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
         distinctUntilChanged(),
         switchMap((query) => {
           const q = query.trim();
+          const effectiveBranchId = this.branchService.getCurrentBranchId() || this.branchService.currentBranchId() || undefined;
           if (!q) {
             return from(
-              this.productService.getProductsPaginated({ _per_page: 20 }),
+              this.productService.getProductsPaginated({ _per_page: 20, branch_id: effectiveBranchId }),
             );
           }
           if (q.length < 2) return of({ data: [] });
 
           this.searchingProducts.set(true);
           return from(
-            this.productService.getProductsPaginated({ q, _per_page: 20 }),
+            this.productService.getProductsPaginated({ q, _per_page: 20, branch_id: effectiveBranchId }),
           ).pipe(
             catchError((err) => {
               console.error('Error searching products', err);
@@ -608,7 +614,10 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
   }
 
   async addManualProduct() {
-    const manualName = this.searchQuery().trim() || 'Repuesto Genérico';
+    const manualName = this.manualPartName().trim() || this.searchQuery().trim() || 'Repuesto Genérico';
+    const price = Math.max(0, Number(this.manualPartPrice()) || 0);
+    const cost = Math.max(0, Number(this.manualPartCost()) || 0);
+    const stock = Math.max(1, Number(this.manualPartStock()) || 1);
     this.saving.set(true);
 
     try {
@@ -619,9 +628,9 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
       const genericProduct: Product = {
         id: newId,
         name: manualName,
-        price: 0,
-        stock: 9999, // Ensures it's not disabled
-        cost_price: 0,
+        price: price,
+        stock: stock,
+        cost_price: cost,
         is_active: true,
         is_global: false,
         sku: '',
@@ -638,6 +647,10 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
       this.addPart(genericProduct);
       this.showProductModal.set(false);
       this.searchQuery.set('');
+      this.manualPartName.set('');
+      this.manualPartPrice.set(0);
+      this.manualPartCost.set(0);
+      this.manualPartStock.set(1);
     } catch (error) {
       console.error('Error creating manual product:', error);
       this.notificationService.showError(
@@ -646,6 +659,42 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     } finally {
       this.saving.set(false);
     }
+  }
+
+  updatePartPrice(index: number, newPrice: number | string) {
+    const price = Math.max(0, Number(newPrice) || 0);
+    this.parts.update((parts) => {
+      const updated = [...parts];
+      if (updated[index]) {
+        updated[index] = { ...updated[index], unit_price_at_time: price };
+      }
+      return updated;
+    });
+    this.calculateFinalCost();
+  }
+
+  updatePartQuantity(index: number, newQty: number | string) {
+    const qty = Math.max(1, Math.floor(Number(newQty) || 1));
+    this.parts.update((parts) => {
+      const updated = [...parts];
+      if (updated[index]) {
+        updated[index] = { ...updated[index], quantity: qty };
+      }
+      return updated;
+    });
+    this.calculateFinalCost();
+  }
+
+  updatePartCost(index: number, newCost: number | string) {
+    const cost = Math.max(0, Number(newCost) || 0);
+    this.parts.update((parts) => {
+      const updated = [...parts];
+      if (updated[index]) {
+        updated[index] = { ...updated[index], cost_price: cost, cost_at_time: cost };
+      }
+      return updated;
+    });
+    this.calculateFinalCost();
   }
 
   removePart(index: number) {

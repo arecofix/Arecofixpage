@@ -178,6 +178,52 @@ describe('ProductMapper', () => {
       expect(product.condition).toBe('Usado');
       expect(product.warranty_type).toBe('Vendedor');
     });
+
+    it('should return specific branch stock when branchId is provided and entry exists', () => {
+      const row: Record<string, unknown> = {
+        id: 'prod-branch-1',
+        name: 'Repuesto Test',
+        price: 1000,
+        stock: 50,
+        branch_stock: [
+          { branch_id: 'branch-A', quantity: 7 },
+          { branch_id: 'branch-B', quantity: 12 }
+        ]
+      };
+
+      const product = ProductMapper.mapFromDb(row, 'branch-A');
+      expect(product.stock).toBe(7);
+    });
+
+    it('should return 0 stock when branchId is provided but product only has stock in another branch', () => {
+      const row: Record<string, unknown> = {
+        id: 'prod-branch-2',
+        name: 'Repuesto Otra Sucursal',
+        price: 1000,
+        stock: 19998,
+        branch_stock: [
+          { branch_id: 'branch-B', quantity: 19998 }
+        ]
+      };
+
+      const product = ProductMapper.mapFromDb(row, 'branch-A');
+      expect(product.stock).toBe(0);
+    });
+
+    it('should return 0 stock when branchId is provided for a product belonging to another branch', () => {
+      const row: Record<string, unknown> = {
+        id: 'prod-branch-3',
+        name: 'Repuesto Local Sucursal B',
+        price: 1000,
+        stock: 9999,
+        branch_id: 'branch-B',
+        is_global: false,
+        branch_stock: []
+      };
+
+      const product = ProductMapper.mapFromDb(row, 'branch-A');
+      expect(product.stock).toBe(0);
+    });
   });
 
   describe('mapUpdateToDb - Safe Partial Updates', () => {

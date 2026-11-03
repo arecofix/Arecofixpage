@@ -88,8 +88,8 @@ export class ProductMapper {
       const specificBranch = branchStockList.find((b: Record<string, unknown>) => b['branch_id'] === branchId);
       if (specificBranch) {
         displayedStock = Number(specificBranch['quantity']);
-      } else if (p['stock'] !== undefined && p['stock'] !== null) {
-        displayedStock = Number(p['stock']);
+      } else if (branchStockList.length === 0 && (p['is_global'] || !p['branch_id'] || p['branch_id'] === branchId)) {
+        displayedStock = Number(p['stock'] || 0);
       } else {
         displayedStock = 0;
       }

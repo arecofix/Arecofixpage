@@ -22,6 +22,7 @@ describe('SupabaseProductRepository', () => {
       in: jest.fn().mockReturnThis(),
       order: jest.fn().mockReturnThis(),
       range: jest.fn().mockReturnThis(),
+      or: jest.fn().mockReturnThis(),
       then: jest.fn((resolve) => resolve({ data: [], count: 0, error: null }))
     };
 
@@ -139,6 +140,19 @@ describe('SupabaseProductRepository', () => {
       expect(selectArg).not.toContain('description');
       expect(selectArg).toContain('price');
       expect(selectArg).toContain('name');
+      done();
+    });
+  });
+
+  it('findWithFilters() should filter by branch isolation when branch_id is provided', (done) => {
+    mockQueryBuilder.then = jest.fn((resolve) =>
+      resolve({ data: [], count: 0, error: null })
+    );
+
+    repository.findWithFilters({ branch_id: 'branch-xyz' }).subscribe(() => {
+      expect(mockQueryBuilder.or).toHaveBeenCalledWith(
+        'is_global.eq.true,branch_id.eq.branch-xyz,branch_id.is.null'
+      );
       done();
     });
   });

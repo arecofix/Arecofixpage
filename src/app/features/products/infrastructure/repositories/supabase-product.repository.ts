@@ -104,6 +104,10 @@ export class SupabaseProductRepository extends BaseRepository<Product> implement
       
     let query = this.applyTenantFilter(baseQuery);
 
+    if (branch_id) {
+      query = query.or(`is_global.eq.true,branch_id.eq.${branch_id},branch_id.is.null`);
+    }
+
     if (params.is_active !== undefined) {
       query = query.eq('is_active', params.is_active);
     } else if (!params.include_inactive) {

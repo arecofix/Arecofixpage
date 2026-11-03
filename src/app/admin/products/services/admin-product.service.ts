@@ -98,10 +98,11 @@ export class AdminProductService {
         const isGlobalAdmin = this.auth.isSuperAdmin() || (profile?.role as string) === 'tenant_owner' || (profile?.role as string) === ROLES.TENANT_OWNER;
         const isCentralBranch = contextBranchId === TENANT_CONSTANTS.DEFAULT_BRANCH_ID || !contextBranchId;
 
+        const targetBranchId = params.branch_id || contextBranchId;
         const enrichedParams = {
             ...params,
             include_inactive: params.include_inactive ?? true,
-            branch_id: (isGlobalAdmin && isCentralBranch) ? undefined : (params.branch_id || contextBranchId)
+            branch_id: (isGlobalAdmin && isCentralBranch && !params.branch_id) ? undefined : targetBranchId
         };
         return firstValueFrom(this.productsStore.getProductsPage(enrichedParams));
     }
@@ -202,7 +203,7 @@ export class AdminProductService {
             if (createdProduct && createdProduct.id && branchId && initialStock !== undefined) {
                 await this.stockService.updateStock(createdProduct.id, branchId, initialStock);
                 if (initialStock > 0) {
-                    await this.stockHistoryService.adjustStock(createdProduct.id, initialStock, 'restock', undefined, branchId);
+                    await this.stockHistoryService.recordMovement(createdProduct.id, initialStock, 0, initialStock, 'initial_stock', undefined, branchId);
                 }
             }
             
