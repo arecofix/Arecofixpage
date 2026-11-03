@@ -780,6 +780,44 @@ body.accessibility-sidebar-open app-ai-chatbot {
   display: none !important;
 }
 
+/* FASE 1 (MOBILE FIX): Limitar tamaño de SVGs internos y checkmarks de WAW */
+#waw-widget svg,
+#waw-widget .waw-check-icon,
+#waw-widget [class*="check"] {
+  max-width: 24px !important;
+  max-height: 24px !important;
+  width: auto !important;
+  height: auto !important;
+  display: inline-block !important;
+}
+
+#waw-widget .opcion__status svg,
+.waw .opcion__status svg {
+  width: 10px !important;
+  height: 10px !important;
+  max-width: 10px !important;
+  max-height: 10px !important;
+  display: block !important;
+}
+
+/* FASE 1 (MOBILE FIX): Desaparición forzada del overlay si el panel está inactivo */
+body:not(.waw-panel-open) #waw-backdrop-overlay,
+body:not(.waw-panel-open) .waw-overlay,
+body:not(.waw-panel-open) .waw-custom-backdrop {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+/* Touch Target Size (WCAG 2.5.8) */
+.footer-link,
+a.footer-link {
+  min-height: 24px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+
 
 
 

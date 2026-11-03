@@ -44,6 +44,9 @@
 
 /* Enlaces del footer */
 .footer-link {
+  min-height: 1.5rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
