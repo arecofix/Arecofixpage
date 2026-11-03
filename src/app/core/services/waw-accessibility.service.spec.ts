@@ -188,6 +188,39 @@ describe('WawAccessibilityService', () => {
       widget.remove();
     });
 
+    it('FASE 2: setupCloseButtonListener debe remover waw-panel-open, ocultar overlay y restaurar inert al hacer clic en #close-button', async () => {
+      await service.init();
+
+      const widget = document.createElement('aside');
+      widget.id = 'waw-widget';
+      widget.classList.add('open');
+
+      const closeBtn = document.createElement('button');
+      closeBtn.id = 'close-button';
+      widget.appendChild(closeBtn);
+      document.body.appendChild(widget);
+
+      const overlay = document.createElement('div');
+      overlay.id = 'waw-backdrop-overlay';
+      overlay.classList.add('visible');
+      document.body.appendChild(overlay);
+
+      document.body.classList.add('waw-panel-open');
+      service.isWawOpen.set(true);
+
+      (service as any).setupCloseButtonListener();
+
+      closeBtn.click();
+
+      expect(document.body.classList.contains('waw-panel-open')).toBe(false);
+      expect(overlay.classList.contains('visible')).toBe(false);
+      expect(widget.hasAttribute('inert')).toBe(true);
+      expect(service.isWawOpen()).toBe(false);
+
+      widget.remove();
+      overlay.remove();
+    });
+
     it('reset() debe limpiar DOM, botones active, localStorage y restablecer Signals', async () => {
       await service.init();
 

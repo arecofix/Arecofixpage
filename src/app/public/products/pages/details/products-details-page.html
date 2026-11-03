@@ -280,7 +280,20 @@
                  }
                </div>
     
-               <!-- Removido: Policy Justification Blocks por redundancia -->
+               <!-- Compartir producto -->
+               <div class="mt-6 pt-6 border-t border-gray-100 dark:border-gray-800">
+                 <div class="flex items-center justify-between mb-3">
+                   <span class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                     Compartir este producto
+                   </span>
+                 </div>
+                 <app-share-buttons 
+                   variant="inline" 
+                   [title]="item.name" 
+                   [text]="'Mirá este producto en Arecofix: ' + item.name" 
+                   [showLabels]="false">
+                 </app-share-buttons>
+               </div>
 
                <!-- WhatsApp Expert Support (Mobile Only) -->
                <div class="mt-8 text-center pt-6 border-t border-gray-100 dark:border-gray-800 lg:hidden block">

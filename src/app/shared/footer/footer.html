@@ -57,25 +57,25 @@
           </h3>
           <ul class="space-y-1.5 sm:space-y-2.5 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
             <li>
-              <a routerLink="/privacy" class="footer-link">
+              <a routerLink="/privacy" class="footer-link min-h-[24px] py-1">
                 <i class="fa-solid fa-angle-right text-[10px] text-gray-400"></i>
                 <span>Privacidad</span>
               </a>
             </li>
             <li>
-              <a routerLink="/terms" class="footer-link">
+              <a routerLink="/terms" class="footer-link min-h-[24px] py-1">
                 <i class="fa-solid fa-angle-right text-[10px] text-gray-400"></i>
                 <span>Términos y Condiciones</span>
               </a>
             </li>
             <li>
-              <a routerLink="/nosotros" class="footer-link">
+              <a routerLink="/nosotros" class="footer-link min-h-[24px] py-1">
                 <i class="fa-solid fa-angle-right text-[10px] text-gray-400"></i>
                 <span>Preguntas Frecuentes</span>
               </a>
             </li>
             <li>
-              <a routerLink="/productos" class="footer-link">
+              <a routerLink="/productos" class="footer-link min-h-[24px] py-1">
                 <i class="fa-solid fa-angle-right text-[10px] text-gray-400"></i>
                 <span>Productos</span>
               </a>
@@ -96,14 +96,14 @@
             <li class="flex items-center gap-2.5">
               <i class="fa-solid fa-phone text-indigo-500 shrink-0" aria-hidden="true"></i>
               <a [href]="'https://wa.me/' + whatsappNumber" target="_blank" rel="noopener noreferrer"
-                 class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors focus-visible:outline-hidden focus-visible:underline">
+                 class="min-h-[24px] inline-flex items-center hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors focus-visible:outline-hidden focus-visible:underline">
                 +{{ whatsappNumber }}
               </a>
             </li>
             <li class="flex items-center gap-2.5">
               <i class="fa-solid fa-envelope text-indigo-500 shrink-0" aria-hidden="true"></i>
               <a href="mailto:info@arecofix.com.ar"
-                 class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors focus-visible:outline-hidden focus-visible:underline">
+                 class="min-h-[24px] inline-flex items-center hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors focus-visible:outline-hidden focus-visible:underline">
                 info@arecofix.com.ar
               </a>
             </li>
@@ -125,10 +125,10 @@
       </p>
       <div class="flex items-center gap-5">
         <button (click)="openAccessibilityMenu($event)" type="button"
-                class="hover:text-indigo-600 dark:hover:text-indigo-400 inline-flex items-center gap-1.5 focus-visible:outline-hidden focus-visible:underline cursor-pointer">
+                class="hover:text-indigo-600 dark:hover:text-indigo-400 inline-flex items-center gap-1.5 focus-visible:outline-hidden focus-visible:underline cursor-pointer min-h-[24px] py-1">
           <i class="fa-solid fa-universal-access" aria-hidden="true"></i> Accesibilidad
         </button>
-        <a routerLink="/sitemap" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors focus-visible:outline-hidden focus-visible:underline">
+        <a routerLink="/sitemap" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors focus-visible:outline-hidden focus-visible:underline min-h-[24px] inline-flex items-center py-1">
           Mapa del sitio
         </a>
       </div>

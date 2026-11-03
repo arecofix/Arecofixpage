@@ -32,4 +32,22 @@ describe('Home Hero CTA & Mobile Layout E2E', () => {
     cy.contains('a', /Descubrir cómo pueden ayudarme/i).click();
     cy.url().should('include', '/portfolio');
   });
+
+  it('debería mostrar el botón flotante para compartir y responder al teclado (Escape)', () => {
+    cy.viewport(1280, 720);
+    cy.visit('/');
+
+    // 1. Debe existir el componente flotante
+    cy.get('app-share-buttons').should('exist');
+    cy.get('app-share-buttons button[aria-label="Abrir opciones para compartir"]').should('be.visible').as('fabTrigger');
+
+    // 2. Al hacer clic, debe desplegar las opciones de redes
+    cy.get('@fabTrigger').click();
+    cy.get('app-share-buttons button[aria-label="Compartir en WhatsApp"]').should('be.visible');
+    cy.get('app-share-buttons button[aria-label="Copiar enlace al portapapeles"]').should('be.visible');
+
+    // 3. Al presionar Escape, debe cerrarse
+    cy.get('body').type('{esc}');
+    cy.get('app-share-buttons button[aria-label="Compartir en WhatsApp"]').should('not.exist');
+  });
 });

@@ -84,6 +84,7 @@ export class WawAccessibilityService {
         this.isInitialized = true;
 
         this.registerKeyboardListener();
+        this.setupCloseButtonListener();
         this.setupStateObserver();
         this.syncStates();
       } catch (err) {
@@ -92,6 +93,35 @@ export class WawAccessibilityService {
     })();
 
     return this.initPromise;
+  }
+
+  /**
+   * FASE 2: Listener directo al botón nativo de cierre ('X') de WAW (#close-button)
+   * Garantiza la remoción inmediata de waw-panel-open y la restauración de inert sin clics extras
+   */
+  private setupCloseButtonListener(): void {
+    if (typeof document === 'undefined') return;
+
+    const closeBtn = document.getElementById('close-button');
+    const widget = document.getElementById('waw-widget');
+
+    if (closeBtn) {
+      this.renderer.listen(closeBtn, 'click', () => {
+        if (document.body) {
+          this.renderer.removeClass(document.body, 'waw-panel-open');
+        }
+        if (widget) {
+          this.renderer.removeClass(widget, 'open');
+          this.renderer.setAttribute(widget, 'inert', '');
+        }
+        const overlay = document.getElementById('waw-backdrop-overlay');
+        if (overlay) {
+          this.renderer.removeClass(overlay, 'visible');
+        }
+        this.isWawOpen.set(false);
+        this.syncStates();
+      });
+    }
   }
 
   /**
@@ -264,7 +294,18 @@ export class WawAccessibilityService {
     const open = widget?.classList.contains('open') ?? (this.instance?.widget_open ?? false);
     this.isWawOpen.set(open);
     if (document.body) {
-      document.body.classList.toggle('waw-panel-open', open);
+      if (open) {
+        this.renderer.addClass(document.body, 'waw-panel-open');
+      } else {
+        this.renderer.removeClass(document.body, 'waw-panel-open');
+      }
+    }
+    const overlay = document.getElementById('waw-backdrop-overlay');
+    if (overlay && !open) {
+      this.renderer.removeClass(overlay, 'visible');
+    }
+    if (widget && !open && !widget.hasAttribute('inert')) {
+      this.renderer.setAttribute(widget, 'inert', '');
     }
   }
 
