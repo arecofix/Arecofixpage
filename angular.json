@@ -72,7 +72,8 @@
               "html2canvas",
               "fflate",
               "dompurify",
-              "canvg"
+              "canvg",
+              "hammerjs"
             ],
             "serviceWorker": "src/ngsw-config.json"
           },
