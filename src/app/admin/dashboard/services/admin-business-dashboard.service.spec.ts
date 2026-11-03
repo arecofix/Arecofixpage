@@ -182,6 +182,41 @@ describe('AdminBusinessDashboardService', () => {
     }, 10);
   });
 
+  it('should normalize and aggregate common repair issues into canonical categories', (done) => {
+    const mockAnalytics = {
+      top_products: [],
+      customer_analytics: { total_customers: 0, repeat_customers: 0, repeat_purchase_rate: 0, top_customers: [] },
+      repair_analytics: {
+        by_brand: [],
+        by_model: [],
+        common_issues: [
+          { issue: 'Modulo', count: 8 },
+          { issue: 'Cambio de modulo', count: 5 },
+          { issue: 'cambio de modulo', count: 2 },
+          { issue: 'Cambio de bateria', count: 2 },
+          { issue: 'Cambio de pin de carga', count: 2 }
+        ]
+      }
+    };
+
+    service.getAnalytics('month').subscribe((res) => {
+      expect(res.success).toBe(true);
+      const issues = res.data?.repair_analytics.common_issues;
+      expect(issues).toEqual([
+        { issue: 'Cambio de módulo', count: 15 },
+        { issue: 'Cambio de batería', count: 2 },
+        { issue: 'Cambio de pin de carga', count: 2 }
+      ]);
+      done();
+    });
+
+    setTimeout(() => {
+      const req = httpMock.expectOne((r) => r.url.includes('/api/admin/dashboard/analytics?range=month'));
+      expect(req.request.method).toBe('GET');
+      req.flush({ success: true, data: mockAnalytics });
+    }, 10);
+  });
+
   it('should fetch database health metrics successfully', (done) => {
     const mockHealth = {
       status: 'healthy',

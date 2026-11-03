@@ -3,10 +3,12 @@ import {
   input,
   output,
   model,
+  computed,
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { CANONICAL_REPAIR_CATEGORIES, getCanonicalRepairCategory } from '@app/shared/utils/repair-category.utils';
 
 @Component({
   selector: 'app-repair-device-section',
@@ -305,6 +307,18 @@ import { FormsModule } from '@angular/forms';
   `,
 })
 export class RepairDeviceSectionComponent {
+  canonicalCategories = CANONICAL_REPAIR_CATEGORIES;
+  detectedCategory = computed(() => getCanonicalRepairCategory(this.issueDescription()));
+
+  selectSuggestedCategory(cat: string) {
+    const current = (this.issueDescription() || '').trim();
+    if (!current) {
+      this.onIssueDescriptionChange.emit(cat);
+    } else if (!current.toLowerCase().includes(cat.toLowerCase())) {
+      this.onIssueDescriptionChange.emit(`${cat} - ${current}`);
+    }
+  }
+
   brands = input<{ id: string; name: string }[]>([]);
   brandId = input<string | null>(null);
   deviceModel = input.required<string>();

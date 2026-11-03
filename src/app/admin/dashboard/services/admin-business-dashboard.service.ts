@@ -1,11 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of, from } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 import { TenantService } from '@app/core/services/tenant.service';
 import { AuthService } from '@app/core/services/auth.service';
 import { SupabaseClient } from '@supabase/supabase-js';
+import { aggregateIssuesByCanonicalCategory } from '@app/shared/utils/repair-category.utils';
 
 export interface DashboardMetricsPeriod {
   range: 'today' | '7days' | 'month' | 'year' | 'custom';
@@ -285,6 +286,16 @@ export class AdminBusinessDashboardService {
     };
   }
 
+  private normalizeAnalyticsData(data?: BusinessAnalyticsData): BusinessAnalyticsData | undefined {
+    if (!data) return data;
+    if (data.repair_analytics?.common_issues) {
+      data.repair_analytics.common_issues = aggregateIssuesByCanonicalCategory(
+        data.repair_analytics.common_issues
+      );
+    }
+    return data;
+  }
+
   getAnalytics(range: string = 'month', branchId?: string): Observable<AnalyticsResponse> {
     const headers = this.buildHeaders();
     let params = `?range=${encodeURIComponent(range)}`;
@@ -292,6 +303,12 @@ export class AdminBusinessDashboardService {
       params += `&branch_id=${encodeURIComponent(branchId)}`;
     }
     return this.http.get<AnalyticsResponse>(`/api/admin/dashboard/analytics${params}`, { headers }).pipe(
+      map((res) => {
+        if (res?.data) {
+          this.normalizeAnalyticsData(res.data);
+        }
+        return res;
+      }),
       catchError((err) => {
         if (this.supabase) {
           return from(this.fetchAnalyticsViaRpc(range, branchId)).pipe(
@@ -352,9 +369,11 @@ export class AdminBusinessDashboardService {
       throw error;
     }
 
+    const typedData = data as unknown as BusinessAnalyticsData;
+    this.normalizeAnalyticsData(typedData);
     return {
       success: true,
-      data: data as unknown as BusinessAnalyticsData
+      data: typedData
     };
   }
 

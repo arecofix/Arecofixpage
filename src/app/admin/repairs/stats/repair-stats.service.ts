@@ -11,14 +11,18 @@ export interface RepairStatsDto {
     ticket_promedio: number;
     total_reparaciones: number;
     reparaciones_vidrio: number;
+    reparaciones_vidrio_global: number;
     ingreso_extra_vidrio: number;
+    ingreso_extra_vidrio_global: number;
     equipos_recibidos: number;
     equipos_entregados: number;
+    equipos_entregados_global: number;
     garantias_efectivas: number;
     equipos_espera: number;
     devoluciones_cantidad: number;
     devoluciones_monto: number;
     venta_total_global: number;
+    venta_total_periodo: number;
     monthly_data: {
         mes: string;
         label: string;
@@ -73,12 +77,12 @@ export class RepairStatsService {
 
         if (repairsError) throw repairsError;
 
-        // 2. Fetch orders
+        // 2. Fetch orders across valid sales statuses
         let ordersQuery = supabase
             .from('orders')
             .select('total_amount, created_at')
             .eq('tenant_id', tenantId)
-            .in('status', ['paid', 'completed', 'shipped', 'paid']);
+            .in('status', ['paid', 'completed', 'shipped', 'delivered']);
 
         if (branchId) {
             ordersQuery = ordersQuery.eq('branch_id', branchId);
@@ -87,12 +91,18 @@ export class RepairStatsService {
         const { data: orders } = await ordersQuery;
 
         // 3. Process calculations
+        // Period-specific accumulators
         let total_facturado = 0;
         let spare_part_costs = 0;
         let reparaciones_vidrio = 0;
         let equipos_entregados = 0;
         let equipos_espera = 0;
         let garantias_efectivas = 0;
+
+        // Global (All-time) accumulators for consolidated metrics
+        let global_facturado_taller = 0;
+        let global_equipos_entregados = 0;
+        let global_reparaciones_vidrio = 0;
 
         const monthlyMap = new Map<string, { ingreso: number, costo: number }>();
         const now = new Date();
@@ -143,11 +153,16 @@ export class RepairStatsService {
                 }
             }
 
-            // Solo contabilizamos ingreso cuando la reparación está facturada (Lista o Entregada)
+            // Solo contabilizamos ingreso cuando la reparación está facturada (Lista [5] o Entregada [6])
             if (statusId === 5 || statusId === 6) {
                 const pIngreso = Number(r.final_cost || 0);
                 monthlyMap.get(revenuePeriod)!.ingreso += pIngreso;
 
+                // Acumulado Histórico Global
+                global_facturado_taller += pIngreso;
+                if (statusId === 6) global_equipos_entregados++;
+
+                // Acumulado Filtrado por Período
                 if (isPeriodMatch(revenueDate)) {
                     total_facturado += pIngreso;
                     if (statusId === 6) equipos_entregados++;
@@ -158,11 +173,21 @@ export class RepairStatsService {
                 if (isPeriodMatch(r.created_at || new Date().toISOString())) equipos_espera++;
             }
             
-            if (r.glass_upsell && isPeriodMatch(r.created_at || new Date().toISOString())) reparaciones_vidrio++;
+            if (r.glass_upsell) {
+                global_reparaciones_vidrio++;
+                if (isPeriodMatch(r.created_at || new Date().toISOString())) {
+                    reparaciones_vidrio++;
+                }
+            }
         }
 
+        // Global orders revenue (all-time)
+        const allOrdersRevenue = (orders || []).reduce((acc: number, o: any) => acc + Number(o.total_amount || 0), 0);
+
+        // Period orders revenue
         const filteredOrders = (orders || []).filter((o: any) => isPeriodMatch(o.created_at));
-        const total_orders_revenue = filteredOrders.reduce((acc: number, o: any) => acc + Number(o.total_amount), 0);
+        const total_orders_revenue = filteredOrders.reduce((acc: number, o: any) => acc + Number(o.total_amount || 0), 0);
+
         const total_reparaciones = (allRepairs || []).filter((r: any) => {
             const sId = Number(r.current_status_id);
             return isPeriodMatch(r.completed_at || r.created_at || new Date().toISOString()) && (sId === 6 || sId === 5);
@@ -193,14 +218,18 @@ export class RepairStatsService {
             ticket_promedio: total_reparaciones > 0 ? total_facturado / total_reparaciones : 0,
             total_reparaciones,
             reparaciones_vidrio,
+            reparaciones_vidrio_global: global_reparaciones_vidrio,
             ingreso_extra_vidrio: reparaciones_vidrio * 2500,
+            ingreso_extra_vidrio_global: global_reparaciones_vidrio * 2500,
             equipos_recibidos,
             equipos_entregados,
+            equipos_entregados_global: global_equipos_entregados,
             garantias_efectivas,
             equipos_espera,
             devoluciones_cantidad: 0,
             devoluciones_monto: 0,
-            venta_total_global: total_facturado + total_orders_revenue,
+            venta_total_global: global_facturado_taller + allOrdersRevenue,
+            venta_total_periodo: total_facturado + total_orders_revenue,
             monthly_data: monthly_data.slice(0, 6) // Últimos 6 meses
         };
     }

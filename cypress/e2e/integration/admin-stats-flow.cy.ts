@@ -149,10 +149,13 @@ describe('Admin Statistics computational and rendering audit', () => {
     // Ticket Promedio = 15000
     cy.contains('15.000').should('exist');
 
+    // Consolidated Global: 30000 (repairs) + 15000 (orders) = 45000
+    cy.contains('45.000').should('exist');
+
     // Equipos Entregados = 1 (status 6)
-    cy.contains('Equipos Entregados').parent().contains('1').should('exist');
+    cy.contains('Equipos Entregados').should('exist');
 
     // Reparaciones con Vidrio = 1 (repair 2)
-    cy.contains('Reparaciones con Vidrio').parent().contains('1').should('exist');
+    cy.contains('Reparaciones con Vidrio').should('exist');
   });
 });

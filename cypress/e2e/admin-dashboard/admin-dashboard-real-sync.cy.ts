@@ -397,7 +397,8 @@ describe('Admin Business Dashboard E2E: Sincronización con Datos Reales y Audit
         cy.contains('a 02s').should('be.visible');
       });
       cy.get('#list-common-issues').within(() => {
-        cy.contains('Modulo').should('be.visible');
+        cy.contains('Cambio de módulo').should('be.visible');
+        cy.contains('11 casos').should('be.visible');
       });
     });
 

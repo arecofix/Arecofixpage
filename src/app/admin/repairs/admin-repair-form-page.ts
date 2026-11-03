@@ -57,6 +57,7 @@ import { RepairWorkflowService } from '@app/features/repairs/application/service
 import { RepairCalculatorService } from '@app/features/repairs/application/services/repair-calculator.service';
 import { SupabaseService } from '@app/core/services/supabase.service';
 import { OfflineSyncService } from '@app/core/services/offline-sync.service';
+import { CANONICAL_REPAIR_CATEGORIES, getCanonicalRepairCategory } from '@app/shared/utils/repair-category.utils';
 
 import { Product } from '@app/features/products/domain/entities/product.entity';
 import { UserProfile } from '@app/shared/interfaces/user.interface';
@@ -354,6 +355,8 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
   }
 
   saving = signal<boolean>(false);
+  canonicalCategories = CANONICAL_REPAIR_CATEGORIES;
+  detectedIssueCategory = signal<string | null>(null);
   private lastSelectedClientName = '';
   error = signal<string | null>(null);
   loading = signal<boolean>(true);
@@ -450,6 +453,13 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
         if (statusId === RepairStatus.CANCELLED || statusId === 7) {
           this.repairForm.patchValue({ warranty: '' }, { emitEvent: false });
         }
+      });
+// Listen to issue_description changes to update detected category in real-time
+    this.repairForm
+      .get('issue_description')
+      ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((issue) => {
+        this.detectedIssueCategory.set(issue?.trim() ? getCanonicalRepairCategory(issue) : null);
       });
   }
 
@@ -1127,6 +1137,16 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
 
   saveShortcuts() {
     localStorage.setItem('arecofix_repair_shortcuts', JSON.stringify(this.shortcuts()));
+  }
+
+  selectSuggestedIssue(category: string) {
+    const current = (this.repairForm.get('issue_description')?.value || '').trim();
+    if (!current) {
+      this.repairForm.patchValue({ issue_description: category });
+    } else if (!current.toLowerCase().includes(category.toLowerCase())) {
+      this.repairForm.patchValue({ issue_description: `${category} - ${current}` });
+    }
+    this.repairForm.get('issue_description')?.markAsDirty();
   }
 
   applyShortcut() {

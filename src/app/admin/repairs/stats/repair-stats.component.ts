@@ -94,10 +94,9 @@ import { BranchService } from '@app/core/services/branch.service';
           >
             <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
             <div class="flex justify-between items-start mb-4">
-              <div
-                class="text-[10px] font-black tracking-widest uppercase text-gray-500 dark:text-gray-400"
-              >
-                Ingresos Totales (Taller)
+              <div class="text-[10px] font-black tracking-widest uppercase text-gray-500 dark:text-gray-400 flex items-center justify-between">
+                <span>Ingresos Totales (Taller)</span>
+                <span class="badge badge-xs font-bold text-[9px] bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">{{ currentPeriodLabel() }}</span>
               </div>
               <div
                 class="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 flex items-center justify-center"
@@ -111,7 +110,7 @@ import { BranchService } from '@app/core/services/branch.service';
               {{ formatARS(s.total_facturado) }}
             </div>
             <div class="text-xs text-gray-500 mt-2 font-medium">
-              Equipos cobrados en caja
+              Equipos cobrados en caja · {{ currentPeriodLabel() }}
             </div>
           </div>
 
@@ -121,10 +120,9 @@ import { BranchService } from '@app/core/services/branch.service';
           >
             <div class="absolute top-0 left-0 w-1 h-full bg-rose-500"></div>
             <div class="flex justify-between items-start mb-4">
-              <div
-                class="text-[10px] font-black tracking-widest uppercase text-gray-500 dark:text-gray-400"
-              >
-                Costo Insumos
+              <div class="text-[10px] font-black tracking-widest uppercase text-gray-500 dark:text-gray-400 flex items-center justify-between">
+                <span>Costo Insumos</span>
+                <span class="badge badge-xs font-bold text-[9px] bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300">{{ currentPeriodLabel() }}</span>
               </div>
               <div
                 class="w-8 h-8 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 flex items-center justify-center"
@@ -136,7 +134,7 @@ import { BranchService } from '@app/core/services/branch.service';
               -{{ formatARS(s.spare_part_costs) }}
             </div>
             <div class="text-xs text-gray-500 mt-2 font-medium">
-              Inversión en repuestos utilizados
+              Inversión en repuestos utilizados · {{ currentPeriodLabel() }}
             </div>
           </div>
 
@@ -146,16 +144,17 @@ import { BranchService } from '@app/core/services/branch.service';
           >
             <div class="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
             <div class="flex justify-between items-start mb-4">
-              <div
-                class="text-[10px] font-black tracking-widest uppercase text-gray-400 flex items-center gap-1"
-              >
-                Ganancia Real (Técnica)
-                <div
-                  class="tooltip tooltip-info"
-                  data-tip="Lógica validada: Solo servicio técnico"
-                >
-                  <i class="fas fa-info-circle text-indigo-400 cursor-help"></i>
+              <div class="text-[10px] font-black tracking-widest uppercase text-gray-400 flex items-center justify-between">
+                <div class="flex items-center gap-1">
+                  <span>Ganancia Real (Técnica)</span>
+                  <div
+                    class="tooltip tooltip-info"
+                    data-tip="Lógica validada: Solo servicio técnico"
+                  >
+                    <i class="fas fa-info-circle text-indigo-400 cursor-help"></i>
+                  </div>
                 </div>
+                <span class="badge badge-xs font-bold text-[9px] bg-emerald-500/20 text-emerald-300">{{ currentPeriodLabel() }}</span>
               </div>
               <div
                 class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center"
@@ -185,10 +184,9 @@ import { BranchService } from '@app/core/services/branch.service';
           >
             <div class="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
             <div class="flex justify-between items-start mb-4">
-              <div
-                class="text-[10px] font-black tracking-widest uppercase text-gray-500 dark:text-gray-400"
-              >
-                Ticket Promedio
+              <div class="text-[10px] font-black tracking-widest uppercase text-gray-500 dark:text-gray-400 flex items-center justify-between">
+                <span>Ticket Promedio</span>
+                <span class="badge badge-xs font-bold text-[9px] bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300">{{ currentPeriodLabel() }}</span>
               </div>
               <div
                 class="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-500/10 text-purple-600 flex items-center justify-center"
@@ -202,7 +200,7 @@ import { BranchService } from '@app/core/services/branch.service';
               {{ formatARS(s.ticket_promedio) }}
             </div>
             <div class="text-xs text-gray-500 mt-2 font-medium">
-              Sobre {{ s.total_reparaciones }} reparaciones finalizadas
+              Sobre {{ s.total_reparaciones }} reparaciones finalizadas en {{ currentPeriodLabel() }}
             </div>
           </div>
         </div>
@@ -215,14 +213,16 @@ import { BranchService } from '@app/core/services/branch.service';
             class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4"
           >
             <div>
-              <h3
-                class="text-lg font-black text-gray-900 dark:text-white flex items-center gap-2"
-              >
-                <i class="fas fa-chart-bar text-indigo-500"></i> Rendimiento
-                Mensual
-              </h3>
-              <p class="text-xs text-gray-500">
-                Comparativa histórica de ingresos vs. costos operativos
+              <div class="flex items-center gap-2">
+                <h3 class="text-lg font-black text-gray-900 dark:text-white flex items-center gap-2">
+                  <i class="fas fa-chart-bar text-indigo-500"></i> Rendimiento Mensual
+                </h3>
+                <span class="badge badge-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 font-bold text-[10px] border-none">
+                  <i class="fas fa-history mr-1 text-[9px]"></i> Histórico Fijo (Últimos 6 Meses)
+                </span>
+              </div>
+              <p class="text-xs text-gray-500 mt-0.5">
+                Comparativa histórica de ingresos vs. costos operativos (independiente del filtro)
               </p>
             </div>
             <div
@@ -320,49 +320,65 @@ import { BranchService } from '@app/core/services/branch.service';
         <!-- Panel Secundario (Venta Global & Upsell) -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div
-            class="bg-indigo-600 dark:bg-indigo-900 rounded-3xl p-8 text-white relative overflow-hidden group"
+            class="bg-indigo-600 dark:bg-indigo-900 rounded-3xl p-8 text-white relative overflow-hidden group shadow-xl"
           >
             <div
               class="absolute -right-10 -bottom-10 w-48 h-48 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"
             ></div>
             <div class="relative z-10">
-              <div
-                class="text-[10px] font-black uppercase tracking-widest text-indigo-200 mb-2"
-              >
-                Ingresos Consolidados (Global)
+              <div class="flex items-center justify-between mb-2">
+                <div
+                  class="text-[10px] font-black uppercase tracking-widest text-indigo-200"
+                >
+                  Ingresos Consolidados (Global)
+                </div>
+                <span class="badge badge-sm bg-white/20 text-white font-bold text-[9px] border-none">
+                  ACUMULADO HISTÓRICO
+                </span>
               </div>
-              <h3 class="text-4xl font-black mb-2">
+              <h3 class="text-4xl font-black mb-2 tracking-tight">
                 {{ formatARS(s.venta_total_global) }}
               </h3>
               <p class="text-xs text-indigo-100 font-medium">
-                Facturación sumada de Taller + Tienda Online
+                Facturación histórica sumada de Taller + Tienda Online
               </p>
+              <div class="text-[11px] text-indigo-200 font-medium mt-2 bg-white/10 inline-block px-2.5 py-1 rounded-lg">
+                Facturación {{ currentPeriodLabel() }}: <strong>{{ formatARS(s.venta_total_periodo) }}</strong>
+              </div>
 
-              <div class="mt-8 flex items-center gap-10">
+              <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6 pt-6 border-t border-indigo-400/30">
                 <div>
                   <div
-                    class="text-[10px] font-black uppercase text-indigo-300 mb-1"
+                    class="text-[10px] font-black uppercase text-indigo-300 mb-1 flex items-center gap-1.5"
                   >
-                    Equipos Entregados
+                    <span>Equipos Entregados</span>
+                    <span class="text-indigo-200 font-semibold text-[9px] opacity-80">({{ currentPeriodLabel() }})</span>
                   </div>
                   <div class="text-2xl font-black">
                     {{ s.equipos_entregados }}
                   </div>
+                  <div class="text-[10px] text-indigo-200/90 font-medium mt-1">
+                    Histórico total: <strong>{{ s.equipos_entregados_global }}</strong>
+                  </div>
                 </div>
                 <div>
                   <div
-                    class="text-[10px] font-black uppercase text-indigo-300 mb-1"
+                    class="text-[10px] font-black uppercase text-indigo-300 mb-1 flex items-center gap-1.5"
                   >
-                    Reparaciones con Vidrio
+                    <span>Reparaciones con Vidrio</span>
+                    <span class="text-indigo-200 font-semibold text-[9px] opacity-80">({{ currentPeriodLabel() }})</span>
                   </div>
                   <div class="text-2xl font-black">
                     {{ s.reparaciones_vidrio }}
-                    <span class="text-xs text-indigo-400 ml-1"
+                    <span class="text-xs text-indigo-300 font-bold ml-1"
                       >+{{
                         s.ingreso_extra_vidrio
                           | currency: 'ARS' : 'symbol' : '1.0-0'
                       }}</span
                     >
+                  </div>
+                  <div class="text-[10px] text-indigo-200/90 font-medium mt-1">
+                    Histórico: <strong>{{ s.reparaciones_vidrio_global }}</strong> (+{{ s.ingreso_extra_vidrio_global | currency: 'ARS' : 'symbol' : '1.0-0' }})
                   </div>
                 </div>
               </div>
@@ -373,11 +389,13 @@ import { BranchService } from '@app/core/services/branch.service';
           <div
             class="bg-white dark:bg-gray-800 rounded-3xl p-6 shadow-sm border border-gray-100 dark:border-gray-700"
           >
-            <h3
-              class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest mb-6 flex items-center gap-2"
-            >
-              <i class="fas fa-history text-indigo-600"></i> Historial de
-              Rentabilidad
+            <h3 class="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest mb-6 flex items-center justify-between">
+              <span class="flex items-center gap-2">
+                <i class="fas fa-history text-indigo-600"></i> Historial de Rentabilidad
+              </span>
+              <span class="badge badge-sm bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 font-bold text-[10px] border-none normal-case">
+                Últimos 6 Meses
+              </span>
             </h3>
             <div class="overflow-x-auto">
               <table class="w-full text-left">
@@ -447,6 +465,24 @@ export class AdminRepairStatsComponent implements OnInit {
   loading = signal(true);
   error = signal<string | null>(null);
   downloadingCsv = signal(false);
+
+  currentPeriodLabel = computed(() => {
+    const p = this.period();
+    const now = new Date();
+    const monthNames = [
+      'Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun',
+      'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'
+    ];
+    if (p === 'this_month') {
+      return `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+    }
+    if (p === 'last_month') {
+      const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      return `${monthNames[prev.getMonth()]} ${prev.getFullYear()}`;
+    }
+    return 'Histórico';
+  });
+
 
   // Computed to find the maximum value among all months to scale the chart bars relatively
   maxMonthlyValue = computed(() => {
