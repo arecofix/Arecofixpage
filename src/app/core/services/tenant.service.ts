@@ -125,7 +125,7 @@ export class TenantService {
       // Force the correct tenant ID for the main site to restore public functionality.
       if (hostname === 'arecofix.com.ar' || hostname === 'www.arecofix.com.ar' || hostname === 'localhost') {
         const { data: realData } = await this.supabase
-          .from('tenants')
+          .from('public_tenant_profile')
           .select('*')
           .eq('id', 'bba26ccd-59ce-471c-aac0-4c1f5513de3b')
           .single();
@@ -140,7 +140,7 @@ export class TenantService {
       // 👇 EQUIVALENTE A POSTMAN (PETICIÓN GET):
       // GET https://<TU_SUPABASE_URL>/rest/v1/tenants?select=*&custom_domain=eq.<hostname>&is_active=eq.true
       let { data, error } = await this.supabase
-        .from('tenants')
+        .from('public_tenant_profile')
         .select('*')
         .eq('custom_domain', hostname)
         .eq('is_active', true)
@@ -168,7 +168,7 @@ export class TenantService {
 
         // console.debug(`Searching for tenant by slug: ${slugToSearch}`);
         const { data: slugData, error: slugError } = await this.supabase
-          .from('tenants')
+          .from('public_tenant_profile')
           .select('*')
           .eq('slug', slugToSearch)
           .eq('is_active', true)
@@ -185,7 +185,7 @@ export class TenantService {
             this.logger.warn(`No tenant found for slug: ${slugToSearch}. Using fallback.`);
             // 3. Fallback de Seguridad / Desarrollo:
             const { data: fallbackData, error: fallbackError } = await this.supabase
-                .from('tenants')
+                .from('public_tenant_profile')
                 .select('*')
                 .limit(1)
                 .maybeSingle();
@@ -339,7 +339,7 @@ export class TenantService {
     if (this._currentTenant()?.id === tenantId) return;
 
     const { data, error } = await this.supabase
-      .from('tenants')
+      .from('public_tenant_profile')
       .select('*')
       .eq('id', tenantId)
       .maybeSingle();
@@ -354,7 +354,7 @@ export class TenantService {
    */
   async getTenantBySlug(slug: string): Promise<Tenant | null> {
     const { data, error } = await this.supabase
-      .from('tenants')
+      .from('public_tenant_profile')
       .select('*')
       .eq('slug', slug)
       .eq('is_active', true)
