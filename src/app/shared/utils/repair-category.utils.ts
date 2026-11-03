@@ -209,3 +209,4 @@ export function aggregateIssuesByCanonicalCategory(
     .sort((a, b) => b.count - a.count)
     .slice(0, limit);
 }
+

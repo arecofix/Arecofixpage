@@ -117,3 +117,4 @@ describe('AdminRepairStatsComponent', () => {
     expect(component.formatCompact(500)).toBe('$500');
   });
 });
+
