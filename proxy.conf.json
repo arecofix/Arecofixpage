@@ -1,0 +1,8 @@
+{
+  "/api": {
+    "target": "https://arecofix.com.ar",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}

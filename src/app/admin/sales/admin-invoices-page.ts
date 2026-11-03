@@ -2,13 +2,13 @@ import {
   Component,
   inject,
   OnInit,
+  OnDestroy,
   signal,
-  computed,
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { TranslationService } from '@app/core/services/translation.service';
 import { InvoiceService } from '@app/features/sales/application/invoice.service';
@@ -16,51 +16,41 @@ import { NotificationService } from '@app/core/services/notification.service';
 import { LoggerService } from '@app/core/services/logger.service';
 import {
   Invoice,
-  InvoiceItem,
-  InvoiceType,
+  CreateInvoiceDto,
+  InvoiceStatus,
 } from '@app/features/sales/domain/entities/invoice.entity';
-
-/** Reactive form model for the manual invoice modal */
-interface ManualInvoiceForm {
-  customerName: string;
-  customerEmail: string;
-  type: InvoiceType;
-  discount: number;
-  notes: string;
-  items: ManualItemRow[];
-}
-
-interface ManualItemRow {
-  description: string;
-  quantity: number;
-  unit_price: number;
-  tax_rate: number; // 0 = exento, 0.105 = 10.5%, 0.21 = 21%
-}
-
-const DEFAULT_ITEM: ManualItemRow = {
-  description: '',
-  quantity: 1,
-  unit_price: 0,
-  tax_rate: 0.21,
-};
+import { InvoicePdfExportService } from '@app/features/sales/application/services/invoice-pdf-export.service';
+import { CompanyService } from '@app/core/services/company.service';
+import { InvoiceFormModalComponent } from './components/invoice-form-modal/invoice-form-modal.component';
+import { ArcaEmitterData } from '@app/features/sales/domain/entities/arca.entity';
+import { AdminLayout } from '@app/admin/layout/admin-layout';
 
 @Component({
   selector: 'app-admin-invoices-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, InvoiceFormModalComponent],
   templateUrl: './admin-invoices-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AdminInvoicesPage implements OnInit {
+export class AdminInvoicesPage implements OnInit, OnDestroy {
   public t = inject(TranslationService).t;
   private invoiceService = inject(InvoiceService);
+  private pdfExportService = inject(InvoicePdfExportService);
+  private companyService = inject(CompanyService);
   private notificationService = inject(NotificationService);
   private logger = inject(LoggerService);
+  private route = inject(ActivatedRoute);
+  private adminLayout = inject(AdminLayout, { optional: true });
+  private wasMenuOpenBeforeModal = false;
 
   // ── Page State ──────────────────────────────────────────────────────────────
   invoices = signal<Invoice[]>([]);
   loading = signal(true);
   saving = signal(false);
+
+  // ── Draft Counter & Filter State ────────────────────────────────────────────
+  pendingDraftCount = signal<number>(0);
+  selectedStatusFilter = signal<'all' | 'draft' | 'issued'>('all');
 
   // ── Pagination & Search State ───────────────────────────────────────────────
   searchTerm = signal('');
@@ -72,32 +62,36 @@ export class AdminInvoicesPage implements OnInit {
 
   // ── Modal State ─────────────────────────────────────────────────────────────
   isModalOpen = signal(false);
-  form = signal<ManualInvoiceForm>({
-    customerName: '',
-    customerEmail: '',
-    type: 'B',
-    discount: 0,
-    notes: '',
-    items: [{ ...DEFAULT_ITEM }],
-  });
-
-  // ── Computed Totals (live preview in the modal) ─────────────────────────────
-  formTotals = computed(() => {
-    const f = this.form();
-    return this.invoiceService.calculateTotals(f.items, f.discount);
-  });
 
   // ── Lifecycle ───────────────────────────────────────────────────────────────
   async ngOnInit() {
-    this.search$.pipe(
-      debounceTime(400),
-      distinctUntilChanged()
-    ).subscribe(term => {
-      this.searchTerm.set(term);
-      this.loadInvoices();
-    });
+    const queryStatus = this.route.snapshot.queryParams['status'];
+    if (queryStatus === 'draft') {
+      this.selectedStatusFilter.set('draft');
+    }
 
-    await this.loadInvoices();
+    this.search$
+      .pipe(debounceTime(400), distinctUntilChanged())
+      .subscribe((term) => {
+        this.searchTerm.set(term);
+        this.loadInvoices();
+      });
+
+    await Promise.all([this.loadInvoices(), this.loadDraftCount()]);
+  }
+
+  async loadDraftCount() {
+    try {
+      const count = await this.invoiceService.getDraftCount();
+      this.pendingDraftCount.set(count);
+    } catch (e) {
+      this.logger.error('Failed to load draft count', e);
+    }
+  }
+
+  setStatusFilter(filter: 'all' | 'draft' | 'issued') {
+    this.selectedStatusFilter.set(filter);
+    this.loadInvoices();
   }
 
   async loadInvoices(append = false) {
@@ -110,18 +104,23 @@ export class AdminInvoicesPage implements OnInit {
     }
 
     try {
+      const filter = this.selectedStatusFilter();
+      const statusParam: InvoiceStatus | undefined =
+        filter === 'draft' ? 'draft' : filter === 'issued' ? 'issued' : undefined;
+
       const data = await this.invoiceService.getAll(
         this.pageSize(),
         this.pageOffset(),
-        this.searchTerm()
+        this.searchTerm(),
+        statusParam
       );
-      
+
       if (append) {
         this.invoices.set([...this.invoices(), ...data]);
       } else {
         this.invoices.set(data);
       }
-      
+
       this.hasMore.set(data.length === this.pageSize());
     } catch (e) {
       this.notificationService.showError('Error al cargar comprobantes');
@@ -134,7 +133,7 @@ export class AdminInvoicesPage implements OnInit {
 
   loadMore() {
     if (this.loading() || this.loadingMore() || !this.hasMore()) return;
-    this.pageOffset.update(v => v + this.pageSize());
+    this.pageOffset.update((v) => v + this.pageSize());
     this.loadInvoices(true);
   }
 
@@ -144,126 +143,111 @@ export class AdminInvoicesPage implements OnInit {
 
   // ── Modal Controls ──────────────────────────────────────────────────────────
   openModal() {
-    this.form.set({
-      customerName: '',
-      customerEmail: '',
-      type: 'B',
-      discount: 0,
-      notes: '',
-      items: [{ ...DEFAULT_ITEM }],
-    });
-    
+    if (this.adminLayout) {
+      this.wasMenuOpenBeforeModal = this.adminLayout.isMainMenuOpen();
+      this.adminLayout.isMainMenuOpen.set(false);
+    }
+    if (typeof document !== 'undefined') {
+      const drawerCheckbox = document.getElementById('admin-drawer') as HTMLInputElement | null;
+      if (drawerCheckbox?.checked) {
+        drawerCheckbox.checked = false;
+      }
+    }
     this.isModalOpen.set(true);
   }
 
   closeModal() {
     this.isModalOpen.set(false);
-  }
-
-  // ── Line Item Helpers ───────────────────────────────────────────────────────
-  addItem() {
-    this.form.update(f => ({
-      ...f,
-      items: [...f.items, { ...DEFAULT_ITEM }],
-    }));
-  }
-
-  removeItem(index: number) {
-    this.form.update(f => ({
-      ...f,
-      items: f.items.filter((_, i) => i !== index),
-    }));
-  }
-
-  updateItem(index: number, field: keyof ManualItemRow, value: any) {
-    this.form.update(f => {
-      const items = f.items.map((item, i) =>
-        i === index ? { ...item, [field]: value } : item
-      );
-      return { ...f, items };
-    });
-  }
-
-  updateField<K extends keyof ManualInvoiceForm>(key: K, value: ManualInvoiceForm[K]) {
-    this.form.update(f => ({ ...f, [key]: value }));
-  }
-
-  // ── Submit ──────────────────────────────────────────────────────────────────
-  async submitManualInvoice() {
-    const f = this.form();
-
-    if (f.items.length === 0) {
-      this.notificationService.showWarning('Agregá al menos un ítem a la factura.');
-      return;
+    if (this.adminLayout && this.wasMenuOpenBeforeModal) {
+      this.adminLayout.isMainMenuOpen.set(true);
     }
+  }
 
-    const hasEmptyDesc = f.items.some(i => !i.description.trim());
-    if (hasEmptyDesc) {
-      this.notificationService.showWarning('Completá la descripción de todos los ítems.');
-      return;
+  ngOnDestroy() {
+    this.search$.complete();
+    if (this.adminLayout && this.wasMenuOpenBeforeModal && this.isModalOpen()) {
+      this.adminLayout.isMainMenuOpen.set(true);
     }
+  }
 
+  async onInvoiceCreated(dto: CreateInvoiceDto) {
+    await this.handleSaveInvoice(dto);
+  }
+
+  async handleSaveInvoice(dto: CreateInvoiceDto) {
     this.saving.set(true);
-    this.logger.debug('Starting manual invoice generation', f);
-
     try {
-      // Build InvoiceItems using the service helper (single formula)
-      const items: InvoiceItem[] = f.items.map(row =>
-        this.invoiceService.buildItem(
-          row.description,
-          row.quantity,
-          row.unit_price,
-          row.tax_rate
-        )
-      );
-
-      const { subtotal, taxAmount, total } = this.invoiceService.calculateTotals(
-        f.items,
-        f.discount
-      );
-
-      this.logger.debug('Calculated totals', { subtotal, taxAmount, total });
-
-      const result = await this.invoiceService.generateInvoice({
-        customer_name:  f.customerName || 'Consumidor Final',
-        customer_email: f.customerEmail || undefined,
-        type:           f.type,
-        origin:         'manual',
-        subtotal,
-        tax_amount:     taxAmount,
-        discount:       f.discount,
-        total_amount:   total,
-        items,
-        notes:          f.notes || undefined,
-      });
-
-      this.logger.debug('GenerateInvoice result', result);
-
-      if (result.error) {
-        this.logger.warn('Service returned error', result.error);
-        this.notificationService.showError('Error al generar la factura: ' + (result.error.message || 'Error desconocido'));
-        return;
+      const result = await this.invoiceService.generateInvoice(dto);
+      if (result.duplicate) {
+        this.notificationService.showInfo('Comprobante duplicado omitido');
+      } else if (result.error) {
+        this.notificationService.showError('Error al guardar comprobante');
+      } else {
+        this.notificationService.showSuccess('Comprobante generado con éxito');
+        this.closeModal();
+        await Promise.all([this.loadInvoices(), this.loadDraftCount()]);
       }
-
-      this.notificationService.showSuccess('✅ Factura manual generada correctamente.');
-      this.closeModal();
-      await this.loadInvoices(); // Refresh list
-    } catch (error: any) {
-      this.logger.error('Catastrophic error in submitManualInvoice', error);
-      this.notificationService.showError('Ocurrió un error inesperado al procesar la factura.');
+    } catch (e) {
+      this.notificationService.showError('Error al crear la factura');
+      this.logger.error('Error saving invoice', e);
     } finally {
       this.saving.set(false);
     }
   }
 
-  /** Track function for @for loops */
-  trackByIndex = (i: number) => i;
+  async downloadInvoicePdf(invoice: Invoice, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    await this.handleDownloadPdf(invoice);
+  }
 
-  /** Tax rate display labels */
-  taxLabels: Record<number, string> = {
-    0:     'Exento (0%)',
-    0.105: 'IVA 10.5%',
-    0.21:  'IVA 21%',
-  };
+  async shareInvoice(invoice: Invoice, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+    try {
+      this.notificationService.showInfo('Generando comprobante para compartir...');
+      const emitter = await this.getEmitterData();
+      const details = await this.invoiceService.getInvoiceWithDetails(invoice.id);
+      const res = await this.pdfExportService.shareOrDownload(invoice, emitter, details.items);
+      if (res.shared) {
+        this.notificationService.showSuccess('Comprobante compartido con éxito.');
+      } else if (res.downloaded) {
+        this.notificationService.showSuccess('Comprobante descargado en tu dispositivo.');
+      }
+    } catch (e) {
+      this.logger.error('Error sharing invoice', e);
+      this.notificationService.showError('No se pudo compartir la factura.');
+    }
+  }
+
+  async handleDownloadPdf(invoice: Invoice) {
+    try {
+      this.notificationService.showInfo('Generando PDF oficial...');
+      const emitter = await this.getEmitterData();
+      const details = await this.invoiceService.getInvoiceWithDetails(invoice.id);
+      await this.pdfExportService.downloadPdf(invoice, emitter, details.items);
+      this.notificationService.showSuccess('PDF descargado con éxito.');
+    } catch (e) {
+      this.logger.error('PDF download failed', e);
+      this.notificationService.showError('No se pudo generar el PDF.');
+    }
+  }
+
+  private async getEmitterData(): Promise<ArcaEmitterData> {
+    const c = await this.companyService.getSettings();
+    return {
+      businessName: c?.name || 'ARECOFIX SERVICIOS INTEGRALES',
+      cuit: c?.tax_id || '30-71649281-9',
+      commercialAddress: c?.address || c?.location || 'Buenos Aires, Argentina',
+      vatCondition: (c as any)?.vat_condition || 'IVA Responsable Inscripto',
+      iibb: (c as any)?.iibb || c?.tax_id || '30-71649281-9',
+      activityStartDate: (c as any)?.activity_start_date || '01/03/2021',
+      pointOfSale: (c as any)?.point_of_sale || '00004',
+      phone: c?.phone || '',
+      email: c?.email || '',
+      logoUrl: c?.logo_url || '',
+    };
+  }
 }
-

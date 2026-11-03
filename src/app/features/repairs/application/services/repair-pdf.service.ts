@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Repair, RepairStatus } from '../../domain/entities/repair.entity';
+import { formatPrice } from '@app/shared/utils/price-formatter.util';
 
 @Injectable({
   providedIn: 'root'
@@ -59,7 +60,8 @@ export class RepairPdfService {
     doc.setFontSize(8);
     const contactY = logoBase64 ? 18 : 16;
     doc.text(company?.address || company?.location || 'Dirección de la Sucursal', 10, contactY);
-    doc.text(`Tel: ${company?.phone || company?.contact_phone || 'Sin Teléfono'}`, 80, contactY); // side-by-side to save space
+    doc.text(`Tel: ${company?.phone || company?.contact_phone || 'Sin Teléfono'}`, 80, contactY);
+    doc.text(`CUIT: ${company?.cuit || 'N/A'}`, 10, contactY + 4);
 
     // Ticket Info (Right side)
     doc.setFontSize(12);
@@ -97,34 +99,45 @@ export class RepairPdfService {
     doc.setFontSize(7);
     doc.text(`Seguridad - PIN: ${repair.security_pin || 'Ninguno'} | Patrón: ${repair.security_pattern || 'Ninguno'} | Passcode: ${repair.device_passcode || 'No'}`, 13, 52);
     
-    const chk = repair.checklist;
+    const chk = repair.checklist as any;
     if (chk) {
       doc.text(`Accesorios: [${chk.charger ? 'X' : ' '}] Cargador  [${chk.battery ? 'X' : ' '}] Batería  [${chk.chip ? 'X' : ' '}] Chip  [${chk.sd ? 'X' : ' '}] SD  [${chk.case ? 'X' : ' '}] Funda`, 13, 57);
+      if (chk.physical_condition) {
+        doc.text(`Estado físico al ingresar: ${chk.physical_condition}`, 13, 61);
+      }
     }
 
     // Reason / Fault
     doc.setFontSize(9);
-    doc.text('Motivo de Ingreso / Falla Reportada', 10, 65);
+    doc.text('Motivo de Ingreso / Falla Reportada', 10, 68);
     doc.setFontSize(8);
     // Limit to fewer lines
     const splitDescription = doc.splitTextToSize(repair.issue_description || 'Sin detalles.', 190);
-    doc.text(splitDescription, 10, 70);
+    doc.text(splitDescription, 10, 73);
 
     // Table for Parts (Highly compressed)
-    const defaultTableY = 70 + (splitDescription.length * 3) + 2;
-    const tableData = (repair.parts || []).map(p => [
-      p.product_name || 'Repuesto',
-      p.quantity.toString(),
-      `$ ${p.unit_price_at_time.toLocaleString('es-AR')}`,
-      `$ ${(p.unit_price_at_time * p.quantity).toLocaleString('es-AR')}`
-    ]);
+    const defaultTableY = 73 + (splitDescription.length * 3) + 2;
+    let partsTotal = 0;
+    const tableData = (repair.parts || []).map(p => {
+      const sub = p.unit_price_at_time * p.quantity;
+      partsTotal += sub;
+      return [
+        p.product_name || 'Repuesto',
+        p.quantity.toString(),
+        formatPrice(p.unit_price_at_time, 'ARS'),
+        formatPrice(sub, 'ARS')
+      ];
+    });
 
-    if (repair.technical_labor_cost && repair.technical_labor_cost > 0) {
+    const total = repair.estimated_cost || repair.final_cost || 0;
+    const laborToDisplay = repair.technical_labor_cost || (total > partsTotal ? (total - partsTotal) : 0);
+
+    if (laborToDisplay > 0) {
       tableData.push([
-        'Mano de Obra Técnica', 
+        'Mano de Obra Técnica / Servicio Técnico', 
         '1', 
-        `$ ${repair.technical_labor_cost.toLocaleString('es-AR')}`, 
-        `$ ${repair.technical_labor_cost.toLocaleString('es-AR')}`
+        formatPrice(laborToDisplay, 'ARS'), 
+        formatPrice(laborToDisplay, 'ARS')
       ]);
     }
 
@@ -146,14 +159,14 @@ export class RepairPdfService {
 
     // Financial Totals
     doc.setFontSize(8);
-    doc.text(`Presupuesto Inicial Estimado: $ ${repair.estimated_cost?.toLocaleString('es-AR') || '0'}`, 120, finalY + 6);
-    doc.text(`Seña / Adelanto Pagado: $ ${repair.deposit_amount?.toLocaleString('es-AR') || '0'}`, 120, finalY + 11);
+    doc.text(`Presupuesto Inicial Estimado: ${formatPrice(repair.estimated_cost || 0, 'ARS')}`, 120, finalY + 6);
+    doc.text(`Seña / Adelanto Pagado: ${formatPrice(repair.deposit_amount || 0, 'ARS')}`, 120, finalY + 11);
     
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     const final_cost = repair.final_cost || 0;
     const deposit = repair.deposit_amount || 0;
-    doc.text(`RESTANTE A ABONAR: $ ${(final_cost - deposit).toLocaleString('es-AR')}`, 120, finalY + 18);
+    doc.text(`RESTANTE A ABONAR: ${formatPrice(final_cost - deposit, 'ARS')}`, 120, finalY + 18);
 
     // Signatures
     doc.setFontSize(7);
@@ -180,6 +193,154 @@ export class RepairPdfService {
 
     // Save PDF
     const fileName = `Arecofix_Orden_${repair.repair_number || 'S-N'}_${(repair.customer_name || 'Cliente').replace(/\s+/g, '_')}.pdf`;
+    doc.save(fileName);
+  }
+
+  private async initJsPdf(): Promise<any> {
+    const { jsPDF } = await import('jspdf') as any;
+    const { default: autoTable } = await import('jspdf-autotable') as any;
+    return { jsPDF, autoTable };
+  }
+
+  /**
+   * Generates and saves a formal PDF Quote (Presupuesto) for the client.
+   */
+  async generateQuotePdf(repair: Repair, company: any): Promise<void> {
+    const { jsPDF, autoTable } = await this.initJsPdf();
+    
+    // A4 format (210 x 297 mm)
+    const doc = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4'
+    });
+
+    const primaryColor = company?.branding_settings?.primary_color || '#16a34a';
+    const colorArray = this.hexToRgb(primaryColor);
+    
+    // Header Background
+    doc.setFillColor(...colorArray);
+    doc.rect(0, 0, 210, 35, 'F');
+
+    // Logo & Header Text
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(22);
+    doc.text('PRESUPUESTO FORMAL', 15, 20);
+    
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Fecha: ${new Date().toLocaleDateString('es-AR')}`, 150, 20);
+    doc.text(`Válido por 7 días`, 150, 26);
+
+    // Business info
+    doc.setTextColor(50, 50, 50);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text(company?.name || 'Arecofix - Centro de Servicios', 15, 50);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    const addressLine = company?.address ? `Dirección: ${company.address}` : 'Centro de Servicios';
+    doc.text(addressLine, 15, 56);
+    doc.text(`Teléfono: ${company?.phone || company?.contact_phone || 'No registrado'}`, 15, 62);
+    const emailStr = company?.email || company?.contact_email || 'No registrado';
+    doc.text(`Mail: ${emailStr}`, 15, 68);
+    if (company?.cuit || company?.tax_id) {
+       doc.text(`CUIT: ${company.cuit || company.tax_id}`, 15, 74);
+    }
+    
+    // Client Info Box
+    doc.setDrawColor(220, 220, 220);
+    doc.setFillColor(249, 250, 251);
+    doc.roundedRect(110, 45, 85, 34, 2, 2, 'FD');
+    doc.setFont('helvetica', 'bold');
+    doc.text('Presupuestado a:', 115, 52);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Cliente: ${repair.customer_name || 'Consumidor Final'}`, 115, 59);
+    doc.text(`Teléfono: ${repair.customer_phone || '-'}`, 115, 66);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Nro. de Presupuesto: ${repair.repair_number || repair.tracking_code}`, 115, 74);
+
+    // Device Info
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Información del Equipo:', 15, 85);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Equipo: ${repair.brand_name || ''} ${repair.device_model}`, 15, 92);
+    doc.text(`IMEI/Serie: ${repair.imei || 'Sin especificar'}`, 150, 92);
+    doc.text(`Falla reportada: ${repair.issue_description || 'No detallada'}`, 15, 99);
+    doc.text(`Tiempo estimado: 2 a 5 días hábiles`, 15, 106);
+
+    // Table of costs
+    const tableBody = [];
+    let partsTotal = 0;
+    
+    if (repair.parts && repair.parts.length > 0) {
+        repair.parts.forEach(p => {
+            const sub = (p.quantity * Number(p.unit_price_at_time || 0));
+            partsTotal += sub;
+            tableBody.push([
+                p.product_name || p.name || 'Repuesto', 
+                p.quantity.toString(), 
+                formatPrice(Number(p.unit_price_at_time || 0), 'ARS'),
+                formatPrice(sub, 'ARS')
+            ]);
+        });
+    }
+
+    const total = repair.estimated_cost || repair.final_cost || 0;
+    const laborToDisplay = repair.technical_labor_cost || (total > partsTotal ? (total - partsTotal) : 0);
+
+    if (laborToDisplay > 0) {
+        tableBody.push([
+            'Mano de obra técnica / Servicio Técnico',
+            '1',
+            formatPrice(Number(laborToDisplay), 'ARS'),
+            formatPrice(Number(laborToDisplay), 'ARS')
+        ]);
+    }
+
+    if (tableBody.length === 0) {
+        // Fallback si no hay desglose, usa costo estimado
+        tableBody.push([
+            'Reparación General (Diagnóstico/Presupuesto)',
+            '1',
+            formatPrice(Number(total), 'ARS'),
+            formatPrice(Number(total), 'ARS')
+        ]);
+    }
+
+    autoTable(doc, {
+      startY: 110,
+      head: [['Descripción', 'Cant.', 'Precio Unit.', 'Subtotal']],
+      body: tableBody,
+      headStyles: { fillColor: colorArray, textColor: [255, 255, 255] },
+      styles: { fontSize: 9 },
+      alternateRowStyles: { fillColor: [249, 250, 251] }
+    });
+
+    const finalY = (doc as any).lastAutoTable.finalY || 110;
+
+    // Totals Box
+    doc.setDrawColor(200, 200, 200);
+    doc.setFillColor(243, 244, 246);
+    doc.rect(120, finalY + 10, 75, 20, 'FD');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(12);
+    doc.text(`TOTAL PRESUPUESTO:`, 125, finalY + 18);
+    doc.setTextColor(...colorArray);
+    doc.text(`${formatPrice(total, 'ARS')}`, 125, finalY + 25);
+    
+    // Notes
+    doc.setTextColor(100, 100, 100);
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Los precios están expresados en Pesos Argentinos (ARS) y pueden variar sin previo aviso si el equipo presenta daños', 15, finalY + 40);
+    doc.text('no detectados durante el diagnóstico inicial.', 15, finalY + 44);
+
+    // Save
+    const fileName = `Presupuesto_${repair.repair_number || 'S-N'}_${(repair.customer_name || 'Cliente').replace(/\s+/g, '_')}.pdf`;
     doc.save(fileName);
   }
 

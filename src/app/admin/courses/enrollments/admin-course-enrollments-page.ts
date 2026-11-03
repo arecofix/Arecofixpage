@@ -9,29 +9,39 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import {
   CoursesService,
+  Course,
   StudentEnrollment,
 } from '@app/core/services/courses.service';
-import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 import { ToastService } from '@app/shared/services/toast.service';
+
+export interface SearchUserResult {
+  id: string;
+  email: string;
+  first_name?: string;
+  last_name?: string;
+  full_name?: string;
+  phone?: string;
+  avatar_url?: string;
+  role?: string;
+}
 
 @Component({
   selector: 'app-admin-course-enrollments-page',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './admin-course-enrollments-page.html',
 })
 export class AdminCourseEnrollmentsPage implements OnInit {
   private coursesService = inject(CoursesService);
-  private supabase = inject(SUPABASE_CLIENT);
   private toastService = inject(ToastService);
 
   enrollments = signal<StudentEnrollment[]>([]);
-  courses = signal<any[]>([]);
+  courses = signal<Course[]>([]);
 
   searchQuery = signal('');
-  searchResults = signal<any[]>([]);
-  selectedUser = signal<any>(null);
+  searchResults = signal<SearchUserResult[]>([]);
+  selectedUser = signal<SearchUserResult | null>(null);
   selectedCourseId = signal('');
   isEnrolling = signal(false);
   loading = signal(true);
@@ -65,10 +75,7 @@ export class AdminCourseEnrollmentsPage implements OnInit {
     if (!confirm('¿Estás seguro de eliminar esta solicitud de inscripción?'))
       return;
 
-    const { error } = await this.supabase
-      .from('course_enrollments')
-      .delete()
-      .eq('id', id);
+    const { error } = await this.coursesService.deleteEnrollment(id);
 
     if (error) {
       this.toastService.show('Error al eliminar inscripción', 'error');
@@ -80,10 +87,7 @@ export class AdminCourseEnrollmentsPage implements OnInit {
   }
 
   async markAsConfirmed(id: string) {
-    const { error } = await this.supabase
-      .from('course_enrollments')
-      .update({ status: 'confirmed' })
-      .eq('id', id);
+    const { error } = await this.coursesService.updateEnrollmentStatus(id, 'confirmed');
 
     if (error) {
       this.toastService.show('Error al actualizar estado', 'error');
@@ -100,11 +104,11 @@ export class AdminCourseEnrollmentsPage implements OnInit {
   searchUsers() {
     const query = this.searchQuery().trim();
     this.coursesService.searchUsersByEmail(query).subscribe((res) => {
-      this.searchResults.set(res.data || []);
+      this.searchResults.set((res.data || []) as SearchUserResult[]);
     });
   }
 
-  selectUser(user: any) {
+  selectUser(user: SearchUserResult) {
     this.selectedUser.set(user);
     this.searchResults.set([]);
     this.searchQuery.set('');
@@ -115,17 +119,17 @@ export class AdminCourseEnrollmentsPage implements OnInit {
   }
 
   async enrollUser() {
-    if (!this.selectedUser() || !this.selectedCourseId()) return;
-
-    this.isEnrolling.set(true);
     const user = this.selectedUser();
     const courseId = this.selectedCourseId();
+    if (!user || !courseId) return;
+
+    this.isEnrolling.set(true);
     const fullName =
       user.full_name ||
       `${user.first_name || ''} ${user.last_name || ''}`.trim() ||
       user.email;
 
-    const { data, error } = await this.coursesService.enrollStudentManually(
+    const { error } = await this.coursesService.enrollStudentManually(
       courseId,
       user.email,
       fullName,

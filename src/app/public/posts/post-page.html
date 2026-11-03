@@ -22,7 +22,7 @@
             <!-- 1. Hero Section + Problems Solved -->
             <div class="relative bg-gray-900 text-white overflow-hidden">
                 <div class="absolute inset-0 z-0">
-                    <img [src]="post.image || 'assets/img/hero-repair.jpg'" alt="Reparación de Celulares Marcos Paz" class="w-full h-full object-cover opacity-20">
+                    <img [src]="post.image || 'assets/img/hero-repair.jpg'" (error)="onImgError($event)" alt="Reparación de Celulares Marcos Paz" class="w-full h-full object-cover opacity-20">
                     <div class="absolute inset-0 bg-linear-to-b from-gray-900/50 to-gray-900"></div>
                 </div>
                 <div class="relative z-10 container mx-auto px-4 py-20 md:py-32 flex flex-col items-center text-center">
@@ -608,7 +608,7 @@
                 @if (post.image) {
                 <div class="relative h-[40vh] md:h-[50vh] w-full overflow-hidden">
                     <div class="absolute inset-0 bg-black/40 z-10"></div>
-                    <img [src]="post.image" [alt]="post.title" class="w-full h-full object-cover">
+                    <img [src]="post.image" (error)="onImgError($event)" [alt]="post.title" class="w-full h-full object-cover">
                     <div class="absolute inset-0 z-20 flex items-end pb-12 md:pb-20">
                         <div class="container mx-auto px-4 max-w-4xl">
                             <a routerLink="/blog" class="inline-flex items-center text-white/80 hover:text-white mb-6 transition-colors text-sm font-medium backdrop-blur-sm bg-black/20 px-3 py-1 rounded-full"><i class="fas fa-arrow-left mr-2"></i> Volver</a>
@@ -634,7 +634,15 @@
                 
                 <!-- Content Section -->
                 <div class="container mx-auto px-4 max-w-3xl py-12 md:py-20">
-                    <div class="prose prose-lg md:prose-xl prose-indigo mx-auto text-gray-700 leading-relaxed" [innerHTML]="post.content"></div>
+                    @if (blocks.length > 0) {
+                        <div class="space-y-6">
+                            @for (block of blocks; track block.id) {
+                                <app-block-renderer [block]="block" />
+                            }
+                        </div>
+                    } @else {
+                        <div class="prose prose-lg md:prose-xl prose-indigo mx-auto text-gray-700 leading-relaxed" [innerHTML]="post.content"></div>
+                    }
                 </div>
             </article>
         }
@@ -651,11 +659,19 @@
                 </div>
                 @if (post.image) {
                 <div class="container mx-auto px-4 max-w-4xl mb-12">
-                    <img [src]="post.image" [alt]="post.title" class="w-full h-auto rounded-lg shadow-sm border border-gray-200">
+                    <img [src]="post.image" (error)="onImgError($event)" [alt]="post.title" class="w-full h-auto rounded-lg shadow-sm border border-gray-200">
                 </div>
                 }
                 <div class="container mx-auto px-4 max-w-2xl bg-white p-8 md:p-12 shadow-sm border border-gray-100 rounded-sm mb-12">
-                    <div class="prose prose-lg prose-stone mx-auto text-gray-800 leading-loose" [innerHTML]="post.content"></div>
+                    @if (blocks.length > 0) {
+                        <div class="space-y-6">
+                            @for (block of blocks; track block.id) {
+                                <app-block-renderer [block]="block" />
+                            }
+                        </div>
+                    } @else {
+                        <div class="prose prose-lg prose-stone mx-auto text-gray-800 leading-loose" [innerHTML]="post.content"></div>
+                    }
                 </div>
             </article>
         }
@@ -669,10 +685,18 @@
                     <p class="text-gray-400 text-sm mb-12"><time>{{ post.created_at | date:'mediumDate' }}</time></p>
                     
                     @if (post.image) {
-                        <img [src]="post.image" [alt]="post.title" class="w-full h-64 object-cover rounded-2xl mb-12 grayscale hover:grayscale-0 transition-all duration-500">
+                        <img [src]="post.image" (error)="onImgError($event)" [alt]="post.title" class="w-full h-64 object-cover rounded-2xl mb-12 grayscale hover:grayscale-0 transition-all duration-500">
                     }
                     
-                    <div class="prose prose-lg mx-auto text-gray-800 leading-relaxed font-light" [innerHTML]="post.content"></div>
+                    @if (blocks.length > 0) {
+                        <div class="space-y-6">
+                            @for (block of blocks; track block.id) {
+                                <app-block-renderer [block]="block" />
+                            }
+                        </div>
+                    } @else {
+                        <div class="prose prose-lg mx-auto text-gray-800 leading-relaxed font-light" [innerHTML]="post.content"></div>
+                    }
                 </div>
             </article>
         }

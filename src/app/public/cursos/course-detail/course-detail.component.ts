@@ -9,7 +9,7 @@ import {
 import { PendingTasks } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SeoService } from '@app/core/services/seo.service';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
   CoursesService,
   Course,
@@ -55,6 +55,7 @@ export class CourseDetailComponent implements OnInit {
   course: Course | null = null;
   loading = true;
   error: string | null = null;
+  public router = inject(Router);
 
   // Registration
   whatsappNumber = environment.contact.whatsappNumber;

@@ -4,7 +4,11 @@ describe('Academy Progress and Certificates', () => {
   const moduleId = '33333333-3333-3333-3333-333333333333';
 
   it('Admin can add materials and edit exam without getting stuck or losing data', () => {
-    // Intercepts set BEFORE visit
+    cy.clearLocalStorage();
+    cy.clearCookies();
+    cy.loginAsAdmin('/');
+    
+    // Intercepts set AFTER loginAsAdmin so they override its catchAll
     cy.intercept('GET', '**/rest/v1/courses?*', {
       statusCode: 200,
       body: [{ id: courseId, title: 'Curso E2E Test', slug: 'curso-e2e-test' }]
@@ -36,12 +40,10 @@ describe('Academy Progress and Certificates', () => {
 
     // Override profile for this specific test
     const mockProfile = { id: '66666666-6666-6666-6666-666666666666', email: 'admin@arecofix.com', role: 'super_admin' };
-    cy.intercept('GET', '**/rest/v1/profiles*', { statusCode: 200, body: [mockProfile] }).as('getProfile');
+    cy.intercept('GET', '**/rest/v1/profiles*', (req) => {
+        req.reply({ statusCode: 200, body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? mockProfile : [mockProfile] });
+    }).as('getProfile');
 
-    // Ensure state is clean, login with a generic URL, then visit the actual URL
-    cy.clearLocalStorage();
-    cy.clearCookies();
-    cy.loginAsAdmin('/');
     cy.visit(`/admin/courses/${courseId}/materials`);
     
     cy.wait('@getModules', { timeout: 10000 });
@@ -52,11 +54,13 @@ describe('Academy Progress and Certificates', () => {
 
     // Add Document
     cy.contains('Agregar Recurso').click({ force: true });
-    cy.contains('Documento').click({ force: true });
+    cy.contains('Documento / PDF').click({ force: true });
+    cy.get('input[placeholder*="URL del archivo"]').should('exist');
     
     // Add Exam
     cy.contains('Agregar Recurso').click({ force: true });
     cy.contains('Examen').click({ force: true });
+    cy.contains('Configurar Examen').should('exist');
     
     // Fill Document Title and URL
     cy.get('input[placeholder="Título del recurso..."]').eq(0).clear().type('Guía PDF E2E', { force: true });
@@ -164,18 +168,19 @@ describe('Academy Progress and Certificates', () => {
       ]
     }).as('getContents');
 
-    cy.intercept('POST', '**/rpc/get_course_progress*', {
+    cy.intercept('GET', '**/rest/v1/course_progress*', {
       statusCode: 200,
-      body: { progress: 0, completed_contents: [], certificate_id: null }
+      body: []
     }).as('getProgress');
 
-    // Simulate login for this user
-    cy.window().then((win) => {
-      win.localStorage.setItem('sb-hszcwwbshkzzhfrpmlng-auth-token', JSON.stringify(session));
-      win.localStorage.setItem('supabase.auth.token', JSON.stringify(session));
-    });
+    cy.intercept('GET', '**/rest/v1/course_certificates*', {
+      statusCode: 200,
+      body: []
+    }).as('getCertificates');
 
-    cy.visit(`/academy/curso-e2e-test/aula`);
+    // Log in as student using standard helper
+    cy.loginAsUser('/academy/curso-e2e-test/aula', session, mockProfile);
+
 
     cy.wait('@getModules', { timeout: 10000 });
     cy.wait('@getProgress', { timeout: 10000 });

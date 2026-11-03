@@ -6,12 +6,14 @@ import { ProductRepository, ImportProductSummary, BulkPriceUpdate } from '../../
 import { Product } from '../../domain/entities/product.entity';
 import { ProductsParams, ProductsResponse } from '@app/public/products/interfaces';
 
+import { environment } from '@env/environment';
+
 @Injectable({
     providedIn: 'root'
 })
 export class FlaskProductRepository implements ProductRepository {
     private http = inject(HttpClient);
-    private apiUrl = 'http://localhost:5000/api/productos';
+    private apiUrl = `${environment.flaskApiUrl}/productos`;
 
     findWithFilters(params: ProductsParams): Observable<ProductsResponse> {
         return this.http.get<{ data: Product[]; total: number }>(this.apiUrl).pipe(
@@ -66,6 +68,10 @@ export class FlaskProductRepository implements ProductRepository {
         return this.getAll().pipe(map(products => products.find(p => p.id === id) || null));
     }
 
+    getBySlug(slug: string): Observable<Product | null> {
+        return this.getAll().pipe(map(products => products.find(p => p.slug === slug) || null));
+    }
+
     create(product: Product): Observable<Product> {
         return this.http.post<Product>(this.apiUrl, product);
     }
@@ -78,11 +84,15 @@ export class FlaskProductRepository implements ProductRepository {
         return this.http.delete<void>(`${this.apiUrl}/${id}`);
     }
 
+    softDelete(id: string): Observable<void> {
+        return this.update(id, { is_active: false, deleted_at: new Date().toISOString() }).pipe(map(() => void 0));
+    }
+
     async uploadImage(file: File): Promise<string> {
         const formData = new FormData();
         formData.append('file', file);
         try {
-            const res = await fetch('http://localhost:5000/api/upload', {
+            const res = await fetch(`${environment.flaskApiUrl}/upload`, {
                 method: 'POST',
                 body: formData
             });

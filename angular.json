@@ -72,7 +72,8 @@
               "html2canvas",
               "fflate",
               "dompurify",
-              "canvg"
+              "canvg",
+              "hammerjs"
             ],
             "serviceWorker": "src/ngsw-config.json"
           },
@@ -155,6 +156,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "arecofix:build:production"

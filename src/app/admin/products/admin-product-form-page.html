@@ -11,7 +11,7 @@
 
     <div class="flex gap-3">
       <a routerLink="/admin/products" class="btn btn-ghost">Cancelar</a>
-      <button (click)="save()" class="btn btn-primary px-8 shadow-lg shadow-indigo-500/30" [disabled]="saving() || uploading()">
+      <button type="submit" (click)="save()" class="btn btn-primary px-8 shadow-lg shadow-indigo-500/30" [disabled]="saving() || uploading()">
         @if (uploading()) {
           <span class="loading loading-spinner text-white"></span>
         } @else if (saving()) {
@@ -49,20 +49,92 @@
               class="input input-bordered w-full focus:input-primary text-lg font-bold" placeholder="Ej: iPhone 14 Pro" required autofocus tabindex="1" />
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Bloque de Precio y Moneda con Selector y Live Preview -->
+          <div class="bg-gray-50/70 dark:bg-gray-800/40 p-4 rounded-xl border border-gray-200 dark:border-gray-700 space-y-4">
             <div class="form-control">
-              <label class="label font-semibold">Precio de Venta</label>
+              <div class="flex justify-between items-center mb-1.5 flex-wrap gap-2">
+                <label class="label font-semibold p-0">Precio de Venta <span class="text-error">*</span></label>
+                
+                <!-- Selector de Moneda Accesible (Segmented Control) -->
+                <div class="inline-flex rounded-lg p-0.5 bg-gray-200 dark:bg-gray-700" role="radiogroup" aria-label="Moneda del Producto">
+                  <button type="button"
+                          role="radio"
+                          [attr.aria-checked]="formVal.currency === 'ARS'"
+                          (click)="setCurrency('ARS')"
+                          class="px-2.5 py-1 text-xs font-bold rounded-md transition-all cursor-pointer"
+                          [class.bg-white]="formVal.currency === 'ARS'"
+                          [class.dark:bg-gray-900]="formVal.currency === 'ARS'"
+                          [class.text-indigo-600]="formVal.currency === 'ARS'"
+                          [class.shadow-sm]="formVal.currency === 'ARS'"
+                          [class.text-gray-600]="formVal.currency !== 'ARS'"
+                          [class.dark:text-gray-400]="formVal.currency !== 'ARS'">
+                    AR$ (Pesos)
+                  </button>
+                  <button type="button"
+                          role="radio"
+                          [attr.aria-checked]="formVal.currency === 'USD'"
+                          (click)="setCurrency('USD')"
+                          class="px-2.5 py-1 text-xs font-bold rounded-md transition-all cursor-pointer"
+                          [class.bg-white]="formVal.currency === 'USD'"
+                          [class.dark:bg-gray-900]="formVal.currency === 'USD'"
+                          [class.text-indigo-600]="formVal.currency === 'USD'"
+                          [class.shadow-sm]="formVal.currency === 'USD'"
+                          [class.text-gray-600]="formVal.currency !== 'USD'"
+                          [class.dark:text-gray-400]="formVal.currency !== 'USD'">
+                    U$D (Dólares)
+                  </button>
+                </div>
+              </div>
+
+              <!-- Input con símbolo reactivo -->
               <div class="relative w-full">
-                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-lg">$</span>
-                <input type="number" [(ngModel)]="formVal.price" name="price" tabindex="2"
-                  class="input input-bordered w-full pl-8 text-lg font-bold text-success" placeholder="0.00" min="0" />
+                <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 font-bold text-sm">
+                  {{ formVal.currency === 'USD' ? 'U$D' : 'AR$' }}
+                </span>
+                <input type="number" [(ngModel)]="formVal.price" (ngModelChange)="onPriceOrCurrencyChanged()" name="price" tabindex="2"
+                  class="input input-bordered w-full pl-14 text-lg font-bold text-gray-900 dark:text-white"
+                  [class.input-error]="priceValidationError()" placeholder="0.00" min="0" step="0.01" />
+              </div>
+
+              @if (priceValidationError()) {
+                <span class="text-xs text-error mt-1 flex items-center gap-1">
+                  <i class="fas fa-circle-exclamation text-[10px]"></i> {{ priceValidationError() }}
+                </span>
+              }
+            </div>
+
+            <!-- Previsualización en Vivo de la Tienda -->
+            <div class="bg-white dark:bg-gray-900/60 p-3 rounded-lg border border-dashed border-gray-200 dark:border-gray-700">
+              <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
+                <span class="font-medium">Previsualización en Tienda:</span>
+                <span class="text-[10px] bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded font-mono">
+                  Cotiz. ref: 1 USD ≈ {{ exchangeRate() }} ARS
+                </span>
+              </div>
+              <div class="flex items-baseline gap-2 flex-wrap">
+                <span class="text-base font-black text-gray-900 dark:text-white">
+                  {{ previewMainPrice() }}
+                </span>
+                @if (previewConvertedPrice()) {
+                  <span class="text-xs text-emerald-600 dark:text-emerald-400 font-bold">
+                    {{ previewConvertedPrice() }}
+                  </span>
+                }
               </div>
             </div>
 
-            <div class="form-control">
-              <label class="label font-semibold">Inventario (Stock)</label>
-              <input type="number" [(ngModel)]="formVal.stock" name="stock" tabindex="3"
-                class="input input-bordered w-full text-lg font-mono" placeholder="0" />
+            <!-- Stock y Alerta de Stock Mínimo -->
+            <div class="grid grid-cols-2 gap-3 pt-1">
+              <div class="form-control">
+                <label class="label font-semibold text-xs">Stock</label>
+                <input type="number" [(ngModel)]="formVal.stock" name="stock" tabindex="3"
+                  class="input input-bordered w-full text-base font-mono" placeholder="0" min="0" />
+              </div>
+              <div class="form-control">
+                <label class="label font-semibold text-xs">Alerta Stock Mín.</label>
+                <input type="number" [(ngModel)]="formVal.min_stock_alert" name="min_stock_alert"
+                  class="input input-bordered w-full text-base font-mono" placeholder="5" min="0" />
+              </div>
             </div>
           </div>
 
@@ -129,14 +201,11 @@
            <!-- NEW QUALITY AND COLORS FIELDS -->
            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
              <div class="form-control">
-                <label class="label font-semibold">Calidad (Opcional)</label>
-                <select [(ngModel)]="formVal.specifications['quality']" name="quality" tabindex="8" class="select select-bordered w-full">
-                  <option value="">Seleccionar calidad...</option>
-                  <option value="Original">Original</option>
-                  <option value="Original Desmontaje">Original Desmontaje</option>
-                  <option value="Premium">Premium</option>
-                  <option value="AAA">AAA</option>
-                  <option value="Genérico">Genérico</option>
+                <label class="label font-semibold">Condición</label>
+                <select [(ngModel)]="formVal.condition" name="condition" tabindex="8" class="select select-bordered w-full">
+                  <option value="Nuevo">Nuevo</option>
+                  <option value="Usado">Usado</option>
+                  <option value="Reacondicionado">Reacondicionado</option>
                 </select>
              </div>
 
@@ -148,11 +217,19 @@
              </div>
            </div>
            
-           <div class="form-control">
-             <label class="label cursor-pointer justify-start gap-4 p-4 border rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
-               <input type="checkbox" [(ngModel)]="formVal.is_active" name="is_active" tabindex="9" class="toggle toggle-success" />
-               <span class="label-text font-bold">Producto Publicado (Visible al público)</span>
-             </label>
+           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+             <div class="form-control">
+               <label class="label cursor-pointer justify-start gap-4 p-4 border rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
+                 <input type="checkbox" [(ngModel)]="formVal.is_active" name="is_active" tabindex="9" class="toggle toggle-success" />
+                 <span class="label-text font-bold">Publicado (Visible)</span>
+               </label>
+             </div>
+             <div class="form-control">
+               <label class="label cursor-pointer justify-start gap-4 p-4 border rounded-xl hover:bg-indigo-50/50 dark:hover:bg-indigo-900/20 transition">
+                 <input type="checkbox" [(ngModel)]="formVal.is_featured" name="is_featured" class="toggle toggle-primary" />
+                 <span class="label-text font-bold text-indigo-700 dark:text-indigo-400">Destacar Producto</span>
+               </label>
+             </div>
            </div>
         </div>
       </div>
@@ -170,16 +247,18 @@
           <div class="form-control">
             <label class="label font-semibold">Costo de Compra (Referencia)</label>
             <div class="relative w-full">
-              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-rose-400 font-bold text-lg">$</span>
+              <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-rose-400 font-bold text-sm">
+                {{ formVal.currency === 'USD' ? 'U$D' : 'AR$' }}
+              </span>
               <input type="number" [(ngModel)]="formVal.cost_price" name="cost_price" tabindex="10"
-                class="input input-bordered w-full pl-8 text-lg font-bold text-rose-500 bg-rose-50/30 dark:bg-rose-900/10 focus:border-rose-300" placeholder="0.00" min="0" />
+                class="input input-bordered w-full pl-14 text-lg font-bold text-rose-500 bg-rose-50/30 dark:bg-rose-900/10 focus:border-rose-300" placeholder="0.00" min="0" />
             </div>
             <p class="text-xs text-gray-400 mt-1">Usado para calcular margen de ganancia real.</p>
           </div>
           
           <div class="form-control">
             <label class="label font-semibold">Moneda Principal</label>
-            <select [(ngModel)]="formVal.currency" name="currency" tabindex="11" class="select select-bordered w-full font-bold">
+            <select [(ngModel)]="formVal.currency" (ngModelChange)="onPriceOrCurrencyChanged()" name="currency" tabindex="11" class="select select-bordered w-full font-bold">
                <option value="ARS">Pesos Argentinos (ARS)</option>
                <option value="USD">Dólares (USD)</option>
             </select>
@@ -231,7 +310,7 @@
     <!-- Section SEO: Custom Meta Tags -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-base-200 p-6 md:p-8">
       <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-6 border-b border-gray-100 dark:border-gray-700 pb-2 flex items-center gap-2">
-        <i class="fas fa-search text-orange-500"></i> Configuración SEO Custom (Opcional)
+        <i class="fas fa-search text-orange-500"></i> Configuración SEO Custom y Etiquetas (Opcional)
       </h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div class="space-y-4">
@@ -247,18 +326,166 @@
               class="input input-bordered w-full" placeholder="https://..." />
             <p class="text-xs text-gray-400 mt-1">Si lo dejas vacío, se usará la imagen principal.</p>
           </div>
+          <div class="form-control">
+            <label class="label font-semibold">Palabras Clave (SEO Keywords)</label>
+            <input type="text" [(ngModel)]="formVal.seo_keywords" name="seo_keywords"
+              class="input input-bordered w-full" placeholder="oferta, barato, mejor precio..." />
+          </div>
+          <div class="form-control">
+            <label class="label font-semibold">Etiquetas Internas (Tags)</label>
+            <input type="text" [(ngModel)]="formVal.tags" name="tags"
+              class="input input-bordered w-full" placeholder="nuevo, destacado, promo_verano..." />
+          </div>
         </div>
         <div class="space-y-4">
           <div class="form-control h-full">
             <label class="label font-semibold">Meta Description</label>
             <textarea [(ngModel)]="formVal.meta_description" name="meta_description"
-              class="textarea textarea-bordered h-full flex-1 min-h-[120px]" placeholder="Breve descripción para los resultados de búsqueda..."></textarea>
+              class="textarea textarea-bordered h-32 flex-1" placeholder="Breve descripción para los resultados de búsqueda..."></textarea>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Section 3: Media -->
+    <!-- Section 4: Logística, Impuestos y Proveedor -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-base-200 p-6 md:p-8">
+      <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-6 border-b border-gray-100 dark:border-gray-700 pb-2 flex items-center gap-2">
+        <i class="fas fa-truck text-blue-500"></i> Logística, Proveedor e Impuestos
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="form-control">
+           <label class="label font-semibold">ID Proveedor (Opcional)</label>
+           <input type="text" [(ngModel)]="formVal.supplier_id" name="supplier_id" class="input input-bordered w-full" placeholder="UUID del proveedor" />
+        </div>
+        <div class="form-control">
+          <label class="label font-semibold">Peso (kg)</label>
+          <input type="number" [(ngModel)]="formVal.weight" name="weight" class="input input-bordered w-full" placeholder="0.5" />
+        </div>
+        <div class="form-control">
+          <label class="label font-semibold">Días de Garantía</label>
+          <input type="number" [(ngModel)]="formVal.warranty_days" name="warranty_days" class="input input-bordered w-full" placeholder="30" />
+        </div>
+        <div class="form-control">
+          <label class="label font-semibold">Tipo Garantía</label>
+          <select [(ngModel)]="formVal.warranty_type" name="warranty_type" class="select select-bordered w-full">
+             <option value="Sin garantía">Sin garantía</option>
+             <option value="Fábrica">Fábrica</option>
+             <option value="Vendedor">Vendedor</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-4">
+        <div class="form-control">
+           <label class="label font-semibold">Impuesto (IVA %)</label>
+           <input type="number" [(ngModel)]="formVal.tax_percentage" name="tax_percentage" class="input input-bordered w-full" placeholder="21" />
+        </div>
+        <div class="form-control col-span-2">
+           <label class="label font-semibold">Dimensiones (cm) - Largo x Ancho x Alto</label>
+           <div class="flex gap-2">
+             <input type="number" [(ngModel)]="formVal.dimensions.length" name="dim_l" class="input input-bordered w-full" placeholder="Largo" title="Largo (cm)"/>
+             <input type="number" [(ngModel)]="formVal.dimensions.width" name="dim_w" class="input input-bordered w-full" placeholder="Ancho" title="Ancho (cm)"/>
+             <input type="number" [(ngModel)]="formVal.dimensions.height" name="dim_h" class="input input-bordered w-full" placeholder="Alto" title="Alto (cm)"/>
+           </div>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6 border-t border-gray-100 dark:border-gray-700 pt-6">
+        <div class="form-control">
+          <label class="label cursor-pointer justify-start gap-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 p-2 rounded-lg transition border">
+            <input type="checkbox" [(ngModel)]="formVal.includes_tax" name="includes_tax" class="toggle toggle-success" />
+            <span class="label-text font-bold">Precio Incluye IVA</span>
+          </label>
+        </div>
+        <div class="form-control">
+          <label class="label cursor-pointer justify-start gap-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 p-2 rounded-lg transition border">
+            <input type="checkbox" [(ngModel)]="formVal.free_shipping" name="free_shipping" class="toggle toggle-info" />
+            <span class="label-text font-bold">Envío Gratis</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 5: Ofertas y Cotización -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-base-200 p-6 md:p-8">
+      <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-6 border-b border-gray-100 dark:border-gray-700 pb-2 flex items-center gap-2">
+        <i class="fas fa-tags text-pink-500"></i> Ofertas Especiales y Cotización
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+         <div class="form-control">
+           <label class="label font-semibold">Precio de Oferta</label>
+           <div class="relative w-full">
+             <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-pink-500 font-bold text-sm">
+               {{ formVal.currency === 'USD' ? 'U$D' : 'AR$' }}
+             </span>
+             <input type="number" [(ngModel)]="formVal.sale_price" name="sale_price" class="input input-bordered w-full pl-14 text-lg font-bold text-pink-500 focus:border-pink-300" placeholder="0.00" min="0" />
+           </div>
+         </div>
+         <div class="form-control">
+           <label class="label font-semibold">Tasa de Cambio (Ref)</label>
+           <input type="number" [(ngModel)]="formVal.reference_exchange_rate" name="reference_exchange_rate" class="input input-bordered w-full" [placeholder]="exchangeRate()" min="0" />
+         </div>
+         <div class="form-control">
+           <label class="label font-semibold">Inicio Oferta</label>
+           <input type="datetime-local" [(ngModel)]="formVal.offer_start_date" name="offer_start_date" class="input input-bordered w-full" />
+         </div>
+         <div class="form-control">
+           <label class="label font-semibold">Fin Oferta</label>
+           <input type="datetime-local" [(ngModel)]="formVal.offer_end_date" name="offer_end_date" class="input input-bordered w-full" />
+         </div>
+      </div>
+    </div>
+
+    <!-- Section 6: Variantes -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-base-200 p-6 md:p-8">
+      <div class="flex justify-between items-center mb-6 border-b border-gray-100 dark:border-gray-700 pb-2">
+        <h3 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
+          <i class="fas fa-layer-group text-cyan-500"></i> Variantes del Producto
+        </h3>
+        <button type="button" (click)="addVariant()" class="btn btn-sm btn-outline btn-primary">
+          <i class="fas fa-plus mr-1"></i> Agregar Variante
+        </button>
+      </div>
+
+      @if (formVal.variants.length === 0) {
+        <div class="text-center py-6 text-gray-500 bg-gray-50 dark:bg-gray-900/50 rounded-xl border border-dashed border-gray-200 dark:border-gray-700">
+          <i class="fas fa-info-circle text-2xl mb-2 text-gray-400"></i>
+          <p>Este producto no tiene variantes configuradas.</p>
+          <p class="text-sm">Se usará el inventario y precio general.</p>
+        </div>
+      } @else {
+        <div class="space-y-4">
+          @for (variant of formVal.variants; track variant.id; let i = $index) {
+            <div class="p-4 border rounded-xl bg-gray-50 dark:bg-gray-900/30 dark:border-gray-700 relative">
+              <button type="button" (click)="removeVariant(i)" class="btn btn-sm btn-circle btn-ghost text-error absolute top-2 right-2">
+                <i class="fas fa-times"></i>
+              </button>
+              
+              <div class="grid grid-cols-1 md:grid-cols-4 gap-4 pr-8">
+                <div class="form-control">
+                  <label class="label font-semibold text-xs">Nombre Variante (ej: Rojo L)</label>
+                  <input type="text" [(ngModel)]="variant.name" [name]="'var_name_'+i" class="input input-bordered input-sm w-full" placeholder="Nombre..." />
+                </div>
+                <div class="form-control">
+                  <label class="label font-semibold text-xs">SKU</label>
+                  <input type="text" [(ngModel)]="variant.sku" [name]="'var_sku_'+i" class="input input-bordered input-sm w-full font-mono uppercase" placeholder="SKU Variante" />
+                </div>
+                <div class="form-control">
+                  <label class="label font-semibold text-xs">Precio (Opcional)</label>
+                  <input type="number" [(ngModel)]="variant.price" [name]="'var_price_'+i" class="input input-bordered input-sm w-full text-success" placeholder="Sobrescribe el base" />
+                </div>
+                <div class="form-control">
+                  <label class="label font-semibold text-xs">Stock</label>
+                  <input type="number" [(ngModel)]="variant.stock" [name]="'var_stock_'+i" class="input input-bordered input-sm w-full font-mono" placeholder="0" />
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Section 7: Media -->
     <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-base-200 p-6 md:p-8">
       <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-6 border-b border-gray-100 dark:border-gray-700 pb-2 flex items-center gap-2">
         <i class="fas fa-images text-purple-500"></i> Galería Multimedia

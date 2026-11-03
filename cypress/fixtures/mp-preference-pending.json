@@ -1,0 +1,30 @@
+{
+  "id": "pending-1234567890-a1b2c3d4",
+  "client_id": "8491686631401074",
+  "collector_id": 374364423,
+  "operation_type": "regular_payment",
+  "items": [
+    {
+      "id": "prod-pending",
+      "title": "Batería Original iPhone 12",
+      "currency_id": "ARS",
+      "quantity": 1,
+      "unit_price": 25000
+    }
+  ],
+  "payer": {
+    "name": "Maria",
+    "surname": "Gomez",
+    "email": "maria.gomez@test.com"
+  },
+  "back_urls": {
+    "success": "https://arecofix.com.ar/checkout/success",
+    "pending": "https://arecofix.com.ar/checkout/pending",
+    "failure": "https://arecofix.com.ar/checkout/failure"
+  },
+  "auto_return": "approved",
+  "notification_url": "https://arecofix.com.ar/api/mercadopago/webhook",
+  "external_reference": "ord-test-pending",
+  "init_point": "https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=pending-1234567890",
+  "sandbox_init_point": "https://sandbox.mercadopago.com.ar/checkout/v1/redirect?pref_id=pending-1234567890"
+}

@@ -33,6 +33,11 @@ export interface CompanySettings {
   phone?: string;
   logo_url?: string;
   contact_phone_whatsapp?: string;
+  // Fiscal / ARCA configuration
+  vat_condition?: string;
+  iibb?: string;
+  activity_start_date?: string;
+  point_of_sale?: string | number;
   // Mercado Libre integration
   ml_markup_percentage?: number;
   ml_access_token?: string;
@@ -94,6 +99,7 @@ export class CompanyService {
     if (branchId) {
         // Actualizamos la sucursal específica
         const branchPayload: Partial<Branch> = {
+            name: updateData.name,
             official_name: updateData.name,
             address: updateData.location,
             contact_email: updateData.contact_email,

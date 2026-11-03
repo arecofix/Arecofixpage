@@ -37,7 +37,10 @@ export class MenuBuilderService {
     const isGlobalAdmin = this.authService.isSuperAdmin() || profile?.role === 'tenant_owner';
     const isCentral = !branch || branch.slug === 'arecofix' || branch.id === 'de967f68-7b15-44c0-bc98-952ccf06e1e5';
 
-    const gestionChildren: MenuItem[] = [
+    const isAdminUser = isGlobalAdmin || profile?.role === 'admin';
+    const isStaffUser = profile?.role === 'staff' || profile?.role === 'technician';
+
+    let gestionChildren: MenuItem[] = [
       { title: lang === 'es' ? 'Clientes & Usuarios' : 'Customers & Users', path: `${basePrefix}/users`, icon: 'fa-users', module: 'customers' },
       { title: lang === 'es' ? 'Identidad de Empresa' : 'Company Identity', path: `${basePrefix}/company`, icon: 'fa-id-badge' },
       { title: lang === 'es' ? 'Dashboard Contable' : 'Accounting Dashboard', path: `${basePrefix}/finance/dashboard`, icon: 'fa-chart-bar' },
@@ -47,6 +50,14 @@ export class MenuBuilderService {
       { title: lang === 'es' ? 'Buzón & Turnos' : 'Inbox & Appointments', path: `${basePrefix}/messages`, icon: 'fa-envelope' },
       { title: lang === 'es' ? 'Base de Conocimiento IA' : 'AI Knowledge Base', path: `${basePrefix}/knowledge-base`, icon: 'fa-brain' },
     ];
+
+    if (isStaffUser && !isAdminUser) {
+      // Remove admin-only routes for Staff/Technicians
+      gestionChildren = gestionChildren.filter(item => 
+        ['Clientes & Usuarios', 'Buzón & Turnos', 'Base de Conocimiento IA'].includes(item.title) ||
+        ['Customers & Users', 'Inbox & Appointments', 'AI Knowledge Base'].includes(item.title)
+      );
+    }
 
     if (isGlobalAdmin && isCentral) {
       gestionChildren.splice(2, 0, { title: lang === 'es' ? 'Red de Sucursales' : 'Branch Network', path: `${basePrefix}/branches`, icon: 'fa-sitemap' });
@@ -71,11 +82,12 @@ export class MenuBuilderService {
         path: `${basePrefix}/sales`,
         icon: 'fa-cash-register', 
         module: 'inventory',
-        expanded: false,
+        expanded: true,
         children: [
           { title: lang === 'es' ? 'Terminal de Venta' : 'Point of Sale (POS)', path: `${basePrefix}/sales`, icon: 'fa-plus-circle' },
           { title: lang === 'es' ? 'Pedidos & E-commerce' : 'Orders & E-commerce', path: `${basePrefix}/orders`, icon: 'fa-shopping-cart' },
           { title: lang === 'es' ? 'Historial de Facturación' : 'Billing History', path: `${basePrefix}/sales/invoices`, icon: 'fa-file-invoice-dollar' },
+          { title: lang === 'es' ? 'Proveedores' : 'Suppliers', path: `${basePrefix}/suppliers`, icon: 'fa-truck' },
           { title: lang === 'es' ? 'Egresos / Compras' : 'Expenses / Purchases', path: `${basePrefix}/purchases`, icon: 'fa-shopping-bag' },
         ]
       },
@@ -83,7 +95,7 @@ export class MenuBuilderService {
         title: lang === 'es' ? 'Servicio Técnico' : 'Technical Service',
         icon: 'fa-wrench',
         module: 'repairs',
-        expanded: false,
+        expanded: true,
         children: [
           { title: lang === 'es' ? 'Lista de Reparaciones' : 'Repairs List', path: `${basePrefix}/repairs`, icon: 'fa-tools' }
         ]
@@ -91,7 +103,7 @@ export class MenuBuilderService {
       {
         title: lang === 'es' ? 'Gestión & Ajustes' : 'Management & Settings',
         icon: 'fa-cogs',
-        expanded: false,
+        expanded: true,
         children: gestionChildren
       },
       { 

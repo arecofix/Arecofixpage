@@ -1,590 +1,1367 @@
-<!-- Main Admin Dashboard -->
-<div class="px-3 md:px-6 py-6 min-h-[calc(100vh-4rem)] bg-gray-50/50 dark:bg-[#0f172a] font-sans">
-  
-    <!-- Header Minimalista -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4 animate-fade-in-down">
+<!-- Main Admin Business Dashboard -->
+<div class="px-3 md:px-6 py-6 min-h-[calc(100vh-4rem)] bg-slate-50/70 dark:bg-[#0f172a] font-sans">
+
+  <!-- Header & Global Actions -->
+  <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4 animate-fade-in-down">
+    <div>
+      <div class="flex items-center gap-3">
+        <span class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-900 via-blue-700 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-900/30 text-xl">
+          <i class="fas fa-chart-line"></i>
+        </span>
         <div>
-             <h1 class="text-3xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-3">
-                 <span class="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/30">
-                     <i class="fas fa-chart-pie"></i>
-                 </span>
-                 Panel de Control
-                 @if (isSuperAdmin()) {
-                     <span class="text-sm font-bold text-white bg-linear-to-r from-purple-600 to-pink-600 px-3 py-1 rounded-full shadow-lg">
-                         Super Admin
-                     </span>
-                 }
-             </h1>
-             <p class="text-sm text-gray-500 dark:text-gray-400 mt-2 font-medium">
-                 @if (isSuperAdmin()) {
-                     Gestión central de todas las sucursales
-                 } @else {
-                     {{ t().repairs.dashboard.subtitleRegular || 'Resumen general del negocio y rendimiento financiero.' }}
-                 }
-             </p>
+          <h1 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+            Dashboard Integral de Negocio
+            @if (isSuperAdmin()) {
+              <span class="text-xs font-black uppercase text-amber-900 bg-amber-400 px-2.5 py-0.5 rounded-full shadow-sm ml-2">
+                Super Admin
+              </span>
+            }
+          </h1>
+          <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">
+            Métricas unificadas de E-commerce, Taller de Reparaciones, Caja y Academia en tiempo real.
+          </p>
         </div>
-
-        <div class="flex flex-wrap items-center gap-3">
-            <a routerLink="/admin/sales" class="btn btn-sm md:btn-md bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white border-none rounded-2xl shadow-lg shadow-blue-500/30 transform hover:-translate-y-0.5 transition-all w-full sm:w-auto">
-                <i class="fas fa-cash-register mr-1 opacity-80"></i> {{ t().repairs.dashboard.newSale || 'Nueva Venta' }}
-            </a>
-            <a routerLink="/admin/repairs/new" class="btn btn-sm md:btn-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-sm hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all w-full sm:w-auto">
-                <i class="fas fa-tools mr-1 opacity-80"></i> {{ t().repairs.dashboard.newRepair || 'Ingreso a Taller' }}
-            </a>
-        </div>
+      </div>
     </div>
-  
-    <!-- UX Guard Warning Removido -->
-    @if (loading()) {
-        <div class="animate-fade-in">
-            <!-- Header Skeleton -->
-            <div class="flex flex-col md:flex-row justify-between mb-8 gap-4">
-                <div class="space-y-2">
-                    <app-skeleton width="200px" height="2rem" borderRadius="rounded-xl"></app-skeleton>
-                    <app-skeleton width="300px" height="1rem"></app-skeleton>
-                </div>
-                <div class="flex gap-2">
-                    <app-skeleton width="120px" height="2.5rem" borderRadius="rounded-2xl"></app-skeleton>
-                    <app-skeleton width="120px" height="2.5rem" borderRadius="rounded-2xl"></app-skeleton>
-                </div>
-            </div>
 
-            <!-- KPIs Skeletons -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-                @for (i of [1,2,3,4,5]; track i) {
-                    <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-6 border border-gray-100 dark:border-gray-800">
-                        <app-skeleton width="40px" height="40px" borderRadius="rounded-2xl" class="mb-4"></app-skeleton>
-                        <app-skeleton width="60%" height="0.75rem" class="mb-2"></app-skeleton>
-                        <app-skeleton width="80%" height="1.5rem"></app-skeleton>
-                    </div>
-                }
-            </div>
+    <!-- Quick Action Buttons & Direct External Links -->
+    <div class="flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
+      <a
+        href="https://studio.arecofix.com.ar"
+        target="_blank"
+        rel="noopener noreferrer"
+        id="btn-open-supabase-studio"
+        class="btn btn-sm md:btn-md bg-emerald-600 hover:bg-emerald-700 text-white font-bold border-none rounded-xl shadow-md shadow-emerald-600/20 transition-all flex items-center gap-1.5"
+        title="Abrir Supabase Studio / Consola de Base de Datos PostgreSQL"
+      >
+        <i class="fas fa-database"></i> Studio / pgAdmin <i class="fas fa-external-link-alt text-[10px]"></i>
+      </a>
 
-            <!-- Main Charts Skeletons -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                <div class="lg:col-span-2 bg-white dark:bg-gray-800/50 rounded-4xl p-8 h-80 border border-gray-100 dark:border-gray-800">
-                    <app-skeleton width="150px" height="1.25rem" class="mb-6"></app-skeleton>
-                    <app-skeleton width="100%" height="200px" borderRadius="rounded-2xl"></app-skeleton>
-                </div>
-                <div class="bg-white dark:bg-gray-800/50 rounded-4xl p-8 h-80 border border-gray-100 dark:border-gray-800">
-                    <app-skeleton width="150px" height="1.25rem" class="mb-6"></app-skeleton>
-                    <app-skeleton width="100%" height="200px" borderRadius="rounded-2xl"></app-skeleton>
-                </div>
-            </div>
+      <a
+        href="https://us.posthog.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        id="btn-open-posthog"
+        class="btn btn-sm md:btn-md bg-purple-600 hover:bg-purple-700 text-white font-bold border-none rounded-xl shadow-md shadow-purple-600/20 transition-all flex items-center gap-1.5"
+        title="Abrir Dashboard de PostHog Analytics"
+      >
+        <i class="fas fa-chart-pie"></i> PostHog <i class="fas fa-external-link-alt text-[10px]"></i>
+      </a>
+
+      <button
+        (click)="openFinanceModal()"
+        class="btn btn-sm md:btn-md bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold border-none rounded-xl shadow-md shadow-amber-500/20 transition-all flex items-center gap-1.5"
+        id="btn-nuevo-movimiento-caja"
+      >
+        <i class="fas fa-cash-register"></i> Caja
+      </button>
+
+      <a
+        routerLink="/admin/sales"
+        class="btn btn-sm md:btn-md bg-blue-700 hover:bg-blue-800 text-white font-bold border-none rounded-xl shadow-md shadow-blue-700/20 transition-all flex items-center gap-1.5"
+      >
+        <i class="fas fa-shopping-cart"></i> Ventas
+      </a>
+
+      <a
+        routerLink="/admin/repairs/new"
+        class="btn btn-sm md:btn-md bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 rounded-xl shadow-sm transition-all flex items-center gap-1.5"
+      >
+        <i class="fas fa-tools"></i> Taller
+      </a>
+    </div>
+  </div>
+
+  <!-- Global Filter Bar (Range Selector & Branch Selector) -->
+  <div class="bg-white dark:bg-slate-800/90 backdrop-blur-xl p-4 rounded-2xl border border-slate-200/70 dark:border-slate-700/60 shadow-sm mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-3 w-full sm:w-auto">
+      <div class="w-9 h-9 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 flex items-center justify-center text-sm">
+        <i class="fas fa-calendar-alt"></i>
+      </div>
+      <div>
+        <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Rango de Métricas</span>
+        <!-- Select accessible for testing and screen readers -->
+        <div class="flex items-center gap-2 mt-0.5">
+          <select
+            id="date-range-filter"
+            [ngModel]="selectedRange()"
+            (ngModelChange)="onRangeChange($event)"
+            class="select select-sm select-bordered rounded-lg bg-slate-50 dark:bg-slate-700 font-bold text-slate-800 dark:text-white"
+          >
+            <option value="today">Hoy</option>
+            <option value="7days">Últimos 7 días</option>
+            <option value="month">Este Mes</option>
+            <option value="year">Este Año</option>
+          </select>
         </div>
-    } @else {
-        
-        <!-- KPIs Section -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6 mb-8 lg:mb-10 animate-fade-in-up" style="animation-delay: 100ms;">
-            
-            <!-- KPI: Ingresos Totales (Tienda) -->
-            <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 md:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-blue-100 dark:hover:border-blue-900 transition-all duration-300">
-                <div class="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b from-blue-400 to-indigo-500 opacity-80"></div>
-                <div class="flex justify-between items-start mb-4">
-                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center text-lg md:text-xl shadow-inner">
-                        <i class="fas fa-wallet"></i>
-                    </div>
-                </div>
-                <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">{{ t().repairs.dashboard.storeRevenue || 'Ingresos Tienda' }}</div>
-                <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">$ {{ stats().revenue | number:'1.0-0' }}</div>
-            </div>
+      </div>
+    </div>
 
-            <!-- KPI: Ingresos Taller -->
-            <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 md:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-teal-100 dark:hover:border-teal-900 transition-all duration-300">
-                <div class="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b from-teal-400 to-emerald-500 opacity-80"></div>
-                <div class="flex justify-between items-start mb-4">
-                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-teal-50 dark:bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center text-lg md:text-xl shadow-inner">
-                        <i class="fas fa-tools"></i>
-                    </div>
-                </div>
-                <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">{{ t().repairs.dashboard.workshopSales || 'Ventas Taller' }}</div>
-                <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">$ {{ stats().repairs_revenue | number:'1.0-0' }}</div>
-            </div>
+    <!-- Quick pills for ranges -->
+    <div class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-900/60 p-1 rounded-xl">
+      <button
+        (click)="onRangeChange('today')"
+        class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all"
+        [class.bg-blue-700]="selectedRange() === 'today'"
+        [class.text-white]="selectedRange() === 'today'"
+        [class.shadow-sm]="selectedRange() === 'today'"
+        [class.text-slate-600]="selectedRange() !== 'today'"
+        [class.dark:text-slate-300]="selectedRange() !== 'today'"
+      >
+        Hoy
+      </button>
+      <button
+        (click)="onRangeChange('7days')"
+        class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all"
+        [class.bg-blue-700]="selectedRange() === '7days'"
+        [class.text-white]="selectedRange() === '7days'"
+        [class.shadow-sm]="selectedRange() === '7days'"
+        [class.text-slate-600]="selectedRange() !== '7days'"
+        [class.dark:text-slate-300]="selectedRange() !== '7days'"
+      >
+        7 Días
+      </button>
+      <button
+        (click)="onRangeChange('month')"
+        class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all"
+        [class.bg-blue-700]="selectedRange() === 'month'"
+        [class.text-white]="selectedRange() === 'month'"
+        [class.shadow-sm]="selectedRange() === 'month'"
+        [class.text-slate-600]="selectedRange() !== 'month'"
+        [class.dark:text-slate-300]="selectedRange() !== 'month'"
+      >
+        Este Mes
+      </button>
+      <button
+        (click)="onRangeChange('year')"
+        class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all"
+        [class.bg-blue-700]="selectedRange() === 'year'"
+        [class.text-white]="selectedRange() === 'year'"
+        [class.shadow-sm]="selectedRange() === 'year'"
+        [class.text-slate-600]="selectedRange() !== 'year'"
+        [class.dark:text-slate-300]="selectedRange() !== 'year'"
+      >
+        Este Año
+      </button>
+    </div>
 
-            <!-- KPI: Ganancia Estimada -->
-            <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 md:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-emerald-100 dark:hover:border-emerald-900 transition-all duration-300">
-                <div class="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b from-emerald-400 to-green-500 opacity-80"></div>
-                <div class="flex justify-between items-start mb-4">
-                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-lg md:text-xl shadow-inner">
-                        <i class="fas fa-hand-holding-usd"></i>
-                    </div>
-                    <div class="badge badge-success text-[10px] text-white border-none font-bold">{{ t().repairs.dashboard.profit || 'GANANCIA' }}</div>
-                </div>
-                <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">{{ t().repairs.dashboard.estProfit || 'Ganancia Estimada' }}</div>
-                <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">$ {{ stats().repairs_profit | number:'1.0-0' }}</div>
-            </div>
+    <!-- Branch switch or refresh -->
+    <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+      @if (isSuperAdmin() && branches().length > 0) {
+        <select
+          (change)="onBranchChange($event)"
+          class="select select-sm select-bordered rounded-lg bg-slate-50 dark:bg-slate-700 font-semibold text-xs"
+        >
+          <option value="global">Todas las sucursales</option>
+          @for (b of branches(); track b.id) {
+            <option [value]="b.id">{{ b.name }}</option>
+          }
+        </select>
+      }
 
-            <!-- KPI: Equipos Arreglados -->
-            <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 md:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-orange-100 dark:hover:border-orange-900 transition-all duration-300">
-                <div class="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b from-orange-400 to-amber-500 opacity-80"></div>
-                <div class="flex justify-between items-start mb-4">
-                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 flex items-center justify-center text-lg md:text-xl shadow-inner">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                </div>
-                <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">{{ t().repairs.dashboard.devicesFixed || 'Equipos Fix.' }}</div>
-                <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">{{ stats().devices_fixed }}</div>
-            </div>
+      <button
+        (click)="loadBusinessMetrics()"
+        [disabled]="loadingBusinessMetrics()"
+        class="btn btn-sm btn-ghost border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700"
+        title="Actualizar métricas"
+      >
+        <i class="fas fa-sync-alt" [class.animate-spin]="loadingBusinessMetrics()"></i>
+      </button>
+    </div>
+  </div>
 
-            <!-- KPI: Pendientes -->
-            <div class="bg-white dark:bg-gray-800/50 rounded-3xl p-5 md:p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-gray-100 dark:border-gray-800 relative overflow-hidden group hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:border-purple-100 dark:hover:border-purple-900 transition-all duration-300">
-                <div class="absolute top-0 left-0 w-1.5 h-full bg-linear-to-b from-purple-400 to-fuchsia-500 opacity-80"></div>
-                <div class="flex justify-between items-start mb-4">
-                    <div class="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center text-lg md:text-xl shadow-inner">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                </div>
-                <div class="text-gray-500 dark:text-gray-400 text-xs md:text-sm font-medium mb-1 line-clamp-1">Pend. Aprobación</div>
-                <div class="text-2xl font-black text-gray-900 dark:text-white tracking-tight">{{ stats().pending_approvals }}</div>
-            </div>
+  <!-- Navigation Tabs Bar for Advanced Analytics & DB Health -->
+  <div class="flex items-center gap-2 overflow-x-auto pb-2 mb-8 no-scrollbar" id="dashboard-views-nav">
+    <button
+      (click)="setActiveViewTab('general')"
+      class="px-4 py-2.5 rounded-2xl text-xs md:text-sm font-black transition-all flex items-center gap-2 whitespace-nowrap shadow-sm"
+      [class.bg-blue-700]="activeViewTab() === 'general'"
+      [class.text-white]="activeViewTab() === 'general'"
+      [class.shadow-blue-700/20]="activeViewTab() === 'general'"
+      [class.bg-white]="activeViewTab() !== 'general'"
+      [class.dark:bg-slate-800]="activeViewTab() !== 'general'"
+      [class.text-slate-600]="activeViewTab() !== 'general'"
+      [class.dark:text-slate-300]="activeViewTab() !== 'general'"
+      [class.border]="activeViewTab() !== 'general'"
+      [class.border-slate-200]="activeViewTab() !== 'general'"
+      [class.dark:border-slate-700]="activeViewTab() !== 'general'"
+      id="tab-view-general"
+    >
+      <i class="fas fa-chart-pie"></i> Resumen General
+    </button>
 
+    <button
+      (click)="setActiveViewTab('products')"
+      class="px-4 py-2.5 rounded-2xl text-xs md:text-sm font-black transition-all flex items-center gap-2 whitespace-nowrap shadow-sm"
+      [class.bg-blue-700]="activeViewTab() === 'products'"
+      [class.text-white]="activeViewTab() === 'products'"
+      [class.shadow-blue-700/20]="activeViewTab() === 'products'"
+      [class.bg-white]="activeViewTab() !== 'products'"
+      [class.dark:bg-slate-800]="activeViewTab() !== 'products'"
+      [class.text-slate-600]="activeViewTab() !== 'products'"
+      [class.dark:text-slate-300]="activeViewTab() !== 'products'"
+      [class.border]="activeViewTab() !== 'products'"
+      [class.border-slate-200]="activeViewTab() !== 'products'"
+      [class.dark:border-slate-700]="activeViewTab() !== 'products'"
+      id="tab-view-products"
+    >
+      <i class="fas fa-box-open"></i> Top Productos
+    </button>
+
+    <button
+      (click)="setActiveViewTab('customers')"
+      class="px-4 py-2.5 rounded-2xl text-xs md:text-sm font-black transition-all flex items-center gap-2 whitespace-nowrap shadow-sm"
+      [class.bg-blue-700]="activeViewTab() === 'customers'"
+      [class.text-white]="activeViewTab() === 'customers'"
+      [class.shadow-blue-700/20]="activeViewTab() === 'customers'"
+      [class.bg-white]="activeViewTab() !== 'customers'"
+      [class.dark:bg-slate-800]="activeViewTab() !== 'customers'"
+      [class.text-slate-600]="activeViewTab() !== 'customers'"
+      [class.dark:text-slate-300]="activeViewTab() !== 'customers'"
+      [class.border]="activeViewTab() !== 'customers'"
+      [class.border-slate-200]="activeViewTab() !== 'customers'"
+      [class.dark:border-slate-700]="activeViewTab() !== 'customers'"
+      id="tab-view-customers"
+    >
+      <i class="fas fa-users"></i> Clientes & RFM
+    </button>
+
+    <button
+      (click)="setActiveViewTab('repairs')"
+      class="px-4 py-2.5 rounded-2xl text-xs md:text-sm font-black transition-all flex items-center gap-2 whitespace-nowrap shadow-sm"
+      [class.bg-blue-700]="activeViewTab() === 'repairs'"
+      [class.text-white]="activeViewTab() === 'repairs'"
+      [class.shadow-blue-700/20]="activeViewTab() === 'repairs'"
+      [class.bg-white]="activeViewTab() !== 'repairs'"
+      [class.dark:bg-slate-800]="activeViewTab() !== 'repairs'"
+      [class.text-slate-600]="activeViewTab() !== 'repairs'"
+      [class.dark:text-slate-300]="activeViewTab() !== 'repairs'"
+      [class.border]="activeViewTab() !== 'repairs'"
+      [class.border-slate-200]="activeViewTab() !== 'repairs'"
+      [class.dark:border-slate-700]="activeViewTab() !== 'repairs'"
+      id="tab-view-repairs"
+    >
+      <i class="fas fa-tools"></i> Taller: Marcas & Modelos
+    </button>
+
+    <button
+      (click)="setActiveViewTab('health')"
+      class="px-4 py-2.5 rounded-2xl text-xs md:text-sm font-black transition-all flex items-center gap-2 whitespace-nowrap shadow-sm"
+      [class.bg-emerald-600]="activeViewTab() === 'health'"
+      [class.text-white]="activeViewTab() === 'health'"
+      [class.shadow-emerald-600/20]="activeViewTab() === 'health'"
+      [class.bg-white]="activeViewTab() !== 'health'"
+      [class.dark:bg-slate-800]="activeViewTab() !== 'health'"
+      [class.text-slate-600]="activeViewTab() !== 'health'"
+      [class.dark:text-slate-300]="activeViewTab() !== 'health'"
+      [class.border]="activeViewTab() !== 'health'"
+      [class.border-slate-200]="activeViewTab() !== 'health'"
+      [class.dark:border-slate-700]="activeViewTab() !== 'health'"
+      id="tab-view-health"
+    >
+      <i class="fas fa-heartbeat"></i> Salud de Base de Datos
+      @if (dbHealthData()?.status === 'healthy') {
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse ml-1"></span>
+      }
+    </button>
+  </div>
+
+
+  <!-- Error State Panel -->
+  @if (error()) {
+    <div
+      id="dashboard-error-panel"
+      class="mb-8 p-6 rounded-3xl bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-800 text-rose-900 dark:text-rose-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4 animate-fade-in"
+    >
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 rounded-2xl bg-rose-200/80 dark:bg-rose-900/60 flex items-center justify-center text-rose-700 dark:text-rose-300 text-2xl flex-shrink-0">
+          <i class="fas fa-exclamation-circle"></i>
         </div>
-
-        <!-- ── Sección Financiera: {{ t().repairs.dashboard.grossRevenue || 'Ingresos Brutos' }} vs Ganancia Real ────────── -->
-        <div class="mb-8 lg:mb-10 animate-fade-in-up" style="animation-delay: 120ms;">
-            <div class="bg-white dark:bg-gray-800/50 rounded-4xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800">
-
-                <!-- Header de sección -->
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                    <div>
-                        <h2 class="text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                            <i class="fas fa-chart-line text-emerald-500"></i>
-                            {{ t().repairs.dashboard.financialSummary || 'Resumen Financiero' }}
-                        </h2>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ t().repairs.dashboard.financialDesc }}</p>
-                    </div>
-                    
-                    <div class="flex items-center gap-2 flex-wrap">
-                        <!-- Selector de Mes -->
-                        <div class="relative min-w-[140px]">
-                            <select (change)="onPeriodChange($event)" [value]="selectedPeriod()"
-                                class="w-full appearance-none bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 text-sm font-semibold rounded-xl px-4 py-2 pr-8 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 shadow-sm transition-all cursor-pointer">
-                                @for (month of stats().monthly_breakdown; track month.period) {
-                                    <option [value]="month.period">{{ month.label }}</option>
-                                }
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
-                                <i class="fas fa-chevron-down text-xs"></i>
-                            </div>
-                        </div>
-
-                        <!-- Inteligencia Financiera: Registro Manual de Ingresos/Gastos -->
-                        <button (click)="openFinanceModal()"
-                            class="flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-sm shadow-md shadow-violet-500/20 hover:shadow-violet-500/40 transition-all">
-                            <i class="fas fa-coins"></i> {{ t().repairs.dashboard.recordExpense || 'Registrar Gasto/Ingreso' }}
-                        </button>
-
-                        <!-- Botones de descarga global -->
-                        <button (click)="downloadCSV()"
-                            class="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 font-bold text-sm border border-emerald-200 dark:border-emerald-500/30 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 transition-all">
-                            <i class="fas fa-file-csv"></i> CSV
-                        </button>
-                        <button (click)="downloadTotalPDF()"
-                            class="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-700 dark:text-blue-400 font-bold text-sm border border-blue-200 dark:border-blue-500/30 hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-all">
-                            <i class="fas fa-file-pdf"></i> PDF
-                        </button>
-                    </div>
-                </div>
-
-                <!-- KPIs del mes seleccionado -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                    <div class="bg-blue-50 dark:bg-blue-500/10 rounded-3xl p-4 border border-blue-100 dark:border-blue-500/20">
-                        <div class="text-xs font-bold text-blue-500 uppercase tracking-wider mb-1">{{ t().repairs.dashboard.grossRevenue || 'Ingresos Brutos' }} ({{ selectedMonthData().label }})</div>
-                        <div class="text-2xl font-black text-gray-900 dark:text-white">$ {{ selectedMonthGross() | number:'1.0-0' }}</div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ t().repairs.dashboard.grossRevDesc || 'Ventas + Reparaciones cobradas' }}</div>
-                    </div>
-                    <div class="bg-red-50 dark:bg-red-500/10 rounded-3xl p-4 border border-red-100 dark:border-red-500/20">
-                        <div class="text-xs font-bold text-red-500 uppercase tracking-wider mb-1">{{ t().repairs.dashboard.realCosts || 'Costos Reales' }} ({{ selectedMonthData().label }})</div>
-                        <div class="text-2xl font-black text-gray-900 dark:text-white">$ {{ selectedMonthCost() | number:'1.0-0' }}</div>
-                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ t().repairs.dashboard.realCostsDesc || 'Repuestos usados + Costo productos' }}</div>
-                    </div>
-                    <div class="bg-emerald-50 dark:bg-emerald-500/10 rounded-3xl p-4 border border-emerald-100 dark:border-emerald-500/20">
-                        <div class="text-xs font-bold text-emerald-500 uppercase tracking-wider mb-1 flex items-center justify-between">
-                            {{ t().repairs.dashboard.netProfit || 'Ganancia Neta' }} ({{ selectedMonthData().label }})
-                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600">{{ currentMonthMargin() }}%</span>
-                        </div>
-                        <div class="text-2xl font-black" [ngClass]="selectedMonthProfit() >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'">
-                            $ {{ selectedMonthProfit() | number:'1.0-0' }}
-                        </div>
-                        <div class="flex flex-col gap-1 mt-2 pt-2 border-t border-emerald-200 dark:border-emerald-500/20">
-                            <div class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
-                                <span><i class="fas fa-store mr-1 text-purple-500"></i> {{ t().repairs.dashboard.workshop50 || '50% Taller:' }}</span>
-                                <span class="font-bold">${{ (selectedMonthRepairsProfit() * 0.5) | number:'1.0-0' }}</span>
-                            </div>
-                            <div class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
-                                <span><i class="fas fa-user-cog mr-1 text-blue-500"></i> 50% Técnico:</span>
-                                <span class="font-bold">${{ (selectedMonthRepairsProfit() * 0.5) | number:'1.0-0' }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Totales históricos -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-3xl border border-gray-100 dark:border-gray-700">
-                    <div class="text-center">
-                        <div class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Total Ingr. Brutos Histórico</div>
-                        <div class="text-xl font-black text-gray-800 dark:text-white">$ {{ stats().total_gross_revenue | number:'1.0-0' }}</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Total Costos Histórico</div>
-                        <div class="text-xl font-black text-red-600 dark:text-red-400">− $ {{ stats().total_cost | number:'1.0-0' }}</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-xs font-medium text-gray-600 dark:text-gray-400 mb-1 flex items-center justify-center gap-1">
-                            Ganancia Total Histórica
-                            <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 font-bold">{{ totalProfitMargin() }}%</span>
-                        </div>
-                        <div class="text-xl font-black text-emerald-600 dark:text-emerald-400 mb-2">$ {{ stats().total_net_profit | number:'1.0-0' }}</div>
-                        <div class="flex justify-center gap-3 text-[10px] sm:text-xs">
-                            <span class="text-gray-500 dark:text-gray-400">Taller: <b class="text-gray-700 dark:text-gray-300">${{ (stats().repairs_profit * 0.5) | number:'1.0-0' }}</b></span>
-                            <span class="text-gray-300 dark:text-gray-600">|</span>
-                            <span class="text-gray-500 dark:text-gray-400">Técnico: <b class="text-gray-700 dark:text-gray-300">${{ (stats().repairs_profit * 0.5) | number:'1.0-0' }}</b></span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tabla de desglose mensual -->
-                @if (stats().monthly_breakdown.length > 0) {
-                    <div class="overflow-x-auto rounded-2xl border border-gray-100 dark:border-gray-700">
-                        <table class="w-full text-sm">
-                            <thead class="bg-gray-50 dark:bg-gray-800/80">
-                                <tr>
-                                    <th class="text-left px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">{{ t().repairs.dashboard.month || 'Mes' }}</th>
-                                    <th class="text-right px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">{{ t().repairs.dashboard.grossRevenue || 'Ingresos Brutos' }}</th>
-                                    <th class="text-right px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide hidden sm:table-cell">{{ t().repairs.dashboard.workshop || 'Taller' }}</th>
-                                    <th class="text-right px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide hidden sm:table-cell">{{ t().repairs.dashboard.store || 'Tienda' }}</th>
-                                    <th class="text-right px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide hidden md:table-cell">Costos</th>
-                                    <th class="text-right px-4 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">{{ t().repairs.dashboard.netProfit || 'Ganancia Neta' }}</th>
-                                    <th class="text-center px-3 py-3 font-bold text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide">PDF</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @for (month of stats().monthly_breakdown; track month.period) {
-                                    <tr class="border-t border-gray-50 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
-                                        <td class="px-4 py-3 font-semibold text-gray-700 dark:text-gray-300">{{ month.label }}</td>
-                                        <td class="px-4 py-3 text-right font-bold text-gray-900 dark:text-white">$ {{ month.gross_revenue | number:'1.0-0' }}</td>
-                                        <td class="px-4 py-3 text-right text-gray-500 dark:text-gray-400 hidden sm:table-cell">$ {{ month.repairs_revenue | number:'1.0-0' }}</td>
-                                        <td class="px-4 py-3 text-right text-gray-500 dark:text-gray-400 hidden sm:table-cell">$ {{ month.sales_revenue | number:'1.0-0' }}</td>
-                                        <td class="px-4 py-3 text-right text-red-500 dark:text-red-400 hidden md:table-cell">− $ {{ month.cost | number:'1.0-0' }}</td>
-                                        <td class="px-4 py-3 text-right font-black" [ngClass]="month.net_profit >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'">
-                                            $ {{ month.net_profit | number:'1.0-0' }}
-                                        </td>
-                                        <td class="px-3 py-3 text-center">
-                                            <button (click)="downloadMonthlyPDF(month)"
-                                                class="p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-500/10 text-blue-400 hover:text-blue-600 transition-all"
-                                                title="Descargar PDF de {{ month.label }}">
-                                                <i class="fas fa-download text-xs"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                } @else {
-                    <div class="text-center py-8 text-gray-400 dark:text-gray-500">
-                        <i class="fas fa-chart-bar text-3xl mb-2 opacity-30"></i>
-                        <p class="text-sm">Sin datos de ingresos registrados todavía.</p>
-                    </div>
-                }
-            </div>
+        <div>
+          <h4 class="font-bold text-base leading-tight">Error al cargar las métricas</h4>
+          <p class="text-xs text-rose-700 dark:text-rose-300 mt-1">
+            {{ error() }}
+          </p>
         </div>
+      </div>
+      <button
+        id="btn-retry-dashboard"
+        (click)="loadBusinessMetrics()"
+        class="btn btn-sm bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl border-none shadow-md flex items-center gap-2 flex-shrink-0"
+      >
+        <i class="fas fa-sync-alt"></i> Reintentar
+      </button>
+    </div>
+  }
 
+  <!-- Skeleton Loader State (DaisyUI skeleton) -->
+  @if (isLoading()) {
+    <div id="dashboard-skeleton-loader" class="space-y-8 animate-pulse mb-8">
+      <!-- 4 KPI Card Skeletons -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="skeleton h-44 w-full rounded-3xl bg-slate-200/70 dark:bg-slate-800/80"></div>
+        <div class="skeleton h-44 w-full rounded-3xl bg-slate-200/70 dark:bg-slate-800/80"></div>
+        <div class="skeleton h-44 w-full rounded-3xl bg-slate-200/70 dark:bg-slate-800/80"></div>
+        <div class="skeleton h-44 w-full rounded-3xl bg-slate-200/70 dark:bg-slate-800/80"></div>
+      </div>
 
-        <!-- Charts Section -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 lg:mb-10 animate-fade-in-up" style="animation-delay: 200ms;">
-            
-            <!-- Sales Line Chart (Takes up 2 columns on large screens) -->
-            <div class="lg:col-span-2 bg-white dark:bg-gray-800/50 rounded-4xl p-5 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-base sm:text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                        <i class="fas fa-chart-area text-blue-500"></i> Evolución de Ingresos
-                    </h2>
-                </div>
-                <div class="h-64 sm:h-80 w-full relative block">
-                    @if (salesChartData) {
-                        @defer (on viewport) {
-                            <canvas baseChart
-                                [data]="salesChartData"
-                                [options]="salesChartOptions"
-                                [type]="salesChartType">
-                            </canvas>
-                        } @placeholder {
-                            <div class="w-full h-full flex items-center justify-center bg-gray-50/50 dark:bg-gray-800/20 rounded-2xl">
-                                <app-skeleton width="100%" height="100%" borderRadius="rounded-2xl"></app-skeleton>
-                            </div>
-                        }
-                    } @else {
-                        <div class="w-full h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
-                            <i class="fas fa-chart-area text-4xl mb-3 opacity-20"></i>
-                            <p class="text-sm">No hay datos de ventas disponibles.</p>
-                        </div>
-                    }
-                </div>
-            </div>
+      <!-- 2 Chart Skeletons -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="skeleton h-80 w-full rounded-3xl lg:col-span-2 bg-slate-200/70 dark:bg-slate-800/80"></div>
+        <div class="skeleton h-80 w-full rounded-3xl bg-slate-200/70 dark:bg-slate-800/80"></div>
+      </div>
 
-            <!-- Top Products Chart -->
-            <div class="bg-white dark:bg-gray-800/50 rounded-4xl p-5 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800 flex flex-col">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-base sm:text-lg font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                        <i class="fas fa-star text-amber-500"></i> {{ t().repairs.dashboard.starProd || 'Prod. Estrella' }}
-                    </h2>
-                </div>
-                <div class="h-56 sm:h-64 w-full flex-1 relative flex items-center justify-center">
-                    @if (productsChartData) {
-                        @defer (on viewport) {
-                            <canvas baseChart
-                                [data]="productsChartData"
-                                [options]="productsChartOptions"
-                                [type]="productsChartType">
-                            </canvas>
-                        } @placeholder {
-                            <div class="w-full h-full">
-                                <app-skeleton width="100%" height="100%" borderRadius="rounded-2xl"></app-skeleton>
-                            </div>
-                        }
-                    } @else {
-                        <div class="w-full h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
-                            <i class="fas fa-box-open text-4xl mb-3 opacity-20"></i>
-                            <p class="text-sm">No hay productos vendidos.</p>
-                        </div>
-                    }
-                </div>
-            </div>
+      <!-- 3 Alert Card Skeletons -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="skeleton h-72 w-full rounded-3xl bg-slate-200/70 dark:bg-slate-800/80"></div>
+        <div class="skeleton h-72 w-full rounded-3xl bg-slate-200/70 dark:bg-slate-800/80"></div>
+        <div class="skeleton h-72 w-full rounded-3xl bg-slate-200/70 dark:bg-slate-800/80"></div>
+      </div>
+    </div>
+  }
 
+  <!-- Real Data State (Protected from crashes) -->
+  @if (!isLoading() && !error()) {
+    <!-- Partial Failure / Adversarial Warning Banner -->
+    @if (partialErrors()) {
+      <div
+        id="partial-error-banner"
+        class="mb-8 p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200 flex items-start sm:items-center justify-between gap-4 shadow-sm animate-fade-in"
+      >
+        <div class="flex items-center gap-3.5">
+          <div class="w-10 h-10 rounded-xl bg-amber-200/60 dark:bg-amber-900/60 flex items-center justify-center text-amber-700 dark:text-amber-300 text-lg flex-shrink-0">
+            <i class="fas fa-exclamation-triangle"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-sm leading-tight">Aviso de Disponibilidad Parcial</h4>
+            @for (entry of objectEntries(partialErrors()!); track entry[0]) {
+              <p class="text-xs font-medium text-amber-800 dark:text-amber-300 mt-0.5">
+                {{ entry[1] }}
+              </p>
+            }
+            <p class="text-[11px] text-amber-700/80 dark:text-amber-400 mt-0.5">
+              Las demás secciones de E-commerce, Taller y Caja continúan operativas con normalidad.
+            </p>
+          </div>
         </div>
-
-        <!-- Lower Section (Category & System) -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in-up" style="animation-delay: 300ms;">
-            
-            <!-- Category Chart -->
-            <div class="bg-white dark:bg-gray-800/50 rounded-4xl p-5 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800">
-                <h2 class="text-base sm:text-lg font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-2">
-                    <i class="fas fa-chart-pie text-fuchsia-500"></i> Ventas por Categoría
-                </h2>
-                <div class="h-56 sm:h-64 w-full flex justify-center items-center">
-                    @if (categoryChartData) {
-                        @defer (on viewport) {
-                            <canvas baseChart
-                                [data]="categoryChartData"
-                                [options]="categoryChartOptions"
-                                [type]="categoryChartType">
-                            </canvas>
-                        } @placeholder {
-                            <div class="w-48 h-48 rounded-full bg-gray-100 dark:bg-gray-800 animate-pulse"></div>
-                        }
-                    } @else {
-                        <div class="w-full h-full flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
-                            <i class="fas fa-chart-pie text-4xl mb-3 opacity-20"></i>
-                            <p class="text-sm">Sin datos por categoría.</p>
-                        </div>
-                    }
-                </div>
-            </div>
-
-            <!-- Quick Access Menu -->
-            <div class="bg-white dark:bg-gray-800/50 rounded-4xl p-5 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 dark:border-gray-800">
-                <h2 class="text-base sm:text-lg font-bold text-gray-800 dark:text-white mb-6 flex items-center gap-2">
-                    <i class="fas fa-bolt text-yellow-500"></i> {{ t().repairs.dashboard.shortcuts || 'Accesos Directos' }}
-                </h2>
-                <div class="grid grid-cols-2 gap-3">
-                    <a routerLink="/admin/products" class="flex flex-col items-center justify-center p-3 sm:p-4 rounded-3xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:border-blue-200 dark:hover:border-blue-500/30 hover:text-blue-600 dark:hover:text-blue-400 transition-all text-gray-600 dark:text-gray-300 group">
-                        <i class="fas fa-box text-xl sm:text-2xl mb-2 text-gray-400 group-hover:text-blue-500 transition-colors"></i>
-                        <span class="text-[10px] sm:text-xs font-bold text-center">Inventario</span>
-                    </a>
-                    
-                    <a routerLink="/admin/repairs" class="flex flex-col items-center justify-center p-3 sm:p-4 rounded-3xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:border-emerald-200 dark:hover:border-emerald-500/30 hover:text-emerald-600 dark:hover:text-emerald-400 transition-all text-gray-600 dark:text-gray-300 group">
-                        <i class="fas fa-tools text-xl sm:text-2xl mb-2 text-gray-400 group-hover:text-emerald-500 transition-colors"></i>
-                        <span class="text-[10px] sm:text-xs font-bold text-center">{{ t().repairs.dashboard.workshop || 'Taller' }}</span>
-                    </a>
-
-                    <a routerLink="/admin/users" class="flex flex-col items-center justify-center p-3 sm:p-4 rounded-3xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:bg-purple-50 dark:hover:bg-purple-500/10 hover:border-purple-200 dark:hover:border-purple-500/30 hover:text-purple-600 dark:hover:text-purple-400 transition-all text-gray-600 dark:text-gray-300 group">
-                        <i class="fas fa-users text-xl sm:text-2xl mb-2 text-gray-400 group-hover:text-purple-500 transition-colors"></i>
-                        <span class="text-[10px] sm:text-xs font-bold text-center">Clientes</span>
-                    </a>
-
-                    <a routerLink="/admin/orders" class="flex flex-col items-center justify-center p-3 sm:p-4 rounded-3xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:bg-orange-50 dark:hover:bg-orange-500/10 hover:border-orange-200 dark:hover:border-orange-500/30 hover:text-orange-600 dark:hover:text-orange-400 transition-all text-gray-600 dark:text-gray-300 group">
-                        <i class="fas fa-shipping-fast text-xl sm:text-2xl mb-2 text-gray-400 group-hover:text-orange-500 transition-colors"></i>
-                        <span class="text-[10px] sm:text-xs font-bold text-center">Envíos</span>
-                    </a>
-
-                    <a routerLink="/admin/sales/invoices" class="flex flex-col items-center justify-center p-3 sm:p-4 rounded-3xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:border-indigo-200 dark:hover:border-indigo-500/30 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all text-gray-600 dark:text-gray-300 group">
-                        <i class="fas fa-file-invoice-dollar text-xl sm:text-2xl mb-2 text-gray-400 group-hover:text-indigo-500 transition-colors"></i>
-                        <span class="text-[10px] sm:text-xs font-bold text-center">Facturación</span>
-                    </a>
-
-                    <a routerLink="/admin/products/approvals" class="flex flex-col items-center justify-center p-3 sm:p-4 rounded-3xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:bg-violet-50 dark:hover:bg-violet-500/10 hover:border-violet-200 dark:hover:border-violet-500/30 hover:text-violet-600 dark:hover:text-violet-400 transition-all text-gray-600 dark:text-gray-300 group relative">
-                        @if ((stats().pending_approvals ?? 0) > 0) {
-                            <div class="absolute top-2 right-2 flex h-5 w-5">
-                                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-75"></span>
-                                <span class="relative inline-flex rounded-full h-5 w-5 bg-violet-500 text-white text-[10px] items-center justify-center font-black shadow-sm">
-                                    {{ stats().pending_approvals }}
-                                </span>
-                            </div>
-                        }
-                        <i class="fas fa-clipboard-check text-xl sm:text-2xl mb-2 text-gray-400 group-hover:text-violet-500 transition-colors"></i>
-                        <span class="text-[10px] sm:text-xs font-bold text-center">Aprobaciones</span>
-                    </a>
-                </div>
-            </div>
-
-            <!-- System Status -->
-            <div class="bg-gray-900 rounded-4xl p-5 sm:p-8 shadow-xl relative overflow-hidden group border border-gray-800">
-                <div class="absolute -inset-1 bg-linear-to-br from-gray-800 to-gray-950 rounded-4xl opacity-50 z-0"></div>
-                
-                <div class="relative z-10 flex flex-col h-full mt-auto">
-                    <h2 class="text-base sm:text-lg font-black text-white mb-6 flex items-center gap-2">
-                        <i class="fas fa-server text-emerald-400"></i> {{ t().repairs.dashboard.sysHealth || 'Sistema & Salud' }}
-                    </h2>
-                    
-                    <div class="space-y-3 sm:space-y-4 flex-1">
-                        <!-- Database -->
-                        <div class="flex justify-between items-center bg-gray-800/50 p-2 sm:p-3 rounded-2xl border border-gray-700/50">
-                            <span class="text-xs sm:text-sm font-medium text-gray-300 flex items-center gap-2">
-                                <i class="fas fa-database text-gray-500"></i> BD Conectada
-                            </span>
-                            <div class="flex items-center gap-2 text-[10px] sm:text-xs font-bold text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-lg">
-                                <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div> OK
-                            </div>
-                        </div>
-                        
-                        <!-- Analytics -->
-                        <div class="flex justify-between items-center bg-gray-800/50 p-2 sm:p-3 rounded-2xl border border-gray-700/50">
-                            <span class="text-xs sm:text-sm font-medium text-gray-300 flex items-center gap-2">
-                                <i class="fas fa-chart-line text-gray-500"></i> Analytics
-                            </span>
-                            <div class="flex items-center gap-2 text-[10px] sm:text-xs font-bold" [ngClass]="analyticsStats().enabled ? 'text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-lg' : 'text-amber-400 bg-amber-400/10 px-2 py-1 rounded-lg'">
-                                <div class="w-2 h-2 rounded-full" [ngClass]="analyticsStats().enabled ? 'bg-emerald-400' : 'bg-amber-400'"></div>
-                                {{ posthogStatus() }}
-                            </div>
-                        </div>
-
-                        <!-- Data details -->
-                        <div class="mt-4 pt-4 border-t border-gray-800">
-                             <div class="flex justify-between items-center text-[10px] sm:text-xs text-gray-400 mb-2">
-                                 <span>Sesión Actual:</span>
-                                 <span class="font-mono text-gray-300">{{ analyticsStats().sessionId ? 'Activa' : 'N/A' }}</span>
-                             </div>
-                             <div class="flex justify-between items-center text-[10px] sm:text-xs text-gray-400">
-                                 <span>ID Usuario:</span>
-                                 <span class="font-mono text-gray-300 truncate max-w-[90px] md:max-w-[120px]">{{ analyticsStats().distinctId || 'Anónimo' }}</span>
-                             </div>
-                        </div>
-                    </div>
-
-                    @if (analyticsStats().enabled) {
-                    <a href="https://us.posthog.com/project/253677/dashboard/791256" target="_blank" 
-                       class="mt-6 w-full py-2.5 sm:py-3 rounded-2xl bg-white/5 hover:bg-white/10 text-white text-[10px] sm:text-sm font-bold border border-white/10 transition-colors flex items-center justify-center gap-2">
-                        <span>Ver Reporte Avanzado</span> <i class="fas fa-external-link-alt text-[8px] sm:text-xs opacity-50"></i>
-                    </a>
-                    }
-                </div>
-            </div>
-
-        </div>
+        <button
+          (click)="partialErrors.set(null)"
+          class="btn btn-xs btn-ghost text-amber-800 hover:bg-amber-200/50 dark:text-amber-200 rounded-lg"
+          title="Cerrar aviso"
+        >
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
     }
-</div>
 
-<!-- Modal Registro Manual Inteligencia Financiera -->
-@if (showFinanceModal()) {
-<div class="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/60 backdrop-blur-md animate-fade-in px-4">
-    <div class="bg-white dark:bg-gray-900 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] w-full max-w-lg overflow-hidden animate-slide-up border border-white/10 relative">
-        <!-- Encabezado con degradado moderno -->
-        <div class="bg-linear-to-r from-violet-600 to-indigo-600 p-6 text-white flex justify-between items-center relative overflow-hidden">
-            <!-- Círculos de luz decorativos -->
-            <div class="absolute -right-10 -top-10 w-32 h-32 rounded-full bg-white/10 blur-xl"></div>
-            <div class="absolute -left-10 -bottom-10 w-24 h-24 rounded-full bg-white/10 blur-lg"></div>
+    <!-- TAB 1: RESUMEN GENERAL -->
+    @if (activeViewTab() === 'general') {
+      <!-- TOP ROW: 4 Critical KPI Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
 
-            <h3 class="font-extrabold text-xl flex items-center gap-3 relative z-10">
-                <i class="fas fa-coins text-yellow-300 text-2xl animate-bounce"></i> 
-                Inteligencia Financiera
-            </h3>
-            <button type="button" class="btn btn-sm btn-circle bg-white/10 hover:bg-white/20 text-white border-none shadow-none focus:outline-none relative z-10" (click)="showFinanceModal.set(false)">
-                <i class="fas fa-times text-lg"></i>
-            </button>
+      <!-- KPI 1: Balance del Mes -->
+      <div
+        id="kpi-balance"
+        class="bg-white dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl p-6 border shadow-sm transition-all duration-300 relative overflow-hidden group hover:shadow-lg"
+        [class.border-emerald-500/30]="(dashboardData()?.kpis?.net_balance ?? 0) >= 0"
+        [class.border-rose-500/30]="(dashboardData()?.kpis?.net_balance ?? 0) < 0"
+      >
+        <div class="flex items-start justify-between mb-4">
+          <div
+            class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl shadow-inner"
+            [class.bg-emerald-50]="(dashboardData()?.kpis?.net_balance ?? 0) >= 0"
+            [class.dark:bg-emerald-950/40]="(dashboardData()?.kpis?.net_balance ?? 0) >= 0"
+            [class.text-emerald-600]="(dashboardData()?.kpis?.net_balance ?? 0) >= 0"
+            [class.dark:text-emerald-400]="(dashboardData()?.kpis?.net_balance ?? 0) >= 0"
+            [class.bg-rose-50]="(dashboardData()?.kpis?.net_balance ?? 0) < 0"
+            [class.dark:bg-rose-950/40]="(dashboardData()?.kpis?.net_balance ?? 0) < 0"
+            [class.text-rose-600]="(dashboardData()?.kpis?.net_balance ?? 0) < 0"
+            [class.dark:text-rose-400]="(dashboardData()?.kpis?.net_balance ?? 0) < 0"
+          >
+            <i class="fas fa-wallet"></i>
+          </div>
+          <span
+            class="px-2.5 py-1 rounded-full text-[11px] font-black uppercase tracking-wider"
+            [class.bg-emerald-100]="(dashboardData()?.kpis?.net_balance ?? 0) >= 0"
+            [class.text-emerald-700]="(dashboardData()?.kpis?.net_balance ?? 0) >= 0"
+            [class.dark:bg-emerald-900/40]="(dashboardData()?.kpis?.net_balance ?? 0) >= 0"
+            [class.dark:text-emerald-300]="(dashboardData()?.kpis?.net_balance ?? 0) >= 0"
+            [class.bg-rose-100]="(dashboardData()?.kpis?.net_balance ?? 0) < 0"
+            [class.text-rose-700]="(dashboardData()?.kpis?.net_balance ?? 0) < 0"
+            [class.dark:bg-rose-900/40]="(dashboardData()?.kpis?.net_balance ?? 0) < 0"
+            [class.dark:text-rose-300]="(dashboardData()?.kpis?.net_balance ?? 0) < 0"
+          >
+            {{ (dashboardData()?.kpis?.net_balance ?? 0) >= 0 ? '+ Positivo' : '- Negativo' }}
+          </span>
         </div>
-        
-        <form (ngSubmit)="saveManualMovement()" class="p-6 sm:p-8 space-y-6">
-            <!-- Selector Tipo de Movimiento (Ingreso / Egreso) -->
-            <div>
-                <label class="label-text text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider mb-2 block">Tipo de Movimiento</label>
-                <div class="grid grid-cols-2 gap-2 bg-gray-100 dark:bg-gray-800 p-1.5 rounded-2xl border border-gray-200/50 dark:border-gray-700/50">
-                    <button type="button" (click)="changeFinanceType('expense')"
-                        [class]="financeForm().type === 'expense' 
-                            ? 'py-3 rounded-xl font-bold text-sm bg-red-500 text-white shadow-md shadow-red-500/20 transition-all border-none'
-                            : 'py-3 rounded-xl font-bold text-sm text-gray-500 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-gray-800/50 border-none bg-transparent transition-all'"
-                        class="flex items-center justify-center gap-2">
-                        <i class="fas fa-arrow-down-long"></i> Egreso / Gasto
-                    </button>
-                    <button type="button" (click)="changeFinanceType('income')"
-                        [class]="financeForm().type === 'income' 
-                            ? 'py-3 rounded-xl font-bold text-sm bg-emerald-500 text-white shadow-md shadow-emerald-500/20 transition-all border-none'
-                            : 'py-3 rounded-xl font-bold text-sm text-gray-500 dark:text-gray-400 hover:bg-white/50 dark:hover:bg-gray-800/50 border-none bg-transparent transition-all'"
-                        class="flex items-center justify-center gap-2">
-                        <i class="fas fa-arrow-up-long"></i> Ingreso / Caja
-                    </button>
-                </div>
-            </div>
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Balance Neto</p>
+        <h3
+          class="text-3xl font-black tracking-tight leading-none mb-3"
+          [class.text-emerald-600]="(dashboardData()?.kpis?.net_balance ?? 0) >= 0"
+          [class.dark:text-emerald-400]="(dashboardData()?.kpis?.net_balance ?? 0) >= 0"
+          [class.text-rose-600]="(dashboardData()?.kpis?.net_balance ?? 0) < 0"
+          [class.dark:text-rose-400]="(dashboardData()?.kpis?.net_balance ?? 0) < 0"
+        >
+          $ {{ (dashboardData()?.kpis?.net_balance ?? 0) | number:'1.0-0' }}
+        </h3>
+        <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-3 border-t border-slate-100 dark:border-slate-700/60 font-medium">
+          <span>Ingresos: <strong class="text-slate-800 dark:text-slate-200 font-bold">${{ (dashboardData()?.kpis?.total_income ?? 0) | number:'1.0-0' }}</strong></span>
+          <span>Egresos: <strong class="text-slate-800 dark:text-slate-200 font-bold">${{ (dashboardData()?.kpis?.total_expense ?? 0) | number:'1.0-0' }}</strong></span>
+        </div>
+      </div>
 
-            <!-- Fila: Monto -->
-            <div class="form-control">
-                <label class="label pb-1.5"><span class="label-text text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">Monto del Movimiento ($)</span></label>
-                <div class="relative">
-                    <span class="absolute left-4 top-1/2 -translate-y-1/2 font-mono text-xl font-bold" [ngClass]="financeForm().type === 'income' ? 'text-emerald-500' : 'text-red-500'">$</span>
-                    <input type="number" [ngModel]="financeForm().amount" (ngModelChange)="updateFinanceField('amount', $event)" name="amount" required min="1"
-                        class="input input-bordered w-full pl-10 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-800 dark:text-white focus:bg-white dark:focus:bg-gray-800 focus:border-violet-500 font-mono text-xl font-black shadow-inner transition-all h-14" placeholder="0.00" />
-                </div>
-            </div>
+      <!-- KPI 2: Ventas Online (E-commerce) -->
+      <div
+        id="kpi-ventas-online"
+        class="bg-white dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/70 dark:border-slate-700/60 shadow-sm transition-all duration-300 relative overflow-hidden group hover:shadow-lg hover:border-blue-300 dark:hover:border-blue-700"
+      >
+        <div class="flex items-start justify-between mb-4">
+          <div class="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 flex items-center justify-center text-xl shadow-inner">
+            <i class="fas fa-shopping-bag"></i>
+          </div>
+          <a
+            routerLink="/admin/orders"
+            class="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 font-bold flex items-center gap-1 group-hover:underline"
+          >
+            Ver Pedidos <i class="fas fa-arrow-right text-[10px]"></i>
+          </a>
+        </div>
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Ventas E-commerce</p>
+        <h3 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-none mb-3">
+          $ {{ (dashboardData()?.kpis?.ecommerce_amount ?? 0) | number:'1.0-0' }}
+        </h3>
+        <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-3 border-t border-slate-100 dark:border-slate-700/60 font-medium">
+          <span>Total de pedidos pagados:</span>
+          <strong class="text-slate-900 dark:text-white font-black text-sm">{{ dashboardData()?.kpis?.ecommerce_orders_count ?? 0 }}</strong>
+        </div>
+      </div>
 
-            <!-- Fila: Categoría y Método de Pago -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="form-control">
-                    <label class="label pb-1.5"><span class="label-text text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">Categoría</span></label>
-                    <select [ngModel]="financeForm().category" (ngModelChange)="updateFinanceField('category', $event)" name="category" required
-                        class="select select-bordered w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-semibold focus:border-violet-500 shadow-sm transition-all h-12">
-                        @for (cat of availableCategories(); track cat.value) {
-                            <option [value]="cat.value">{{ cat.label }}</option>
-                        }
-                    </select>
-                </div>
+      <!-- KPI 3: Reparaciones Pendientes -->
+      <div
+        id="kpi-reparaciones-pendientes"
+        class="bg-white dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/70 dark:border-slate-700/60 shadow-sm transition-all duration-300 relative overflow-hidden group hover:shadow-lg hover:border-amber-300 dark:hover:border-amber-700"
+      >
+        <div class="flex items-start justify-between mb-4">
+          <div class="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xl shadow-inner">
+            <i class="fas fa-tools"></i>
+          </div>
+          <a
+            routerLink="/admin/repairs"
+            class="text-xs text-amber-600 hover:text-amber-800 dark:text-amber-400 font-bold flex items-center gap-1 group-hover:underline"
+          >
+            Ver Taller <i class="fas fa-arrow-right text-[10px]"></i>
+          </a>
+        </div>
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Reparaciones Pendientes</p>
+        <div class="flex items-baseline gap-2 mb-2">
+          <h3 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-none">
+            {{ dashboardData()?.kpis?.active_repairs_count ?? 0 }}
+          </h3>
+          <span class="text-xs text-slate-400 font-semibold">equipos activos</span>
+        </div>
 
-                <div class="form-control">
-                    <label class="label pb-1.5"><span class="label-text text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">Método de Pago</span></label>
-                    <select [ngModel]="financeForm().payment_method" (ngModelChange)="updateFinanceField('payment_method', $event)" name="payment_method" required
-                        class="select select-bordered w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-semibold focus:border-violet-500 shadow-sm transition-all h-12">
-                        <option value="cash">💵 Efectivo</option>
-                        <option value="transfer">🏦 Transferencia Bancaria</option>
-                        <option value="credit_card">💳 Tarjeta de Crédito</option>
-                        <option value="debit_card">💳 Tarjeta de Débito</option>
-                    </select>
-                </div>
-            </div>
+        <!-- Alerta si hay más de 5 retrasadas -->
+        @if ((dashboardData()?.kpis?.delayed_repairs_count ?? 0) > 5 || dashboardData()?.kpis?.has_delayed_alert) {
+          <div id="delayed-repairs-alert" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400 border border-rose-500/20 mt-1">
+            <i class="fas fa-clock"></i> ⚠️ {{ dashboardData()?.kpis?.delayed_repairs_count ?? 0 }} en retraso
+          </div>
+        } @else {
+          <p class="text-xs text-emerald-600 dark:text-emerald-400 font-semibold mt-2 flex items-center gap-1">
+            <i class="fas fa-check-circle"></i> Ritmo de taller normal
+          </p>
+        }
+      </div>
 
-            <!-- Fila: Notas descriptivas -->
-            <div class="form-control">
-                <label class="label pb-1.5"><span class="label-text text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">Notas / Concepto descriptivo</span></label>
-                <textarea [ngModel]="financeForm().notes" (ngModelChange)="updateFinanceField('notes', $event)" name="notes" rows="2"
-                    class="textarea textarea-bordered w-full rounded-2xl bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 font-medium focus:border-violet-500 shadow-sm transition-all text-sm" placeholder="Ej: Compra de café para taller, Pago de publicidad de Meta Pixel..."></textarea>
-            </div>
-
-            <!-- Botones de Acción -->
-            <div class="flex gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">
-                <button type="button" class="btn bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-300 border-none rounded-2xl flex-1 font-bold h-12 transition-all" (click)="showFinanceModal.set(false)" [disabled]="savingFinance()">
-                    Cancelar
-                </button>
-                <button type="submit" 
-                    [class]="financeForm().type === 'income' ? 'bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/20' : 'bg-red-600 hover:bg-red-700 shadow-red-500/20'"
-                    class="btn text-white border-none rounded-2xl flex-1 font-bold h-12 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all" [disabled]="savingFinance()">
-                    @if (savingFinance()) {
-                        <span class="loading loading-spinner text-white opacity-80"></span> Guardando...
-                    } @else {
-                        <i class="fas fa-save mr-1 opacity-80"></i> Registrar
-                    }
-                </button>
-            </div>
-        </form>
+      <!-- KPI 4: Alumnos Activos en Academia -->
+      <div
+        id="kpi-alumnos-academia"
+        class="bg-white dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/70 dark:border-slate-700/60 shadow-sm transition-all duration-300 relative overflow-hidden group hover:shadow-lg hover:border-indigo-300 dark:hover:border-indigo-700"
+      >
+        <div class="flex items-start justify-between mb-4">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xl shadow-inner">
+            <i class="fas fa-graduation-cap"></i>
+          </div>
+          <a
+            routerLink="/admin/courses"
+            class="text-xs text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 font-bold flex items-center gap-1 group-hover:underline"
+          >
+            Ver Cursos <i class="fas fa-arrow-right text-[10px]"></i>
+          </a>
+        </div>
+        <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Alumnos en Academia</p>
+        <div class="flex items-baseline gap-2 mb-3">
+          <h3 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-none">
+            {{ dashboardData()?.kpis?.active_subscriptions_count ?? 0 }}
+          </h3>
+          <span class="text-xs text-slate-400 font-semibold">membresías activas</span>
+        </div>
+        <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-3 border-t border-slate-100 dark:border-slate-700/60 font-medium">
+          <span>Ingresos membresías:</span>
+          <strong class="text-slate-900 dark:text-white font-bold">$ {{ (dashboardData()?.kpis?.academy_revenue ?? 0) | number:'1.0-0' }}</strong>
+        </div>
+      </div>
     </div>
-</div>
+
+    <!-- MIDDLE ROW: Trend Charts -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+
+      <!-- Chart 1: Ingresos vs Egresos (Últimos 6 Meses) -->
+      <div
+        id="chart-trend-income-expense"
+        class="lg:col-span-2 bg-white dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/70 dark:border-slate-700/60 shadow-sm flex flex-col justify-between"
+      >
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h3 class="text-lg font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+              <i class="fas fa-chart-bar text-blue-700 mr-1"></i> Tendencia de Ingresos vs Egresos
+            </h3>
+            <p class="text-xs text-slate-400 font-medium mt-0.5">Evolución mensual consolidada (Caja, Tienda y Taller)</p>
+          </div>
+          <div class="flex items-center gap-3 text-xs font-bold">
+            <span class="flex items-center gap-1.5 text-blue-900 dark:text-blue-400">
+              <span class="w-3 h-3 rounded-full bg-blue-800"></span> Ingresos
+            </span>
+            <span class="flex items-center gap-1.5 text-orange-600 dark:text-orange-400">
+              <span class="w-3 h-3 rounded-full bg-orange-500"></span> Egresos
+            </span>
+          </div>
+        </div>
+
+        <div class="h-72 w-full relative">
+          @if (trendChartData) {
+            <canvas
+              baseChart
+              [data]="trendChartData"
+              [options]="trendChartOptions"
+              [type]="trendChartType"
+            ></canvas>
+          } @else {
+            <div class="h-full flex items-center justify-center text-slate-400 text-sm">
+              <i class="fas fa-chart-line mr-2 opacity-50"></i> Sin registros históricos para graficar
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Chart 2: Origen de Ingresos -->
+      <div
+        id="chart-revenue-origin"
+        class="bg-white dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/70 dark:border-slate-700/60 shadow-sm flex flex-col justify-between"
+      >
+        <div class="mb-4">
+          <h3 class="text-lg font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+            <i class="fas fa-pie-chart text-amber-500 mr-1"></i> Origen de Ingresos
+          </h3>
+          <p class="text-xs text-slate-400 font-medium mt-0.5">Distribución proporcional por canal de negocio</p>
+        </div>
+
+        <div class="h-60 w-full relative flex items-center justify-center">
+          @if (revenueOriginChartData) {
+            <canvas
+              baseChart
+              [data]="revenueOriginChartData"
+              [options]="revenueOriginChartOptions"
+              [type]="revenueOriginChartType"
+            ></canvas>
+          } @else {
+            <div class="h-full flex items-center justify-center text-slate-400 text-sm">
+              <i class="fas fa-circle-notch mr-2 opacity-50"></i> Sin movimientos registrados
+            </div>
+          }
+        </div>
+
+        <!-- Breakdown items -->
+        <div class="grid grid-cols-3 gap-2 pt-4 border-t border-slate-100 dark:border-slate-700/60 text-center">
+          <div>
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">E-commerce</span>
+            <strong class="text-xs font-black text-blue-700 dark:text-blue-400">
+              ${{ (dashboardData()?.charts?.revenue_by_origin?.ecommerce ?? 0) | number:'1.0-0' }}
+            </strong>
+          </div>
+          <div>
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Taller</span>
+            <strong class="text-xs font-black text-amber-600 dark:text-amber-400">
+              ${{ (dashboardData()?.charts?.revenue_by_origin?.repairs ?? 0) | number:'1.0-0' }}
+            </strong>
+          </div>
+          <div>
+            <span class="text-[10px] uppercase font-bold text-slate-400 block">Academia</span>
+            <strong class="text-xs font-black text-emerald-600 dark:text-emerald-400">
+              ${{ (dashboardData()?.charts?.revenue_by_origin?.academy ?? 0) | number:'1.0-0' }}
+            </strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM ROW: Centro de Alertas Operativas -->
+    <div id="center-operational-alerts" class="space-y-4">
+      <div class="flex items-center justify-between mb-2">
+        <div>
+          <h2 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+            <i class="fas fa-bell text-rose-500 mr-1"></i> Centro de Alertas Operativas
+          </h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">
+            Detección proactiva de desabastecimiento, demoras en retiros y suscripciones por vencer.
+          </p>
+        </div>
+      </div>
+
+      <!-- Alert Cards Grid (3 Columns) -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Alert Card 1: Stock Crítico -->
+        <div
+          id="alert-critical-stock"
+          class="bg-white dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/70 dark:border-slate-700/60 shadow-sm flex flex-col justify-between"
+        >
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 flex items-center justify-center text-sm">
+                  <i class="fas fa-boxes"></i>
+                </div>
+                <h4 class="font-black text-base text-slate-900 dark:text-white">Stock Crítico</h4>
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300">
+                {{ dashboardData()?.alerts?.critical_stock_items?.length ?? 0 }} en alerta
+              </span>
+            </div>
+
+            @if ((dashboardData()?.alerts?.critical_stock_items?.length ?? 0) === 0) {
+              <div class="py-8 text-center text-slate-400 text-sm">
+                <i class="fas fa-check-circle text-emerald-500 text-2xl mb-2"></i>
+                <p class="font-bold text-slate-700 dark:text-slate-300">Stock saludable</p>
+                <p class="text-xs">No hay productos por debajo del umbral mínimo.</p>
+              </div>
+            } @else {
+              <div class="space-y-2.5 max-h-64 overflow-y-auto pr-1">
+                @for (item of dashboardData()?.alerts?.critical_stock_items ?? []; track item.id) {
+                  <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-700/40 border border-slate-100 dark:border-slate-700/50 flex items-center justify-between text-xs">
+                    <div class="truncate max-w-[65%]">
+                      <p class="font-bold text-slate-900 dark:text-white truncate" [title]="item.name">{{ item.name }}</p>
+                      <p class="text-[11px] text-slate-400 font-mono">{{ item.sku || 'SKU N/A' }}</p>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                      <span class="inline-block px-2 py-0.5 rounded-lg bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-400 font-black">
+                        Stock: {{ item.stock }}
+                      </span>
+                      <span class="text-[10px] text-slate-400 block mt-0.5">Mín: {{ item.min_stock_alert }}</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="pt-4 mt-4 border-t border-slate-100 dark:border-slate-700/60 text-right">
+            <a
+              routerLink="/admin/products"
+              class="text-xs font-bold text-blue-700 hover:text-blue-900 dark:text-blue-400 inline-flex items-center gap-1"
+            >
+              Gestionar Inventario <i class="fas fa-arrow-right text-[10px]"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Alert Card 2: Reparaciones Listas > 48hs -->
+        <div
+          id="alert-overdue-repairs"
+          class="bg-white dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/70 dark:border-slate-700/60 shadow-sm flex flex-col justify-between"
+        >
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 flex items-center justify-center text-sm">
+                  <i class="fas fa-wrench"></i>
+                </div>
+                <h4 class="font-black text-base text-slate-900 dark:text-white">Retiros > 48hs</h4>
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                {{ dashboardData()?.alerts?.overdue_pickup_repairs?.length ?? 0 }} pendientes
+              </span>
+            </div>
+
+            @if ((dashboardData()?.alerts?.overdue_pickup_repairs?.length ?? 0) === 0) {
+              <div class="py-8 text-center text-slate-400 text-sm">
+                <i class="fas fa-check-circle text-emerald-500 text-2xl mb-2"></i>
+                <p class="font-bold text-slate-700 dark:text-slate-300">Retiros al día</p>
+                <p class="text-xs">No hay equipos demorados en el mostrador.</p>
+              </div>
+            } @else {
+              <div class="space-y-2.5 max-h-64 overflow-y-auto pr-1">
+                @for (repair of dashboardData()?.alerts?.overdue_pickup_repairs ?? []; track repair.id) {
+                  <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-700/40 border border-slate-100 dark:border-slate-700/50 flex items-center justify-between text-xs">
+                    <div class="truncate max-w-[65%]">
+                      <p class="font-bold text-slate-900 dark:text-white truncate">{{ repair.tracking_code }}</p>
+                      <p class="text-[11px] text-slate-500 truncate">{{ repair.client_name }}</p>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                      <span class="inline-block px-2 py-0.5 rounded-lg bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 font-bold">
+                        {{ repair.hours_waiting }} hs esperando
+                      </span>
+                      <span class="text-[10px] text-slate-400 block mt-0.5">Saldo: ${{ (repair.final_cost ?? 0) | number:'1.0-0' }}</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="pt-4 mt-4 border-t border-slate-100 dark:border-slate-700/60 text-right">
+            <a
+              routerLink="/admin/repairs"
+              class="text-xs font-bold text-amber-600 hover:text-amber-800 dark:text-amber-400 inline-flex items-center gap-1"
+            >
+              Ver Taller y Notificar <i class="fas fa-arrow-right text-[10px]"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Alert Card 3: Suscripciones en Grace Period -->
+        <div
+          id="alert-expiring-subscriptions"
+          class="bg-white dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl p-6 border border-slate-200/70 dark:border-slate-700/60 shadow-sm flex flex-col justify-between"
+        >
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-900/30 text-purple-600 flex items-center justify-center text-sm">
+                  <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h4 class="font-black text-base text-slate-900 dark:text-white">Membresías por Vencer</h4>
+              </div>
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300">
+                {{ dashboardData()?.alerts?.expiring_grace_subscriptions?.length ?? 0 }} en riesgo
+              </span>
+            </div>
+
+            @if ((dashboardData()?.alerts?.expiring_grace_subscriptions?.length ?? 0) === 0) {
+              <div class="py-8 text-center text-slate-400 text-sm">
+                <i class="fas fa-check-circle text-emerald-500 text-2xl mb-2"></i>
+                <p class="font-bold text-slate-700 dark:text-slate-300">Membresías al día</p>
+                <p class="text-xs">Sin alumnos en período de gracia crítico.</p>
+              </div>
+            } @else {
+              <div class="space-y-2.5 max-h-64 overflow-y-auto pr-1">
+                @for (sub of dashboardData()?.alerts?.expiring_grace_subscriptions ?? []; track sub.id) {
+                  <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-700/40 border border-slate-100 dark:border-slate-700/50 flex items-center justify-between text-xs">
+                    <div class="truncate max-w-[65%]">
+                      <p class="font-bold text-slate-900 dark:text-white truncate">{{ sub.student_name }}</p>
+                      <p class="text-[11px] text-slate-400 truncate">{{ sub.user_email }}</p>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                      <span class="inline-block px-2 py-0.5 rounded-lg bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300 font-bold">
+                        {{ sub.days_left }} días restantes
+                      </span>
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="pt-4 mt-4 border-t border-slate-100 dark:border-slate-700/60 text-right">
+            <a
+              routerLink="/admin/courses/subscriptions"
+              class="text-xs font-bold text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 inline-flex items-center gap-1"
+            >
+              Gestionar Suscripciones <i class="fas fa-arrow-right text-[10px]"></i>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  }
+
+  <!-- TAB 2: TOP PRODUCTOS Y VENTAS -->
+  @if (activeViewTab() === 'products') {
+    <div id="view-top-products" class="bg-white dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl p-6 md:p-8 border border-slate-200/70 dark:border-slate-700/60 shadow-sm animate-fade-in mb-8">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-slate-100 dark:border-slate-700/60 pb-5">
+        <div>
+          <h2 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+            <i class="fas fa-trophy text-amber-500 mr-1"></i> Top 10 Productos Más Vendidos
+          </h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">
+            Ranking por volumen de venta, facturación generada y disponibilidad de inventario actual.
+          </p>
+        </div>
+        <a routerLink="/admin/products" class="btn btn-sm bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-xl border-none shadow-sm flex items-center gap-1.5">
+          <i class="fas fa-boxes"></i> Inventario Completo
+        </a>
+      </div>
+
+      @if (loadingAnalytics()) {
+        <div class="py-12 flex justify-center items-center">
+          <span class="loading loading-spinner loading-md text-blue-700"></span>
+          <span class="ml-3 text-sm font-bold text-slate-500">Cargando ranking de productos...</span>
+        </div>
+      } @else if ((analyticsData()?.top_products?.length ?? 0) === 0) {
+        <div class="py-16 text-center text-slate-400">
+          <i class="fas fa-box-open text-4xl mb-3 opacity-40"></i>
+          <h4 class="font-bold text-base text-slate-700 dark:text-slate-300">Sin ventas en este período</h4>
+          <p class="text-xs">No se registraron pedidos completados en el rango seleccionado.</p>
+        </div>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="table table-zebra w-full text-left" id="table-top-products">
+            <thead>
+              <tr class="text-xs uppercase font-black text-slate-400 border-b border-slate-100 dark:border-slate-700/60">
+                <th class="py-3 px-4"># Posición</th>
+                <th class="py-3 px-4">Producto</th>
+                <th class="py-3 px-4">Categoría</th>
+                <th class="py-3 px-4 text-center">Unidades Vendidas</th>
+                <th class="py-3 px-4 text-right">Facturación</th>
+                <th class="py-3 px-4 text-center">Stock Actual</th>
+                <th class="py-3 px-4 text-right">Acción</th>
+              </tr>
+            </thead>
+            <tbody class="text-sm divide-y divide-slate-100 dark:divide-slate-700/40">
+              @for (prod of analyticsData()?.top_products ?? []; track prod.product_id || $index; let idx = $index) {
+                <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors">
+                  <td class="py-3.5 px-4 font-black">
+                    <span
+                      class="w-7 h-7 rounded-lg inline-flex items-center justify-center text-xs font-black"
+                      [class.bg-amber-400]="idx === 0"
+                      [class.text-amber-950]="idx === 0"
+                      [class.bg-slate-200]="idx === 1"
+                      [class.text-slate-800]="idx === 1"
+                      [class.bg-amber-700/20]="idx === 2"
+                      [class.text-amber-800]="idx === 2"
+                      [class.bg-slate-100]="idx > 2"
+                      [class.text-slate-600]="idx > 2"
+                      [class.dark:bg-slate-700]="idx > 2"
+                      [class.dark:text-slate-300]="idx > 2"
+                    >
+                      {{ idx + 1 }}
+                    </span>
+                  </td>
+                  <td class="py-3.5 px-4">
+                    <p class="font-bold text-slate-900 dark:text-white leading-tight">{{ prod.product_name }}</p>
+                    <p class="text-xs text-slate-400 font-mono">{{ prod.sku }}</p>
+                  </td>
+                  <td class="py-3.5 px-4">
+                    <span class="badge badge-sm font-semibold bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 border-none">
+                      {{ prod.category_name }}
+                    </span>
+                  </td>
+                  <td class="py-3.5 px-4 text-center font-black text-slate-900 dark:text-white">
+                    {{ prod.units_sold }}
+                  </td>
+                  <td class="py-3.5 px-4 text-right font-black text-blue-700 dark:text-blue-400">
+                    $ {{ prod.revenue | number:'1.0-0' }}
+                  </td>
+                  <td class="py-3.5 px-4 text-center">
+                    <span
+                      class="badge badge-sm font-black"
+                      [class.badge-error]="prod.current_stock <= 5"
+                      [class.badge-success]="prod.current_stock > 5"
+                    >
+                      {{ prod.current_stock }} un.
+                    </span>
+                  </td>
+                  <td class="py-3.5 px-4 text-right">
+                    <a routerLink="/admin/products" class="btn btn-xs btn-ghost text-blue-600 hover:text-blue-800 font-bold">
+                      Ver <i class="fas fa-arrow-right text-[10px]"></i>
+                    </a>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- TAB 3: CLIENTES Y RFM -->
+  @if (activeViewTab() === 'customers') {
+    <div id="view-customers-rfm" class="space-y-6 animate-fade-in mb-8">
+      <div class="bg-white dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl p-6 md:p-8 border border-slate-200/70 dark:border-slate-700/60 shadow-sm">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-slate-100 dark:border-slate-700/60 pb-5">
+          <div>
+            <h2 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+              <i class="fas fa-users text-indigo-500 mr-1"></i> Análisis de Clientes y Segmentación RFM
+            </h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">
+              Recency (recencia), Frequency (frecuencia) y Monetary (valor LTV) de compradores registrados y recurrentes.
+            </p>
+          </div>
+          <a routerLink="/admin/orders" class="btn btn-sm bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl border-none shadow-sm flex items-center gap-1.5">
+            <i class="fas fa-receipt"></i> Historial de Pedidos
+          </a>
+        </div>
+
+        <!-- RFM Summary KPIs -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
+          <div class="p-5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200/60 dark:border-indigo-800/50">
+            <p class="text-xs uppercase font-black text-indigo-600 dark:text-indigo-400 tracking-wider mb-1">Tasa de Recompra</p>
+            <h3 class="text-3xl font-black text-slate-900 dark:text-white" id="customer-repeat-rate">
+              {{ analyticsData()?.customer_analytics?.repeat_purchase_rate ?? 0 }}%
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Porcentaje de clientes con > 1 pedido</p>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-800/50">
+            <p class="text-xs uppercase font-black text-blue-600 dark:text-blue-400 tracking-wider mb-1">Clientes Totales</p>
+            <h3 class="text-3xl font-black text-slate-900 dark:text-white">
+              {{ analyticsData()?.customer_analytics?.total_customers ?? 0 }}
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Compradores únicos en la base de datos</p>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/50">
+            <p class="text-xs uppercase font-black text-emerald-600 dark:text-emerald-400 tracking-wider mb-1">Clientes Recurrentes</p>
+            <h3 class="text-3xl font-black text-slate-900 dark:text-white">
+              {{ analyticsData()?.customer_analytics?.repeat_customers ?? 0 }}
+            </h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Clientes con múltiples órdenes pagadas</p>
+          </div>
+        </div>
+
+        <!-- Top RFM Customers Table -->
+        @if (loadingAnalytics()) {
+          <div class="py-12 flex justify-center items-center">
+            <span class="loading loading-spinner loading-md text-indigo-600"></span>
+            <span class="ml-3 text-sm font-bold text-slate-500">Cargando segmentación de clientes...</span>
+          </div>
+        } @else if ((analyticsData()?.customer_analytics?.top_customers?.length ?? 0) === 0) {
+          <div class="py-16 text-center text-slate-400">
+            <i class="fas fa-user-slash text-4xl mb-3 opacity-40"></i>
+            <h4 class="font-bold text-base text-slate-700 dark:text-slate-300">Sin datos de clientes en el período</h4>
+            <p class="text-xs">No se encontraron clientes con órdenes pagadas registradas.</p>
+          </div>
+        } @else {
+          <div class="overflow-x-auto">
+            <table class="table table-zebra w-full text-left" id="table-customers-rfm">
+              <thead>
+                <tr class="text-xs uppercase font-black text-slate-400 border-b border-slate-100 dark:border-slate-700/60">
+                  <th class="py-3 px-4">Cliente</th>
+                  <th class="py-3 px-4">Email</th>
+                  <th class="py-3 px-4 text-center">Frecuencia</th>
+                  <th class="py-3 px-4 text-right">LTV Monetario</th>
+                  <th class="py-3 px-4 text-center">Última Compra</th>
+                  <th class="py-3 px-4 text-right">Segmento RFM</th>
+                </tr>
+              </thead>
+              <tbody class="text-sm divide-y divide-slate-100 dark:divide-slate-700/40">
+                @for (cust of analyticsData()?.customer_analytics?.top_customers ?? []; track cust.customer_email || $index) {
+                  <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors">
+                    <td class="py-3.5 px-4 font-bold text-slate-900 dark:text-white">
+                      {{ cust.customer_name }}
+                    </td>
+                    <td class="py-3.5 px-4 text-slate-500 dark:text-slate-400 font-mono text-xs">
+                      {{ cust.customer_email }}
+                    </td>
+                    <td class="py-3.5 px-4 text-center font-black">
+                      <span class="badge badge-sm bg-slate-100 dark:bg-slate-700 font-bold">
+                        {{ cust.frequency }} {{ cust.frequency === 1 ? 'pedido' : 'pedidos' }}
+                      </span>
+                    </td>
+                    <td class="py-3.5 px-4 text-right font-black text-emerald-600 dark:text-emerald-400">
+                      $ {{ cust.monetary | number:'1.0-0' }}
+                    </td>
+                    <td class="py-3.5 px-4 text-center text-xs text-slate-500">
+                      {{ cust.last_order_date }}
+                    </td>
+                    <td class="py-3.5 px-4 text-right">
+                      <span
+                        class="px-2.5 py-1 rounded-full text-xs font-black inline-block"
+                        [class.bg-amber-100]="cust.segment.includes('Campeón')"
+                        [class.text-amber-800]="cust.segment.includes('Campeón')"
+                        [class.bg-indigo-100]="cust.segment.includes('Frecuente')"
+                        [class.text-indigo-800]="cust.segment.includes('Frecuente')"
+                        [class.bg-rose-100]="cust.segment.includes('Riesgo')"
+                        [class.text-rose-800]="cust.segment.includes('Riesgo')"
+                        [class.bg-slate-100]="cust.segment.includes('Nuevo') || cust.segment.includes('Ocasional')"
+                        [class.text-slate-700]="cust.segment.includes('Nuevo') || cust.segment.includes('Ocasional')"
+                      >
+                        {{ cust.segment }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- TAB 4: TALLER (MARCAS Y MODELOS) -->
+  @if (activeViewTab() === 'repairs') {
+    <div id="view-repairs-analytics" class="space-y-6 animate-fade-in mb-8">
+      <div class="bg-white dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl p-6 md:p-8 border border-slate-200/70 dark:border-slate-700/60 shadow-sm">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-slate-100 dark:border-slate-700/60 pb-5">
+          <div>
+            <h2 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+              <i class="fas fa-wrench text-amber-500 mr-1"></i> Estadísticas del Taller: Marcas, Modelos y Fallas
+            </h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">
+              Volumen de reparaciones categorizado por fabricante, modelo de equipo e incidencia de fallas comunes.
+            </p>
+          </div>
+          <a routerLink="/admin/repairs" class="btn btn-sm bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl border-none shadow-sm flex items-center gap-1.5">
+            <i class="fas fa-tools"></i> Módulo Taller
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- 1. Tickets por Marca -->
+          <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-700/30 border border-slate-200/60 dark:border-slate-700/50 flex flex-col justify-between">
+            <div>
+              <h4 class="font-black text-base text-slate-900 dark:text-white mb-1 flex items-center gap-2">
+                <i class="fas fa-tag text-blue-600"></i> Reparaciones por Marca
+              </h4>
+              <p class="text-xs text-slate-400 mb-4">Fabricantes con mayor número de equipos ingresados</p>
+
+              <div class="space-y-3" id="list-repairs-by-brand">
+                @for (brand of analyticsData()?.repair_analytics?.by_brand ?? []; track brand.brand_name) {
+                  <div>
+                    <div class="flex justify-between items-center text-xs font-bold mb-1">
+                      <span class="text-slate-800 dark:text-slate-200">{{ brand.brand_name }}</span>
+                      <span class="text-slate-500">{{ brand.repair_count }} equipos ({{ brand.percentage }}%)</span>
+                    </div>
+                    <div class="w-full bg-slate-200 dark:bg-slate-600 h-2 rounded-full overflow-hidden">
+                      <div class="bg-blue-600 h-2 rounded-full" [style.width.%]="brand.percentage"></div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Tickets por Modelo -->
+          <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-700/30 border border-slate-200/60 dark:border-slate-700/50 flex flex-col justify-between">
+            <div>
+              <h4 class="font-black text-base text-slate-900 dark:text-white mb-1 flex items-center gap-2">
+                <i class="fas fa-mobile-alt text-amber-600"></i> Modelos Más Reparados
+              </h4>
+              <p class="text-xs text-slate-400 mb-4">Equipos con mayor recurrencia de servicio técnico</p>
+
+              <div class="space-y-2.5 max-h-80 overflow-y-auto pr-1" id="list-repairs-by-model">
+                @for (mod of analyticsData()?.repair_analytics?.by_model ?? []; track mod.model_name) {
+                  <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-between text-xs">
+                    <div>
+                      <p class="font-bold text-slate-900 dark:text-white">{{ mod.model_name }}</p>
+                      <p class="text-[11px] text-slate-400">{{ mod.brand_name }}</p>
+                    </div>
+                    <span class="badge badge-sm bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 font-bold">
+                      {{ mod.repair_count }} rep.
+                    </span>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Fallas Comunes / Causa Raíz -->
+          <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-700/30 border border-slate-200/60 dark:border-slate-700/50 flex flex-col justify-between">
+            <div>
+              <h4 class="font-black text-base text-slate-900 dark:text-white mb-1 flex items-center gap-2">
+                <i class="fas fa-exclamation-triangle text-rose-500"></i> Fallas Recurrentes
+              </h4>
+              <p class="text-xs text-slate-400 mb-4">Problemas técnicos más diagnosticados</p>
+
+              <div class="space-y-2.5 max-h-80 overflow-y-auto pr-1" id="list-common-issues">
+                @for (issue of analyticsData()?.repair_analytics?.common_issues ?? []; track issue.issue) {
+                  <div class="p-3 rounded-xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-between text-xs">
+                    <p class="font-bold text-slate-800 dark:text-slate-200 truncate max-w-[70%]" [title]="issue.issue">
+                      {{ issue.issue }}
+                    </p>
+                    <span class="badge badge-sm bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300 font-bold">
+                      {{ issue.count }} casos
+                    </span>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- TAB 5: SALUD DE BASE DE DATOS (POSTGRESQL PG_STAT_*) -->
+  @if (activeViewTab() === 'health') {
+    <div id="view-database-health" class="space-y-6 animate-fade-in mb-8">
+      <div class="bg-white dark:bg-slate-800/80 backdrop-blur-xl rounded-3xl p-6 md:p-8 border border-slate-200/70 dark:border-slate-700/60 shadow-sm">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4 border-b border-slate-100 dark:border-slate-700/60 pb-5">
+          <div>
+            <h2 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
+              <i class="fas fa-heartbeat text-emerald-500 mr-1"></i> Monitor de Salud de PostgreSQL
+            </h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400 font-medium">
+              Inspección operativa directa de <code class="font-mono text-xs bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded">db.arecofix.com.ar</code> vía <code class="font-mono text-xs bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded">pg_stat_*</code>.
+            </p>
+          </div>
+          <div class="flex items-center gap-3">
+            <a
+              href="https://studio.arecofix.com.ar"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl border-none shadow-sm flex items-center gap-1.5"
+              id="btn-health-open-studio"
+            >
+              <i class="fas fa-database"></i> Abrir Supabase Studio / pgAdmin <i class="fas fa-external-link-alt text-[10px]"></i>
+            </a>
+            <button
+              (click)="loadDatabaseHealth()"
+              [disabled]="loadingDbHealth()"
+              class="btn btn-sm btn-ghost border border-slate-200 dark:border-slate-700 rounded-xl"
+              title="Refrescar métricas de DB"
+            >
+              <i class="fas fa-sync-alt" [class.animate-spin]="loadingDbHealth()"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4 Top Health Indicators -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+          <!-- Card 1: Estado General -->
+          <div class="p-5 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/50">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs uppercase font-black text-emerald-600 dark:text-emerald-400 tracking-wider">Estado Global</span>
+              <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+            </div>
+            <h3 class="text-2xl font-black text-slate-900 dark:text-white capitalize" id="health-status-badge">
+              {{ dbHealthData()?.status === 'healthy' ? 'Saludable' : dbHealthData()?.status }}
+            </h3>
+            <p class="text-xs text-slate-500 mt-1 font-mono">Host: {{ dbHealthData()?.links?.db_host || 'db.arecofix.com.ar' }}</p>
+          </div>
+
+          <!-- Card 2: Conexiones -->
+          <div class="p-5 rounded-2xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-800/50">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs uppercase font-black text-blue-600 dark:text-blue-400 tracking-wider">Conexiones</span>
+              <span class="badge badge-sm font-bold bg-blue-100 text-blue-800">{{ dbHealthData()?.connections?.percentage ?? 0 }}%</span>
+            </div>
+            <h3 class="text-2xl font-black text-slate-900 dark:text-white" id="health-connections-count">
+              {{ dbHealthData()?.connections?.active ?? 0 }} / {{ dbHealthData()?.connections?.max ?? 100 }}
+            </h3>
+            <p class="text-xs text-slate-500 mt-1">Idle in tx: {{ dbHealthData()?.connections?.idle_in_transaction ?? 0 }}</p>
+          </div>
+
+          <!-- Card 3: Cache Hit Ratio -->
+          <div class="p-5 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200/60 dark:border-indigo-800/50">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs uppercase font-black text-indigo-600 dark:text-indigo-400 tracking-wider">Buffer Cache Hit</span>
+              <span class="text-xs text-emerald-600 font-bold"><i class="fas fa-check-circle"></i> Óptimo</span>
+            </div>
+            <h3 class="text-2xl font-black text-slate-900 dark:text-white" id="health-cache-hit">
+              {{ dbHealthData()?.performance?.cache_hit_ratio ?? 99.9 }}%
+            </h3>
+            <p class="text-xs text-slate-500 mt-1">Eficiencia de lectura en memoria</p>
+          </div>
+
+          <!-- Card 4: Bloqueos y Long Queries -->
+          <div class="p-5 rounded-2xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/60 dark:border-amber-800/50">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs uppercase font-black text-amber-600 dark:text-amber-400 tracking-wider">Bloqueos & Queries</span>
+              <span class="text-xs text-slate-400 font-mono">{{ dbHealthData()?.timestamp }}</span>
+            </div>
+            <h3 class="text-2xl font-black text-slate-900 dark:text-white">
+              {{ dbHealthData()?.performance?.blocked_locks ?? 0 }} bloqueos
+            </h3>
+            <p class="text-xs text-slate-500 mt-1">Consultas lentas (> 30m): {{ dbHealthData()?.performance?.long_running_queries ?? 0 }}</p>
+          </div>
+        </div>
+
+        <!-- Table Stats -->
+        <div class="mb-8">
+          <h4 class="font-black text-base text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+            <i class="fas fa-table text-blue-600"></i> Métricas por Tabla (Volumen, Tuplas Muertas y Vacuum)
+          </h4>
+          <div class="overflow-x-auto">
+            <table class="table table-zebra w-full text-left" id="table-db-stats">
+              <thead>
+                <tr class="text-xs uppercase font-black text-slate-400 border-b border-slate-100 dark:border-slate-700/60">
+                  <th class="py-3 px-4">Tabla</th>
+                  <th class="py-3 px-4 text-center">Filas Estimadas</th>
+                  <th class="py-3 px-4 text-center">Tuplas Muertas</th>
+                  <th class="py-3 px-4">Último Autovacuum</th>
+                  <th class="py-3 px-4 text-center">% Uso de Índices</th>
+                  <th class="py-3 px-4 text-right">Tamaño en Disco</th>
+                </tr>
+              </thead>
+              <tbody class="text-sm divide-y divide-slate-100 dark:divide-slate-700/40">
+                @for (tbl of dbHealthData()?.table_stats ?? []; track tbl.table_name) {
+                  <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-700/30 transition-colors">
+                    <td class="py-3.5 px-4 font-bold font-mono text-slate-900 dark:text-white">
+                      public.{{ tbl.table_name }}
+                    </td>
+                    <td class="py-3.5 px-4 text-center font-bold">
+                      {{ tbl.row_count | number }}
+                    </td>
+                    <td class="py-3.5 px-4 text-center font-bold" [class.text-amber-600]="tbl.dead_tuples > 100">
+                      {{ tbl.dead_tuples }}
+                    </td>
+                    <td class="py-3.5 px-4 text-xs text-slate-500">
+                      {{ tbl.last_autovacuum || 'Automático regular' }}
+                    </td>
+                    <td class="py-3.5 px-4 text-center">
+                      <span
+                        class="badge badge-sm font-bold"
+                        [class.badge-success]="tbl.idx_scan_pct >= 50"
+                        [class.badge-warning]="tbl.idx_scan_pct < 50"
+                      >
+                        {{ tbl.idx_scan_pct }}%
+                      </span>
+                    </td>
+                    <td class="py-3.5 px-4 text-right font-black font-mono text-slate-800 dark:text-slate-200">
+                      {{ tbl.total_size }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Data Freshness -->
+        <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-700/30 border border-slate-200/60 dark:border-slate-700/50">
+          <h4 class="font-black text-base text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+            <i class="fas fa-history text-indigo-500"></i> Frescura de Datos (Últimas Actividades Registradas)
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 text-xs">
+            <div class="p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
+              <span class="text-slate-400 font-bold block mb-1">Último Pedido</span>
+              <strong class="text-slate-800 dark:text-slate-200 font-mono">{{ dbHealthData()?.data_freshness?.last_order || 'N/A' }}</strong>
+            </div>
+            <div class="p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
+              <span class="text-slate-400 font-bold block mb-1">Última Reparación</span>
+              <strong class="text-slate-800 dark:text-slate-200 font-mono">{{ dbHealthData()?.data_freshness?.last_repair || 'N/A' }}</strong>
+            </div>
+            <div class="p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
+              <span class="text-slate-400 font-bold block mb-1">Último Movimiento Caja</span>
+              <strong class="text-slate-800 dark:text-slate-200 font-mono">{{ dbHealthData()?.data_freshness?.last_cash_movement || 'N/A' }}</strong>
+            </div>
+            <div class="p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
+              <span class="text-slate-400 font-bold block mb-1">Último Alumno / Curso</span>
+              <strong class="text-slate-800 dark:text-slate-200 font-mono">{{ dbHealthData()?.data_freshness?.last_enrollment || 'N/A' }}</strong>
+            </div>
+            <div class="p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700">
+              <span class="text-slate-400 font-bold block mb-1">Último Producto</span>
+              <strong class="text-slate-800 dark:text-slate-200 font-mono">{{ dbHealthData()?.data_freshness?.last_product || 'N/A' }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
 }
 
+  <!-- Manual Movement Registration Modal -->
+  @if (showFinanceModal()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+      <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl border border-slate-200 dark:border-slate-700">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center text-lg">
+              <i class="fas fa-coins"></i>
+            </div>
+            <div>
+              <h3 class="text-xl font-black text-slate-900 dark:text-white">Registrar Movimiento de Caja</h3>
+              <p class="text-xs text-slate-400">Ingreso o egreso directo en el libro diario de tesorería.</p>
+            </div>
+          </div>
+          <button (click)="showFinanceModal.set(false)" class="btn btn-sm btn-ghost btn-circle">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
 
+        <!-- Tipo: Ingreso vs Egreso -->
+        <div class="grid grid-cols-2 gap-3 mb-5">
+          <button
+            type="button"
+            (click)="changeFinanceType('income')"
+            class="py-3 px-4 rounded-2xl font-bold text-sm border-2 transition-all flex items-center justify-center gap-2"
+            [class.border-emerald-500]="financeForm().type === 'income'"
+            [class.bg-emerald-50]="financeForm().type === 'income'"
+            [class.text-emerald-700]="financeForm().type === 'income'"
+            [class.border-slate-200]="financeForm().type !== 'income'"
+            [class.text-slate-600]="financeForm().type !== 'income'"
+          >
+            <i class="fas fa-arrow-down text-emerald-600"></i> Ingreso (+)
+          </button>
+          <button
+            type="button"
+            (click)="changeFinanceType('expense')"
+            class="py-3 px-4 rounded-2xl font-bold text-sm border-2 transition-all flex items-center justify-center gap-2"
+            [class.border-rose-500]="financeForm().type === 'expense'"
+            [class.bg-rose-50]="financeForm().type === 'expense'"
+            [class.text-rose-700]="financeForm().type === 'expense'"
+            [class.border-slate-200]="financeForm().type !== 'expense'"
+            [class.text-slate-600]="financeForm().type !== 'expense'"
+          >
+            <i class="fas fa-arrow-up text-rose-600"></i> Egreso (-)
+          </button>
+        </div>
+
+        <!-- Monto -->
+        <div class="mb-4">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Monto en ARS ($)</label>
+          <input
+            type="number"
+            min="1"
+            [ngModel]="financeForm().amount"
+            (ngModelChange)="updateFinanceField('amount', $event)"
+            placeholder="0.00"
+            class="input input-bordered w-full rounded-xl text-lg font-black"
+          />
+        </div>
+
+        <!-- Categoría -->
+        <div class="mb-4">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Categoría</label>
+          <select
+            [ngModel]="financeForm().category"
+            (ngModelChange)="updateFinanceField('category', $event)"
+            class="select select-bordered w-full rounded-xl text-sm font-semibold"
+          >
+            @for (cat of availableCategories(); track cat.value) {
+              <option [value]="cat.value">{{ cat.label }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Notas -->
+        <div class="mb-6">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Notas / Motivo</label>
+          <input
+            type="text"
+            [ngModel]="financeForm().notes"
+            (ngModelChange)="updateFinanceField('notes', $event)"
+            placeholder="Ej. Pago de flete, compra de cinta térmica..."
+            class="input input-bordered w-full rounded-xl text-sm"
+          />
+        </div>
+
+        <div class="flex items-center justify-end gap-3">
+          <button
+            type="button"
+            (click)="showFinanceModal.set(false)"
+            class="btn btn-ghost rounded-xl text-slate-500 font-bold text-sm"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            (click)="saveManualMovement()"
+            [disabled]="savingFinance()"
+            class="btn bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-xl px-6 border-none shadow-md"
+          >
+            @if (savingFinance()) {
+              <span class="loading loading-spinner loading-xs mr-1"></span>
+            }
+            Guardar Movimiento
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

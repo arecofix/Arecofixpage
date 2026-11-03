@@ -6,6 +6,7 @@ import { SUPABASE_CLIENT } from '../di/supabase-token';
 import { DatabaseError } from '../errors/application.error';
 import { LoggerService } from './logger.service';
 import { TENANT_CONSTANTS } from '../constants/tenant.constants';
+import { assertUuid } from '../utils/uuid.utils';
 
 /**
  * Interfaz base para un Tenant de Arecofix SaaS
@@ -88,17 +89,20 @@ export class TenantService {
    */
   getTenantId(): string {
     const tenant = this._currentTenant();
-    if (tenant) return tenant.id;
+    if (tenant) {
+      const valid = assertUuid(tenant.id);
+      if (valid) return valid;
+    }
 
     if (isPlatformBrowser(this.platformId)) {
       // Intenta recuperar de localStorage en entornos browser como fallback temporal si Signal cayó (ej: F5)
       const storedId = localStorage.getItem('arecofix_tenant_id');
       if (storedId) {
-        const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(storedId);
-        if (isUUID) {
-          return storedId;
+        const valid = assertUuid(storedId);
+        if (valid) {
+          return valid;
         } else {
-          // Limpiar caché corrupto (ej: guardaron un slug 'arecofix' en vez de UUID)
+          // Limpiar caché corrupto (ej: guardaron un slug 'arecofix' o 'undefined' en vez de UUID)
           localStorage.removeItem('arecofix_tenant_id');
         }
       }
@@ -241,11 +245,17 @@ export class TenantService {
    * Seteo forzoso del Tenant (Utilizado principalmente tras Login del Admin/Owner o si resuelven su tienda)
    */
   setTenant(tenant: Tenant): void {
+    if (!tenant) return;
     this._currentTenant.set(tenant);
     this._isInitialized.set(true);
     
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('arecofix_tenant_id', tenant.id);
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const validId = assertUuid(tenant.id);
+      if (validId) {
+        localStorage.setItem('arecofix_tenant_id', validId);
+      } else {
+        localStorage.removeItem('arecofix_tenant_id');
+      }
       
       // Feature Útil: Aplicar Clean Code inyectando la variable CSS del color de la marca del tenant
       if (tenant.branding_settings?.primary_color) {

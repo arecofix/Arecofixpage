@@ -1,0 +1,213 @@
+<div class="space-y-6">
+
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-emerald-400 flex items-center gap-2">
+        <i class="fas fa-users-viewfinder"></i> Prospectos y Consultas (Leads)
+      </h1>
+      <p class="text-xs text-gray-500 mt-1">
+        Consultas generadas a través de las landing pages de servicios y formularios de contacto.
+      </p>
+    </div>
+    <div>
+      <a routerLink="/admin/services" class="btn btn-outline btn-sm gap-1.5 text-xs">
+        <i class="fas fa-layer-group"></i> Ver Servicios
+      </a>
+    </div>
+  </div>
+
+  <!-- Filter & Search Toolbar -->
+  <div class="bg-base-100 p-4 rounded-2xl border border-base-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+    <!-- Search Bar -->
+    <div class="relative flex-1 min-w-[240px] max-w-md">
+      <i class="fas fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+      <input type="text" [(ngModel)]="search" (ngModelChange)="onSearchChange()"
+             placeholder="Buscar por nombre, correo o teléfono..."
+             class="input input-sm input-bordered w-full pl-9 text-xs" />
+    </div>
+
+    <!-- Status Filters -->
+    <div class="join overflow-x-auto">
+      <button type="button" class="join-item btn btn-xs"
+              [class.btn-active]="filterStatus() === 'all'" (click)="onFilterStatusChange('all')">
+        Todos ({{ totalItems() }})
+      </button>
+      <button type="button" class="join-item btn btn-xs"
+              [class.btn-active]="filterStatus() === 'new'" (click)="onFilterStatusChange('new')">
+        Nuevos
+      </button>
+      <button type="button" class="join-item btn btn-xs"
+              [class.btn-active]="filterStatus() === 'contacted'" (click)="onFilterStatusChange('contacted')">
+        Contactados
+      </button>
+      <button type="button" class="join-item btn btn-xs"
+              [class.btn-active]="filterStatus() === 'quoted'" (click)="onFilterStatusChange('quoted')">
+        Cotizados
+      </button>
+      <button type="button" class="join-item btn btn-xs"
+              [class.btn-active]="filterStatus() === 'won'" (click)="onFilterStatusChange('won')">
+        Ganados
+      </button>
+      <button type="button" class="join-item btn btn-xs"
+              [class.btn-active]="filterStatus() === 'lost'" (click)="onFilterStatusChange('lost')">
+        Perdidos
+      </button>
+    </div>
+  </div>
+
+  <!-- Table Card -->
+  <div class="bg-base-100 rounded-2xl border border-base-200 shadow-sm overflow-hidden text-base-content">
+    <div class="overflow-x-auto">
+      <table class="table w-full text-xs">
+        <thead>
+          <tr class="text-base-content bg-base-200/50">
+            <th>Fecha</th>
+            <th>Cliente</th>
+            <th>Contacto</th>
+            <th>Servicio</th>
+            <th>Mensaje</th>
+            <th>Estado</th>
+            <th class="text-right">Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading()) {
+            <tr>
+              <td colspan="7" class="text-center py-12">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+                <span class="text-gray-400">Cargando prospectos...</span>
+              </td>
+            </tr>
+          } @else if (leads().length === 0) {
+            <tr>
+              <td colspan="7" class="text-center py-12 text-gray-400">
+                <i class="fas fa-inbox text-3xl mb-2 block"></i>
+                No se encontraron consultas registradas.
+              </td>
+            </tr>
+          } @else {
+            @for (lead of leads(); track lead.id) {
+              <tr class="hover:bg-base-200/40 transition-colors">
+                <td class="font-mono text-gray-500 whitespace-nowrap">
+                  {{ lead.created_at | date:'dd/MM/yyyy HH:mm' }}
+                </td>
+                <td class="font-bold text-base-content">
+                  {{ lead.name }}
+                </td>
+                <td>
+                  <div class="font-medium text-emerald-600 dark:text-emerald-400">{{ lead.phone || '—' }}</div>
+                  <div class="text-[11px] text-gray-500">{{ lead.email || '' }}</div>
+                </td>
+                <td>
+                  @if (lead.service_id) {
+                    <a [routerLink]="['/admin/services', lead.service_id, 'edit']" class="badge badge-sm badge-ghost hover:badge-primary text-[10px]">
+                      {{ lead.service_name || 'Ver Servicio' }}
+                    </a>
+                  } @else {
+                    <span class="text-gray-400">General</span>
+                  }
+                </td>
+                <td class="max-w-xs truncate cursor-pointer hover:text-primary" (click)="openLeadDetail(lead)" [title]="lead.message">
+                  {{ lead.message }}
+                </td>
+                <td>
+                  <select [ngModel]="lead.status" (ngModelChange)="updateStatus(lead.id, $event)"
+                          class="select select-bordered select-xs font-semibold"
+                          [class.text-amber-500]="lead.status === 'new'"
+                          [class.text-blue-500]="lead.status === 'contacted'"
+                          [class.text-purple-500]="lead.status === 'quoted'"
+                          [class.text-emerald-600]="lead.status === 'won'"
+                          [class.text-gray-400]="lead.status === 'lost'">
+                    <option value="new">🟡 Nuevo</option>
+                    <option value="contacted">🔵 Contactado</option>
+                    <option value="quoted">🟣 Cotizado</option>
+                    <option value="won">🟢 Ganado</option>
+                    <option value="lost">⚪ Perdido</option>
+                  </select>
+                </td>
+                <td class="text-right">
+                  <button type="button" (click)="openLeadDetail(lead)" class="btn btn-ghost btn-xs text-primary" title="Ver detalles">
+                    <i class="fas fa-eye"></i> Detalle
+                  </button>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="p-4 border-t border-base-200 flex justify-center">
+      <pagination [pages]="totalPages()" [currentPage]="currentPage()" (pageChange)="changePage($event)" />
+    </div>
+  </div>
+
+  <!-- Detail Modal -->
+  @if (selectedLead(); as lead) {
+    <div class="modal modal-open">
+      <div class="modal-box max-w-lg">
+        <div class="flex justify-between items-start border-b border-base-200 pb-3 mb-4">
+          <div>
+            <h3 class="font-bold text-lg text-base-content">{{ lead.name }}</h3>
+            <p class="text-xs text-gray-500 font-mono">{{ lead.created_at | date:'fullDate' }} - {{ lead.created_at | date:'mediumTime' }}</p>
+          </div>
+          <button type="button" (click)="closeLeadDetail()" class="btn btn-sm btn-circle btn-ghost">✕</button>
+        </div>
+
+        <div class="space-y-4 text-xs">
+          <div class="grid grid-cols-2 gap-4 p-3 bg-base-200/50 rounded-xl">
+            <div>
+              <span class="text-gray-400 block font-semibold">Teléfono / WhatsApp</span>
+              <span class="font-bold text-base-content">{{ lead.phone || 'No especificado' }}</span>
+              @if (lead.phone) {
+                <a [href]="'https://wa.me/' + lead.phone.replace(' ', '')" target="_blank" rel="noopener noreferrer"
+                   class="btn btn-xs btn-success text-white mt-1.5 flex items-center gap-1 w-fit">
+                  <i class="fab fa-whatsapp"></i> Abrir WhatsApp
+                </a>
+              }
+            </div>
+            <div>
+              <span class="text-gray-400 block font-semibold">Correo Electrónico</span>
+              <span class="font-bold text-base-content">{{ lead.email || 'No especificado' }}</span>
+            </div>
+          </div>
+
+          <div>
+            <span class="text-gray-400 block font-semibold mb-1">Mensaje Completo:</span>
+            <div class="p-4 rounded-xl bg-base-200 text-base-content text-sm whitespace-pre-wrap leading-relaxed border border-base-300">
+              {{ lead.message }}
+            </div>
+          </div>
+
+          @if (lead.utm_source || lead.utm_campaign) {
+            <div class="p-3 bg-base-200/30 rounded-xl text-[11px] text-gray-500 space-y-1">
+              <span class="font-bold text-gray-700 dark:text-gray-300 block">Datos de Campaña (UTM):</span>
+              <div>Fuente: <code>{{ lead.utm_source || 'N/A' }}</code> | Medio: <code>{{ lead.utm_medium || 'N/A' }}</code></div>
+              <div>Campaña: <code>{{ lead.utm_campaign || 'N/A' }}</code></div>
+            </div>
+          }
+
+          <div>
+            <span class="text-gray-400 block font-semibold mb-1">Estado de la Consulta:</span>
+            <select [ngModel]="lead.status" (ngModelChange)="updateStatus(lead.id, $event)"
+                    class="select select-bordered select-sm w-full font-bold">
+              <option value="new">🟡 Nuevo</option>
+              <option value="contacted">🔵 Contactado</option>
+              <option value="quoted">🟣 Cotizado</option>
+              <option value="won">🟢 Ganado</option>
+              <option value="lost">⚪ Perdido</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-action">
+          <button type="button" (click)="closeLeadDetail()" class="btn btn-sm">Cerrar</button>
+        </div>
+      </div>
+      <div class="modal-backdrop" (click)="closeLeadDetail()"></div>
+    </div>
+  }
+
+</div>

@@ -28,7 +28,6 @@
                     </div>
                     <input type="text" #searchInput [ngModel]="searchInputText()" (ngModelChange)="searchInputText.set($event); onSearchChange($event)"
                        placeholder="Escanear o buscar producto... (F3)" 
-                       autofocus
                        class="w-full pl-10 pr-3 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm" />
                 </div>
             </div>

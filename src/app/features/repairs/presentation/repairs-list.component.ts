@@ -332,8 +332,7 @@ export class RepairListComponent implements OnInit {
 
         // Debounce implícito para el searchTerm al reiniciar a página 1
         this.resetAndLoad();
-      },
-      { allowSignalWrites: true },
+      }
     );
   }
 

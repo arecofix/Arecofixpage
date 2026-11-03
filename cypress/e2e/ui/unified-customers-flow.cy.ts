@@ -31,7 +31,7 @@ describe('Unified Customers Flow Validation', () => {
     // Para evitar la complejidad del carrito, vamos a inyectar directamente a la vista de "Personas y Clientes"
     // y mockear las respuestas de orders y profiles para validar la *lógica de unificación* del Frontend.
     
-    cy.loginAsAdmin('/admin/clients');
+    cy.loginAsAdmin('/admin/users');
 
     // Interceptamos la llamada a `v_unified_clients` para el getPaginatedUnifiedClients
     cy.intercept('GET', '**/rest/v1/v_unified_clients*', {

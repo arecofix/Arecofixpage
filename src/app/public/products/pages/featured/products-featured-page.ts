@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { combineLatest, map, switchMap, Subject, of } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { rxResource, toObservable } from '@angular/core/rxjs-interop';
+import { rxResource, toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { TenantService } from '@app/core/services/tenant.service';
 
@@ -29,6 +29,7 @@ import {
 import { ProductCard } from '@app/public/products/components';
 import { Product } from '@app/public/products/interfaces';
 import { GsmService } from '@app/public/gsm/services/gsm.service';
+import { FormatPricePipe } from '@app/shared/pipes/format-price.pipe';
 
 @Component({
   selector: 'products-featured-page',
@@ -39,7 +40,8 @@ import { GsmService } from '@app/public/gsm/services/gsm.service';
     ProductCard,
     Pagination,
     FormsModule,
-    RouterModule
+    RouterModule,
+    FormatPricePipe,
   ],
   templateUrl: './products-featured-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -73,7 +75,8 @@ export class ProductsFeaturedPage {
   constructor() {
     this.searchSubject.pipe(
       debounceTime(400),
-      distinctUntilChanged()
+      distinctUntilChanged(),
+      takeUntilDestroyed()
     ).subscribe(q => {
       this.updateQueryParams({ q: q || null, _page: 1 });
     });

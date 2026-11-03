@@ -2,7 +2,7 @@ import {
   Component, inject, OnInit,
   ChangeDetectionStrategy, ChangeDetectorRef, signal
 } from '@angular/core';
-import { CommonModule, CurrencyPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { Branch, BranchLandingConfig, BranchServiceCard, BranchHighlight } from '@app/shared/interfaces/branch.interface';
 import { BranchService } from '@app/core/services/branch.service';
@@ -11,6 +11,7 @@ import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 import { BranchContextService } from '@app/core/services/branch-context.service';
 import { GsmService } from '@app/public/gsm/services/gsm.service';
 import { firstValueFrom } from 'rxjs';
+import { FormatPricePipe } from '@app/shared/pipes/format-price.pipe';
 
 // ---------------------------------------------------------------------------
 // HELPERS: Detectar el tipo de sucursal y elegir defaults apropiados
@@ -162,7 +163,7 @@ function resolveLandingConfig(branch: Branch): BranchLandingConfig {
 @Component({
   selector: 'app-branch-home',
   standalone: true,
-  imports: [CommonModule, CurrencyPipe],
+  imports: [CommonModule, FormatPricePipe],
   templateUrl: './branch-home.component.html',
   styleUrls: ['./branch-home.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

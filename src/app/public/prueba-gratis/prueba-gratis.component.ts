@@ -2,9 +2,14 @@ import {
   Component,
   inject,
   signal,
+  OnInit,
+  AfterViewInit,
+  OnDestroy,
+  NgZone,
+  PLATFORM_ID,
   ChangeDetectionStrategy,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
   FormBuilder,
   FormGroup,
@@ -13,18 +18,22 @@ import {
 } from '@angular/forms';
 import { SeoService } from '@app/core/services/seo.service';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
+import { STORAGE_KEYS } from '@app/core/constants/storage.constants';
+import { environment } from '@env/environment';
 
 @Component({
   selector: 'app-prueba-gratis',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './prueba-gratis.component.html',
 })
-export class PruebaGratisComponent {
+export class PruebaGratisComponent implements OnInit, AfterViewInit, OnDestroy {
   private seoService = inject(SeoService);
   private fb = inject(FormBuilder);
   private supabase = inject(SUPABASE_CLIENT);
+  private platformId = inject(PLATFORM_ID);
+  private zone = inject(NgZone);
 
   trialForm: FormGroup;
 
@@ -32,6 +41,7 @@ export class PruebaGratisComponent {
   success = signal(false);
   errorMsg = signal<string | null>(null);
   uploadingLogo = signal(false);
+  hasClaimedTrial = signal(false);
 
   // Credenciales generadas para mostrar al usuario
   generatedEmail = signal('');
@@ -41,6 +51,94 @@ export class PruebaGratisComponent {
   // Logo
   selectedLogoFile: File | null = null;
   logoPreviewUrl = signal<string | null>(null);
+
+  // Turnstile
+  turnstileToken = signal<string | null>(null);
+  readonly turnstileSiteKey = environment.turnstileSiteKey;
+  private widgetId: string | null = null;
+
+  // Feature Flag
+  readonly trialEnabled = signal<boolean>(environment.features?.trialEnabled ?? false);
+
+  readonly whatsappUrl = `https://wa.me/${environment.contact.whatsappNumber}?text=${encodeURIComponent('Hola! Quiero solicitar una prueba gratuita de Arecofix')}`;
+
+  readonly exeDownloadUrl = environment.downloads.desktopSetupUrl;
+
+  ngOnInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      if (localStorage.getItem(STORAGE_KEYS.TRIAL_CLAIMED) === 'true') {
+        this.hasClaimedTrial.set(true);
+      }
+    }
+  }
+
+  ngAfterViewInit(): void {
+    if (isPlatformBrowser(this.platformId) && this.trialEnabled()) {
+      this.initTurnstile();
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (isPlatformBrowser(this.platformId) && this.widgetId && typeof (window as any).turnstile !== 'undefined') {
+      try {
+        (window as any).turnstile.remove(this.widgetId);
+      } catch (e) {
+        console.warn('[Turnstile remove error]', e);
+      }
+    }
+  }
+
+  private initTurnstile(): void {
+    if (!isPlatformBrowser(this.platformId) || !this.trialEnabled()) return;
+
+    if (typeof (window as any).turnstile !== 'undefined') {
+      this.renderWidget();
+    } else {
+      let attempts = 0;
+      const interval = setInterval(() => {
+        attempts++;
+        if (typeof (window as any).turnstile !== 'undefined') {
+          clearInterval(interval);
+          this.renderWidget();
+        } else if (attempts > 50) {
+          clearInterval(interval);
+          console.warn('[Turnstile] Script failed to load in time.');
+        }
+      }, 100);
+    }
+  }
+
+  private renderWidget(): void {
+    const container = document.getElementById('turnstile-container');
+    if (!container) return;
+    if (this.widgetId) return;
+
+    try {
+      this.widgetId = (window as any).turnstile.render(container, {
+        sitekey: this.turnstileSiteKey,
+        action: 'trial_signup',
+        callback: (token: string) => {
+          this.zone.run(() => {
+            this.turnstileToken.set(token);
+            this.errorMsg.set(null);
+          });
+        },
+        'error-callback': (code: any) => {
+          this.zone.run(() => {
+            this.turnstileToken.set(null);
+            console.error('[Turnstile error code]', code);
+          });
+        },
+        'expired-callback': () => {
+          this.zone.run(() => {
+            this.turnstileToken.set(null);
+          });
+        },
+      });
+    } catch (e) {
+      console.error('[Turnstile render error]', e);
+    }
+  }
 
   constructor() {
     this.trialForm = this.fb.group({
@@ -123,6 +221,11 @@ export class PruebaGratisComponent {
       return;
     }
 
+    if (!this.turnstileToken()) {
+      this.errorMsg.set('Debe completar la verificación de seguridad para continuar.');
+      return;
+    }
+
     this.loading.set(true);
     this.errorMsg.set(null);
 
@@ -146,6 +249,8 @@ export class PruebaGratisComponent {
             subtitle: 'Reparación Especializada por ' + formData.userName,
             currency: 'ARS',
             logo_url: logoUrl,
+            'cf-turnstile-response': this.turnstileToken(),
+            turnstileToken: this.turnstileToken(),
           },
         },
       );
@@ -164,12 +269,22 @@ export class PruebaGratisComponent {
       this.generatedEmail.set(data?.credentials?.email ?? formData.email);
       this.generatedPassword.set(data?.credentials?.password ?? '');
 
+      if (isPlatformBrowser(this.platformId)) {
+        localStorage.setItem(STORAGE_KEYS.TRIAL_CLAIMED, 'true');
+      }
+
       this.success.set(true);
     } catch (e: unknown) {
       const err = e as Error;
       this.errorMsg.set(
         err.message || 'Ocurrió un error inesperado al solicitar la prueba.',
       );
+      if (this.widgetId && typeof (window as any).turnstile !== 'undefined') {
+        try {
+          (window as any).turnstile.reset(this.widgetId);
+        } catch {}
+        this.turnstileToken.set(null);
+      }
     } finally {
       this.loading.set(false);
     }
@@ -194,10 +309,6 @@ export class PruebaGratisComponent {
   }
 
   downloadApp() {
-    // Generar la descarga de la app de escritorio
-    const link = document.createElement('a');
-    link.href = '/assets/downloads/Arecofix-Setup.zip';
-    link.download = 'Arecofix-Setup.zip';
-    link.click();
+    window.open(this.exeDownloadUrl, '_blank', 'noopener,noreferrer');
   }
 }

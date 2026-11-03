@@ -1,0 +1,51 @@
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="flex flex-col items-center justify-center py-32">
+      <div class="animate-spin rounded-full h-14 w-14 border-b-2 border-emerald-500"></div>
+      <p class="mt-4 text-gray-500 font-medium text-lg">Cargando información del servicio...</p>
+    </div>
+  }
+
+  <!-- Error / 404 State -->
+  @if (error()) {
+    <div class="max-w-xl mx-auto py-32 px-4 text-center">
+      <div class="w-20 h-20 rounded-full bg-red-100 dark:bg-red-950/60 text-red-600 dark:text-red-400 flex items-center justify-center mx-auto text-3xl mb-6">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white">Servicio no disponible</h1>
+      <p class="mt-3 text-gray-600 dark:text-gray-300 text-base leading-relaxed">{{ error() }}</p>
+      <div class="mt-8 flex justify-center gap-4">
+        <a routerLink="/servicios" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow transition-all">
+          <i class="fas fa-arrow-left mr-2"></i> Ver otros servicios
+        </a>
+        <a routerLink="/" class="px-6 py-3 bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 font-semibold rounded-xl hover:bg-gray-300 transition-all">
+          Ir al Inicio
+        </a>
+      </div>
+    </div>
+  }
+
+  <!-- Service Landing Content -->
+  @if (!loading() && !error() && service(); as s) {
+    <!-- Breadcrumb Bar -->
+    <nav aria-label="Breadcrumb" class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 py-3 px-4 sm:px-6 lg:px-8">
+      <div class="max-w-6xl mx-auto flex items-center gap-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+        <a routerLink="/" class="hover:text-emerald-600 transition-colors">Inicio</a>
+        <i class="fas fa-chevron-right text-[10px]"></i>
+        <a routerLink="/servicios" class="hover:text-emerald-600 transition-colors">Servicios</a>
+        <i class="fas fa-chevron-right text-[10px]"></i>
+        <span class="text-gray-900 dark:text-white font-medium truncate max-w-xs">{{ s.name }}</span>
+      </div>
+    </nav>
+
+    <!-- Blocks Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      @for (block of s.blocks; track block.id || $index) {
+        <app-block-renderer [block]="block" [serviceId]="s.id" [serviceName]="s.name" />
+      }
+    </main>
+  }
+
+</div>

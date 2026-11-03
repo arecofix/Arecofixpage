@@ -1,4 +1,4 @@
-﻿<div class="px-6 py-8 min-h-[calc(100vh-4rem)] bg-gray-50/50 dark:bg-[#0f172a] font-sans text-gray-800 dark:text-gray-200">
+<div class="px-6 py-8 min-h-[calc(100vh-4rem)] bg-gray-50/50 dark:bg-[#0f172a] font-sans text-gray-800 dark:text-gray-200">
   <div class="max-w-6xl mx-auto animate-fade-in-up">
 
     <!-- ── Header ── -->
@@ -31,13 +31,50 @@
     </div>
     
     <!-- ── Search Bar ── -->
-    <div class="mb-8 w-full animate-fade-in-up" style="animation-delay: 100ms;">
+    <div class="mb-4 w-full animate-fade-in-up" style="animation-delay: 100ms;">
         <div class="relative group">
             <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
             <input type="text" [ngModel]="searchTerm()" (ngModelChange)="onSearch($event)"
                 placeholder="Buscar por cliente, notas o número de comprobante..."
                 class="w-full pl-11 pr-4 py-3.5 bg-white dark:bg-gray-800 border-none rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 shadow-[0_4px_20px_rgb(0,0,0,0.02)] border border-gray-100 dark:border-gray-700 transition-all font-medium text-gray-800 dark:text-gray-200" />
         </div>
+    </div>
+
+    <!-- ── Status Filter Tabs & Draft Counter Badge ── -->
+    <div class="mb-6 flex flex-wrap items-center gap-2 animate-fade-in-up" style="animation-delay: 150ms;">
+      <button
+        type="button"
+        (click)="setStatusFilter('all')"
+        class="btn btn-sm rounded-xl font-bold transition-all"
+        [ngClass]="selectedStatusFilter() === 'all' ? 'btn-primary' : 'btn-ghost bg-white/70 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700'"
+      >
+        Todas las facturas
+      </button>
+
+      <button
+        type="button"
+        (click)="setStatusFilter('draft')"
+        class="btn btn-sm rounded-xl font-bold transition-all flex items-center gap-2"
+        [ngClass]="selectedStatusFilter() === 'draft' ? 'btn-warning text-gray-900 shadow-md shadow-amber-500/20' : 'btn-ghost bg-white/70 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700'"
+        id="btn-filter-drafts"
+      >
+        <i class="fas fa-file-signature text-xs"></i>
+        <span>Borradores Pendientes</span>
+        @if (pendingDraftCount() > 0) {
+          <span class="badge badge-sm badge-error font-extrabold text-white animate-pulse" id="badge-pending-drafts">
+            {{ pendingDraftCount() }}
+          </span>
+        }
+      </button>
+
+      <button
+        type="button"
+        (click)="setStatusFilter('issued')"
+        class="btn btn-sm rounded-xl font-bold transition-all"
+        [ngClass]="selectedStatusFilter() === 'issued' ? 'btn-primary' : 'btn-ghost bg-white/70 dark:bg-gray-800/70 border border-gray-200 dark:border-gray-700'"
+      >
+        Emitidas
+      </button>
     </div>
 
     <!-- ── Content ── -->
@@ -134,13 +171,36 @@
                   </div>
                 </td>
                 <td class="px-6 py-4 text-right">
-                  <div class="flex justify-end gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                  <div class="flex justify-end gap-1.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                    <!-- PDF A4 Download -->
+                    <button
+                      type="button"
+                      (click)="downloadInvoicePdf(invoice, $event)"
+                      class="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600
+                             dark:text-emerald-400 hover:bg-emerald-500 hover:text-white transition-colors
+                             flex items-center justify-center tooltip tooltip-left shadow-sm cursor-pointer"
+                      data-tip="Descargar PDF A4">
+                      <i class="fas fa-file-pdf text-[11px]"></i>
+                    </button>
+
+                    <!-- Web Share / Share -->
+                    <button
+                      type="button"
+                      (click)="shareInvoice(invoice, $event)"
+                      class="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600
+                             dark:text-blue-400 hover:bg-blue-500 hover:text-white transition-colors
+                             flex items-center justify-center tooltip tooltip-left shadow-sm cursor-pointer"
+                      data-tip="Compartir">
+                      <i class="fas fa-share-nodes text-[11px]"></i>
+                    </button>
+
+                    <!-- Ver Detalle -->
                     <a [routerLink]="['/admin/sales/invoices', invoice.id]"
                        class="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600
                               dark:text-indigo-400 hover:bg-indigo-500 hover:text-white transition-colors
                               flex items-center justify-center tooltip tooltip-left shadow-sm"
                        data-tip="Ver Detalle">
-                      <i class="fas fa-eye text-[10px]"></i>
+                      <i class="fas fa-eye text-[11px]"></i>
                     </a>
                   </div>
                 </td>
@@ -181,11 +241,27 @@
               <div class="font-black text-blue-600 dark:text-blue-400 text-xl tracking-tight">
                 {{ invoice.total_amount | currency:'ARS':'symbol':'1.0-0' }}
               </div>
-              <a [routerLink]="['/admin/sales/invoices', invoice.id]"
-                 class="btn btn-sm btn-circle btn-ghost bg-indigo-50 dark:bg-indigo-900/20
-                        text-indigo-600 dark:text-indigo-400 shadow-sm border border-indigo-100 dark:border-indigo-800">
-                <i class="fas fa-eye"></i>
-              </a>
+              <div class="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  (click)="downloadInvoicePdf(invoice, $event)"
+                  class="btn btn-sm btn-circle btn-ghost bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 shadow-sm border border-emerald-100 dark:border-emerald-800"
+                  title="Descargar PDF A4">
+                  <i class="fas fa-file-pdf"></i>
+                </button>
+                <button
+                  type="button"
+                  (click)="shareInvoice(invoice, $event)"
+                  class="btn btn-sm btn-circle btn-ghost bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 shadow-sm border border-blue-100 dark:border-blue-800"
+                  title="Compartir">
+                  <i class="fas fa-share-nodes"></i>
+                </button>
+                <a [routerLink]="['/admin/sales/invoices', invoice.id]"
+                   class="btn btn-sm btn-circle btn-ghost bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 shadow-sm border border-indigo-100 dark:border-indigo-800"
+                   title="Ver Detalle">
+                  <i class="fas fa-eye"></i>
+                </a>
+              </div>
             </div>
           </div>
         }
@@ -216,251 +292,13 @@
 
 
 <!-- ═══════════════════════════════════════════════════════════════════════════
-     MODAL — {{ t().invoices.createManual || 'Crear Factura Manual' }}
-     Minimalista, sin dependencias de librería externa. Ítems dinámicos con IVA.
+     MODAL — Facturación ARCA (ex AFIP) Compliant Form
      ═══════════════════════════════════════════════════════════════════════════ -->
 @if (isModalOpen()) {
-<div class="modal modal-open z-50 animate-fade-in" id="manual-invoice-modal">
-  <div class="modal-box max-w-3xl w-full bg-white dark:bg-gray-900 rounded-3xl p-0 overflow-hidden shadow-2xl">
-
-    <!-- Modal Header -->
-    <div class="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-800">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-linear-to-br from-violet-500 to-indigo-600
-                    flex items-center justify-center text-white shadow-md">
-          <i class="fas fa-file-pen text-lg"></i>
-        </div>
-        <div>
-          <h2 class="text-lg font-black text-gray-900 dark:text-white">{{ t().invoices.manualInvoiceTitle || 'Factura Manual' }}</h2>
-          <p class="text-xs text-gray-400 dark:text-gray-500">{{ t().invoices.manualInvoiceDesc || 'Comprobante interno sin restricción de stock' }}</p>
-        </div>
-      </div>
-      <button (click)="closeModal()"
-        class="w-8 h-8 rounded-xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700
-               flex items-center justify-center text-gray-500 transition-colors">
-        <i class="fas fa-times text-sm"></i>
-      </button>
-    </div>
-
-    <div class="p-6 overflow-y-auto max-h-[70vh] space-y-6">
-
-      <!-- Cliente + Tipo -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="md:col-span-2 space-y-1">
-          <label class="text-xs font-bold uppercase tracking-widest text-gray-400">{{ t().invoices.customer || 'Cliente / Receptor' }}</label>
-          <input
-            id="manual-invoice-customer"
-            type="text"
-            [value]="form().customerName"
-            (input)="updateField('customerName', $any($event.target).value)"
-            placeholder="Consumidor Final"
-            class="input input-bordered w-full rounded-2xl bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
-          />
-        </div>
-        <div class="space-y-1">
-          <label class="text-xs font-bold uppercase tracking-widest text-gray-400">{{ t().invoices.type || 'Tipo' }}</label>
-          <select
-            [value]="form().type"
-            (change)="updateField('type', $any($event.target).value)"
-            class="select select-bordered w-full rounded-2xl bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
-            <option value="B">{{ t().invoices.invoiceB || 'Factura B' }}</option>
-            <option value="A">{{ t().invoices.invoiceA || 'Factura A' }}</option>
-            <option value="C">{{ t().invoices.invoiceC || 'Factura C' }}</option>
-            <option value="X">{{ t().invoices.internalTicket || 'Ticket Interno' }}</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- {{ t().invoices.emailOptional || 'Email (opcional)' }} -->
-      <div class="space-y-1">
-        <label class="text-xs font-bold uppercase tracking-widest text-gray-400">{{ t().invoices.emailOptional || 'Email (opcional)' }}</label>
-        <input
-          type="email"
-          [value]="form().customerEmail"
-          (input)="updateField('customerEmail', $any($event.target).value)"
-          placeholder="cliente@email.com"
-          class="input input-bordered w-full rounded-2xl bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
-        />
-      </div>
-
-      <!-- ── Ítems ── -->
-      <div>
-        <div class="flex justify-between items-center mb-3">
-          <label class="text-xs font-bold uppercase tracking-widest text-gray-400">{{ t().invoices.items || 'Ítems' }}</label>
-          <button (click)="addItem()"
-            class="flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400
-                   hover:text-indigo-700 transition-colors">
-            <i class="fas fa-plus-circle"></i> Agregar ítem
-          </button>
-        </div>
-
-        <div class="space-y-2">
-          @for (item of form().items; track $index; let i = $index) {
-            <div class="grid grid-cols-12 gap-2 items-center bg-gray-50 dark:bg-gray-800/50
-                        rounded-2xl p-3 border border-gray-100 dark:border-gray-800">
-
-              <!-- Descripción  -->
-              <div class="col-span-12 md:col-span-5">
-                <input
-                  type="text"
-                  [value]="item.description"
-                  (input)="updateItem(i, 'description', $any($event.target).value)"
-                  placeholder="Descripción del servicio o producto"
-                  class="input input-sm input-bordered w-full rounded-xl bg-white dark:bg-gray-900
-                         border-gray-200 dark:border-gray-700 text-sm"
-                />
-              </div>
-
-              <!-- Cantidad -->
-              <div class="col-span-4 md:col-span-2">
-                <input
-                  type="number"
-                  min="1"
-                  [value]="item.quantity"
-                  (input)="updateItem(i, 'quantity', +$any($event.target).value)"
-                  placeholder="Cant."
-                  class="input input-sm input-bordered w-full rounded-xl bg-white dark:bg-gray-900
-                         border-gray-200 dark:border-gray-700 text-sm text-center"
-                />
-              </div>
-
-              <!-- Precio Unitario -->
-              <div class="col-span-4 md:col-span-2">
-                <div class="relative">
-                  <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    [value]="item.unit_price"
-                    (input)="updateItem(i, 'unit_price', +$any($event.target).value)"
-                    placeholder="0.00"
-                    class="input input-sm input-bordered w-full rounded-xl bg-white dark:bg-gray-900
-                           border-gray-200 dark:border-gray-700 text-sm pl-6"
-                  />
-                </div>
-              </div>
-
-              <!-- IVA -->
-              <div class="col-span-3 md:col-span-2">
-                <select
-                  [value]="item.tax_rate"
-                  (change)="updateItem(i, 'tax_rate', +$any($event.target).value)"
-                  class="select select-sm select-bordered w-full rounded-xl bg-white dark:bg-gray-900
-                         border-gray-200 dark:border-gray-700 text-xs">
-                  <option [value]="0">{{ t().invoices.exempt || 'Exento' }}</option>
-                  <option [value]="0.105">10.5%</option>
-                  <option [value]="0.21">21%</option>
-                </select>
-              </div>
-
-              <!-- Eliminar -->
-              <div class="col-span-1">
-                @if (form().items.length > 1) {
-                  <button (click)="removeItem(i)"
-                    class="w-7 h-7 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-500
-                           hover:bg-red-100 transition-colors flex items-center justify-center ml-auto">
-                    <i class="fas fa-trash-alt text-[10px]"></i>
-                  </button>
-                }
-              </div>
-
-            </div>
-          }
-        </div>
-      </div>
-
-      <!-- Descuento y Notas -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div class="space-y-1">
-          <label class="text-xs font-bold uppercase tracking-widest text-gray-400">Descuento ($)</label>
-          <div class="relative">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
-            <input
-              type="number"
-              min="0"
-              step="0.01"
-              [value]="form().discount"
-              (input)="updateField('discount', +$any($event.target).value)"
-              placeholder="0.00"
-              class="input input-bordered w-full rounded-2xl bg-gray-50 dark:bg-gray-800
-                     border-gray-200 dark:border-gray-700 pl-8"
-            />
-          </div>
-        </div>
-        <div class="space-y-1">
-          <label class="text-xs font-bold uppercase tracking-widest text-gray-400">{{ t().invoices.internalNotes || 'Notas internas' }}</label>
-          <input
-            type="text"
-            [value]="form().notes"
-            (input)="updateField('notes', $any($event.target).value)"
-            placeholder="Ej: Reparación fuera de garantía"
-            class="input input-bordered w-full rounded-2xl bg-gray-50 dark:bg-gray-800
-                   border-gray-200 dark:border-gray-700"
-          />
-        </div>
-      </div>
-
-      <!-- ── Totales Preview ── -->
-      <div class="bg-gray-900 dark:bg-black/40 rounded-2xl p-5 space-y-2 text-sm">
-        <div class="flex justify-between text-gray-400">
-          <span>{{ t().invoices.subtotalNoTax || 'Subtotal (sin IVA)' }}</span>
-          <span class="font-mono font-bold text-gray-200">
-            {{ formTotals().subtotal | currency:'ARS':'symbol':'1.2-2' }}
-          </span>
-        </div>
-        <div class="flex justify-between text-gray-400">
-          <span>{{ t().invoices.tax || 'IVA' }}</span>
-          <span class="font-mono font-bold text-gray-200">
-            {{ formTotals().taxAmount | currency:'ARS':'symbol':'1.2-2' }}
-          </span>
-        </div>
-        @if (form().discount > 0) {
-          <div class="flex justify-between text-red-400">
-            <span>Descuento</span>
-            <span class="font-mono font-bold">
-              - {{ form().discount | currency:'ARS':'symbol':'1.2-2' }}
-            </span>
-          </div>
-        }
-        <div class="flex justify-between pt-2 border-t border-gray-700/50">
-          <span class="font-black text-white text-base">{{ t().invoices.totalToBill || 'Total a Facturar' }}</span>
-          <span class="font-black text-indigo-400 text-xl font-mono">
-            {{ formTotals().total | currency:'ARS':'symbol':'1.0-0' }}
-          </span>
-        </div>
-      </div>
-
-    </div><!-- /scroll area -->
-
-    <!-- Modal Footer -->
-    <div class="flex items-center justify-end gap-3 p-6 border-t border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
-      <button (click)="closeModal()"
-        class="btn btn-ghost rounded-2xl text-gray-500 hover:text-gray-900 dark:hover:text-white">
-        Cancelar
-      </button>
-      <button
-        id="btn-generar-factura"
-        (click)="submitManualInvoice()"
-        [disabled]="saving()"
-        class="btn btn-primary rounded-2xl gap-2 shadow-lg shadow-indigo-500/30
-               min-w-[160px] font-bold disabled:opacity-60">
-        @if (saving()) {
-          <span class="loading loading-spinner loading-sm"></span>
-          {{ t().invoices.generating || 'Generando...' }}
-        } @else {
-          <i class="fas fa-file-check"></i>
-          {{ t().invoices.generateInvoice || 'Generar Factura' }}
-        }
-      </button>
-    </div>
-
-  </div><!-- /modal-box -->
-
-  <!-- Backdrop -->
-  <form method="dialog" class="modal-backdrop bg-black/40 backdrop-blur-sm">
-    <button (click)="closeModal()">close</button>
-  </form>
-</div>
+  <app-invoice-form-modal
+    (closed)="closeModal()"
+    (invoiceCreated)="onInvoiceCreated($event)"
+  ></app-invoice-form-modal>
 }
+
 

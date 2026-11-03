@@ -1,0 +1,376 @@
+schemaname,tablename,policyname,roles,cmd,qual,with_check
+public,academy_email_notifications,tenant_academy_email_notifications_select,{authenticated},SELECT,"(is_super_admin() OR ((tenant_id = get_current_tenant_id()) AND (EXISTS ( SELECT 1
+   FROM profiles p
+  WHERE ((p.id = auth.uid()) AND (p.role = ANY (ARRAY['admin'::text, 'staff'::text, 'tenant_owner'::text])))))))",
+public,academy_payments,academy_payments_admin_manage_policy,{public},ALL,"(is_admin() OR (EXISTS ( SELECT 1
+   FROM profiles
+  WHERE ((profiles.id = auth.uid()) AND (profiles.role = ANY (ARRAY['admin'::text, 'staff'::text, 'super_admin'::text, 'tenant_owner'::text]))))))",
+public,academy_payments,academy_payments_select_policy,{public},SELECT,"((user_id = auth.uid()) OR is_admin() OR (EXISTS ( SELECT 1
+   FROM profiles
+  WHERE ((profiles.id = auth.uid()) AND (profiles.role = ANY (ARRAY['admin'::text, 'staff'::text, 'super_admin'::text, 'tenant_owner'::text]))))))",
+public,academy_plans,academy_plans_admin_manage_policy,{public},ALL,"(is_admin() OR (EXISTS ( SELECT 1
+   FROM profiles
+  WHERE ((profiles.id = auth.uid()) AND (profiles.role = ANY (ARRAY['admin'::text, 'staff'::text, 'super_admin'::text, 'tenant_owner'::text]))))))",
+public,academy_plans,academy_plans_select_policy,{public},SELECT,"((is_active = true) OR is_admin() OR (EXISTS ( SELECT 1
+   FROM profiles
+  WHERE ((profiles.id = auth.uid()) AND (profiles.role = ANY (ARRAY['admin'::text, 'staff'::text, 'super_admin'::text, 'tenant_owner'::text]))))))",
+public,academy_subscriptions,academy_subscriptions_admin_manage_policy,{public},ALL,"(is_admin() OR (EXISTS ( SELECT 1
+   FROM profiles
+  WHERE ((profiles.id = auth.uid()) AND (profiles.role = ANY (ARRAY['admin'::text, 'staff'::text, 'super_admin'::text, 'tenant_owner'::text]))))))",
+public,academy_subscriptions,academy_subscriptions_select_policy,{public},SELECT,"((user_id = auth.uid()) OR is_admin() OR (EXISTS ( SELECT 1
+   FROM profiles
+  WHERE ((profiles.id = auth.uid()) AND (profiles.role = ANY (ARRAY['admin'::text, 'staff'::text, 'super_admin'::text, 'tenant_owner'::text]))))))",
+public,app_settings,Public profiles can read app_settings,{public},SELECT,true,
+public,audit_logs,Deny all client access on audit_logs,{public},ALL,false,
+public,audit_logs,audit_logs_tenant_isolation,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,audit_logs,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,auth_logs,auth_logs_tenant_isolation,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,auth_logs,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,bank_reconciliations,bank_reconciliations_tenant_isolation,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,bank_reconciliations,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,blog_categories,blog_categories_tenant_isolation,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,blog_categories,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,blog_post_tags,blog_post_tags_tenant_isolation,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,blog_post_tags,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,blog_posts,bp_delete,{authenticated},DELETE,((tenant_id = get_current_tenant_id()) OR is_super_admin()),
+public,blog_posts,bp_insert,{authenticated},INSERT,,((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,blog_posts,bp_select,{public},SELECT,"((((status)::text = 'published'::text) AND (EXISTS ( SELECT 1
+   FROM tenants t
+  WHERE ((t.id = blog_posts.tenant_id) AND (t.is_active = true))))) OR (tenant_id = get_current_tenant_id()) OR is_super_admin())",
+public,blog_posts,bp_update,{authenticated},UPDATE,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,blog_posts,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,blog_posts_backup_20261018,blog_posts_backup_superadmin_only,{authenticated},ALL,is_super_admin(),is_super_admin()
+public,blog_tags,blog_tags_tenant_isolation,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,blog_tags,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,branches,Branch Staff Isolation,{authenticated},ALL,(id = get_auth_user_branch()),
+public,branches,SuperAdmin Bypass All,{authenticated},ALL,(get_auth_user_role() = 'super_admin'::text),
+public,branches,branches_public_select,{anon},SELECT,(is_active = true),
+public,branches,branches_select,{public},SELECT,true,
+public,branches,branches_tenant_isolation,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,branches,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,brands,Authenticated View - Brands,{authenticated},SELECT,((is_active = true) AND (deleted_at IS NULL)),
+public,brands,Branch Staff Isolation,{authenticated},ALL,"((get_auth_user_role() = ANY (ARRAY['admin'::text, 'staff'::text, 'technician'::text])) AND (branch_id = get_auth_user_branch()))",
+public,brands,Filter_Soft_Deleted_Brands,{authenticated},SELECT,(deleted_at IS NULL),
+public,brands,Public View - Brands,{anon},SELECT,((is_active = true) AND (deleted_at IS NULL)),
+public,brands,SuperAdmin Bypass All,{authenticated},ALL,(get_auth_user_role() = 'super_admin'::text),
+public,brands,Tenant Owner Isolation,{authenticated},ALL,((get_auth_user_role() = 'tenant_owner'::text) AND (tenant_id = get_auth_user_tenant())),
+public,brands,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,cash_movements,Branch Staff Isolation,{authenticated},ALL,"((get_auth_user_role() = ANY (ARRAY['admin'::text, 'staff'::text])) AND (branch_id = get_auth_user_branch()))",
+public,cash_movements,SuperAdmin Bypass All,{authenticated},ALL,(get_auth_user_role() = 'super_admin'::text),
+public,cash_movements,Tenant Owner Isolation,{authenticated},ALL,((get_auth_user_role() = 'tenant_owner'::text) AND (tenant_id = get_auth_user_tenant())),
+public,cash_movements,cash_movements_tenant_isolation,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,cash_movements,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,categories,Authenticated View - Categories,{authenticated},SELECT,((is_active = true) AND (deleted_at IS NULL)),
+public,categories,Branch Staff Isolation,{authenticated},ALL,"((get_auth_user_role() = ANY (ARRAY['admin'::text, 'staff'::text, 'technician'::text])) AND (branch_id = get_auth_user_branch()))",
+public,categories,Filter_Soft_Deleted_Categories,{authenticated},SELECT,(deleted_at IS NULL),
+public,categories,Public View - Categories,{anon},SELECT,((is_active = true) AND (deleted_at IS NULL)),
+public,categories,SuperAdmin Bypass All,{authenticated},ALL,(get_auth_user_role() = 'super_admin'::text),
+public,categories,SuperAdmin Bypass All - Categories,{authenticated},ALL,(get_auth_user_role() = 'super_admin'::text),(get_auth_user_role() = 'super_admin'::text)
+public,categories,Tenant Isolation - Categories,{authenticated},ALL,"((get_auth_user_role() = ANY (ARRAY['tenant_owner'::text, 'admin'::text, 'staff'::text, 'technician'::text])) AND (tenant_id = get_auth_user_tenant()))","((get_auth_user_role() = ANY (ARRAY['tenant_owner'::text, 'admin'::text, 'staff'::text, 'technician'::text])) AND (tenant_id = get_auth_user_tenant()))"
+public,categories,Tenant Owner Isolation,{authenticated},ALL,((get_auth_user_role() = 'tenant_owner'::text) AND (tenant_id = get_auth_user_tenant())),
+public,categories,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,cola_tiktok,Permitir actualización de cola_tiktok a roles de servicio,{public},UPDATE,true,
+public,cola_tiktok,Permitir inserción en cola_tiktok,{public},INSERT,,true
+public,cola_tiktok,Permitir lectura de cola_tiktok a roles de servicio,{public},SELECT,true,
+public,contact_messages,public_contact_messages_insert_anon,{anon},INSERT,,"((tenant_id IS NOT NULL) AND (EXISTS ( SELECT 1
+   FROM tenants t
+  WHERE ((t.id = contact_messages.tenant_id) AND (t.is_active = true)))))"
+public,contact_messages,super_admin_contact_messages_all,{authenticated},ALL,is_super_admin(),is_super_admin()
+public,contact_messages,tenant_contact_messages_delete,{authenticated},DELETE,"((tenant_id = get_current_tenant_id()) AND (EXISTS ( SELECT 1
+   FROM profiles p
+  WHERE ((p.id = auth.uid()) AND (p.role = ANY (ARRAY['admin'::text, 'tenant_owner'::text]))))))",
+public,contact_messages,tenant_contact_messages_insert_auth,{authenticated},INSERT,,(tenant_id = get_current_tenant_id())
+public,contact_messages,tenant_contact_messages_select,{authenticated},SELECT,"((tenant_id = get_current_tenant_id()) AND (EXISTS ( SELECT 1
+   FROM profiles p
+  WHERE ((p.id = auth.uid()) AND (p.role = ANY (ARRAY['admin'::text, 'staff'::text, 'technician'::text, 'tenant_owner'::text]))))))",
+public,contact_messages,tenant_contact_messages_update,{authenticated},UPDATE,"((tenant_id = get_current_tenant_id()) AND (EXISTS ( SELECT 1
+   FROM profiles p
+  WHERE ((p.id = auth.uid()) AND (p.role = ANY (ARRAY['admin'::text, 'staff'::text, 'technician'::text, 'tenant_owner'::text]))))))",(tenant_id = get_current_tenant_id())
+public,course_certificates,Admins can manage all certificates,{authenticated},ALL,"(EXISTS ( SELECT 1
+   FROM profiles p
+  WHERE ((p.id = auth.uid()) AND (p.role = ANY (ARRAY['admin'::text, 'staff'::text, 'super_admin'::text, 'tenant_owner'::text])))))",
+public,course_certificates,Admins can view certificates,{authenticated},ALL,"(( SELECT profiles.role
+   FROM profiles
+  WHERE (profiles.id = auth.uid())) = ANY (ARRAY['admin'::text, 'staff'::text, 'super_admin'::text, 'tenant_owner'::text]))",
+public,course_certificates,Instructors can insert course_certificates,{authenticated},INSERT,,true
+public,course_certificates,Public can verify certificates,{public},SELECT,true,
+public,course_certificates,Public can view course_certificates,{public},SELECT,true,
+public,course_certificates,Students can view their own certificates,{authenticated},SELECT,((user_id = auth.uid()) OR ((email IS NOT NULL) AND (lower(email) = lower((auth.jwt() ->> 'email'::text))))),
+public,course_enrollments,course_enrollments_all_policy,{authenticated},ALL,"((lower(email) = lower(COALESCE((auth.jwt() ->> 'email'::text), ''::text))) OR ((user_id IS NOT NULL) AND (user_id = auth.uid())) OR is_admin_of_tenant(tenant_id) OR is_admin() OR (EXISTS ( SELECT 1
+   FROM profiles
+  WHERE ((profiles.id = auth.uid()) AND (profiles.role = ANY (ARRAY['admin'::text, 'staff'::text, 'super_admin'::text, 'tenant_owner'::text]))))))","((lower(email) = lower(COALESCE((auth.jwt() ->> 'email'::text), ''::text))) OR ((user_id IS NOT NULL) AND (user_id = auth.uid())) OR is_admin_of_tenant(tenant_id) OR is_admin() OR (EXISTS ( SELECT 1
+   FROM profiles
+  WHERE ((profiles.id = auth.uid()) AND (profiles.role = ANY (ARRAY['admin'::text, 'staff'::text, 'super_admin'::text, 'tenant_owner'::text]))))))"
+public,course_enrollments,course_enrollments_select_policy,"{anon,authenticated}",SELECT,"((lower(email) = lower(COALESCE((auth.jwt() ->> 'email'::text), ''::text))) OR ((user_id IS NOT NULL) AND (user_id = auth.uid())) OR is_admin_of_tenant(tenant_id) OR is_admin() OR (EXISTS ( SELECT 1
+   FROM profiles
+  WHERE ((profiles.id = auth.uid()) AND (profiles.role = ANY (ARRAY['admin'::text, 'staff'::text, 'super_admin'::text, 'tenant_owner'::text]))))))",
+public,course_enrollments,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,course_exam_questions,Admins can manage exam questions,{authenticated},ALL,"(( SELECT profiles.role
+   FROM profiles
+  WHERE (profiles.id = auth.uid())) = ANY (ARRAY['admin'::text, 'staff'::text, 'super_admin'::text, 'tenant_owner'::text]))",
+public,course_exam_submissions,Admins can view exam submissions,{authenticated},ALL,"(( SELECT profiles.role
+   FROM profiles
+  WHERE (profiles.id = auth.uid())) = ANY (ARRAY['admin'::text, 'staff'::text, 'super_admin'::text, 'tenant_owner'::text]))",
+public,course_exam_submissions,Students can view their own submissions,{authenticated},SELECT,(email = (auth.jwt() ->> 'email'::text)),
+public,course_instructors,Escritura para usuarios autenticados,{authenticated},ALL,(auth.uid() IS NOT NULL),
+public,course_instructors,Lectura publica de instructores,{public},SELECT,true,
+public,course_lessons,Authors can manage course contents,{authenticated},ALL,"(EXISTS ( SELECT 1
+   FROM (course_modules cm
+     JOIN courses c ON ((c.id = cm.course_id)))
+  WHERE ((cm.id = course_lessons.module_id) AND (c.author_id = auth.uid()))))",
+public,course_lessons,course_lessons_admin_all_policy,{authenticated},ALL,"(is_admin_of_tenant(tenant_id) OR is_admin() OR (EXISTS ( SELECT 1
+   FROM profiles
+  WHERE ((profiles.id = auth.uid()) AND (profiles.role = ANY (ARRAY['admin'::text, 'staff'::text, 'super_admin'::text, 'tenant_owner'::text]))))) OR (EXISTS ( SELECT 1
+   FROM (course_modules cm
+     JOIN courses c ON ((c.id = cm.course_id)))
+  WHERE ((cm.id = course_lessons.module_id) AND (c.author_id = auth.uid())))))","(is_admin_of_tenant(tenant_id) OR is_admin() OR (EXISTS ( SELECT 1
+   FROM profiles
+  WHERE ((profiles.id = auth.uid()) AND (profiles.role = ANY (ARRAY['admin'::text, 'staff'::text, 'super_admin'::text, 'tenant_owner'::text]))))) OR (EXISTS ( SELECT 1
+   FROM (course_modules cm
+     JOIN courses c ON ((c.id = cm.course_id)))
+  WHERE ((cm.id = course_lessons.module_id) AND (c.author_id = auth.uid())))))"
+public,course_lessons,course_lessons_select_policy,"{anon,authenticated}",SELECT,"(is_admin_of_tenant(tenant_id) OR is_admin() OR (EXISTS ( SELECT 1
+   FROM profiles
+  WHERE ((profiles.id = auth.uid()) AND (profiles.role = ANY (ARRAY['admin'::text, 'staff'::text, 'super_admin'::text, 'tenant_owner'::text]))))) OR (EXISTS ( SELECT 1
+   FROM (course_modules cm
+     JOIN course_enrollments ce ON ((ce.course_id = cm.course_id)))
+  WHERE ((cm.id = course_lessons.module_id) AND (ce.status = 'confirmed'::text) AND ((lower(ce.email) = lower(COALESCE((auth.jwt() ->> 'email'::text), ''::text))) OR ((ce.user_id IS NOT NULL) AND (ce.user_id = auth.uid()))) AND ((cm.unlock_date IS NULL) OR (cm.unlock_date <= now()))))) OR (EXISTS ( SELECT 1
+   FROM (course_modules cm
+     JOIN courses c ON ((c.id = cm.course_id)))
+  WHERE ((cm.id = course_lessons.module_id) AND (c.author_id = auth.uid())))))",
+public,course_modules,Admins can manage course modules,{authenticated},ALL,"(( SELECT profiles.role
+   FROM profiles
+  WHERE (profiles.id = auth.uid())) = ANY (ARRAY['admin'::text, 'staff'::text, 'super_admin'::text, 'tenant_owner'::text]))",
+public,course_modules,Authors can manage course modules,{authenticated},ALL,"(EXISTS ( SELECT 1
+   FROM courses c
+  WHERE ((c.id = course_modules.course_id) AND (c.author_id = auth.uid()))))",
+public,course_modules,course_modules_select_policy,"{anon,authenticated}",SELECT,"((EXISTS ( SELECT 1
+   FROM courses c
+  WHERE ((c.id = course_modules.course_id) AND (c.is_active = true)))) OR is_admin_of_tenant(tenant_id))",
+public,course_modules,modules_tenant_isolation,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,course_modules,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,course_progress,Students manage own progress,{authenticated},ALL,"((lower(email) = lower(COALESCE((auth.jwt() ->> 'email'::text), ''::text))) OR ((user_id IS NOT NULL) AND (user_id = auth.uid())) OR is_admin_of_tenant(tenant_id) OR is_admin() OR (EXISTS ( SELECT 1
+   FROM profiles
+  WHERE ((profiles.id = auth.uid()) AND (profiles.role = ANY (ARRAY['admin'::text, 'staff'::text, 'super_admin'::text, 'tenant_owner'::text]))))))","((lower(email) = lower(COALESCE((auth.jwt() ->> 'email'::text), ''::text))) OR ((user_id IS NOT NULL) AND (user_id = auth.uid())) OR is_admin_of_tenant(tenant_id) OR is_admin() OR (EXISTS ( SELECT 1
+   FROM profiles
+  WHERE ((profiles.id = auth.uid()) AND (profiles.role = ANY (ARRAY['admin'::text, 'staff'::text, 'super_admin'::text, 'tenant_owner'::text]))))))"
+public,courses,Admins_All_Courses,{public},ALL,is_admin(),
+public,courses,Authors can manage their courses,{authenticated},ALL,(author_id = auth.uid()),
+public,courses,Public View - Courses,{anon},SELECT,(is_active = true),
+public,courses,courses_select_policy,"{anon,authenticated}",SELECT,((is_active = true) OR is_admin_of_tenant(tenant_id)),
+public,courses,crs_delete,{authenticated},DELETE,((tenant_id = get_current_tenant_id()) OR is_super_admin()),
+public,courses,crs_insert,{authenticated},INSERT,,((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,courses,crs_select,{public},SELECT,"(((is_active = true) AND (EXISTS ( SELECT 1
+   FROM tenants t
+  WHERE ((t.id = courses.tenant_id) AND (t.is_active = true))))) OR (tenant_id = get_current_tenant_id()) OR is_super_admin())",
+public,courses,crs_update,{authenticated},UPDATE,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,courses,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,customer_devices,Filter_Soft_Deleted_Customer_Devices,{authenticated},SELECT,(deleted_at IS NULL),
+public,customer_devices,customer_devices_tenant_isolation,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,customer_devices,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,invoices,Filter_Soft_Deleted_Invoices,{authenticated},SELECT,(deleted_at IS NULL),
+public,invoices,invoices_tenant_isolation_all,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,invoices,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,knowledge_base,knowledge_base_tenant_isolation,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,models,Filter_Soft_Deleted_Models,{authenticated},SELECT,(deleted_at IS NULL),
+public,models,mod_delete,{authenticated},DELETE,((tenant_id = get_current_tenant_id()) OR is_super_admin()),
+public,models,mod_insert,{authenticated},INSERT,,((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,models,mod_select,{public},SELECT,"(((deleted_at IS NULL) AND (EXISTS ( SELECT 1
+   FROM tenants t
+  WHERE ((t.id = models.tenant_id) AND (t.is_active = true))))) OR (tenant_id = get_current_tenant_id()) OR is_super_admin())",
+public,models,mod_update,{authenticated},UPDATE,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,models,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,notifications,super_admin_notifications_all,{authenticated},ALL,is_super_admin(),is_super_admin()
+public,notifications,tenant_notifications_delete,{authenticated},DELETE,"((tenant_id = get_current_tenant_id()) AND (EXISTS ( SELECT 1
+   FROM profiles p
+  WHERE ((p.id = auth.uid()) AND (p.role = ANY (ARRAY['admin'::text, 'tenant_owner'::text]))))))",
+public,notifications,tenant_notifications_insert,{authenticated},INSERT,,(tenant_id = get_current_tenant_id())
+public,notifications,tenant_notifications_select,{authenticated},SELECT,"((tenant_id = get_current_tenant_id()) AND ((((scope)::text = 'user'::text) AND ((user_id IS NULL) OR (user_id = auth.uid()))) OR (((scope)::text = 'admin'::text) AND (EXISTS ( SELECT 1
+   FROM profiles p
+  WHERE ((p.id = auth.uid()) AND (p.role = ANY (ARRAY['admin'::text, 'staff'::text, 'technician'::text, 'tenant_owner'::text]))))))))",
+public,notifications,tenant_notifications_update,{authenticated},UPDATE,(tenant_id = get_current_tenant_id()),(tenant_id = get_current_tenant_id())
+public,order_items,Anon can manage guest order items,{anon},ALL,"(EXISTS ( SELECT 1
+   FROM orders o
+  WHERE ((o.id = order_items.order_id) AND (o.session_id IS NOT NULL) AND (o.user_id IS NULL) AND (o.session_id = get_request_guest_session()))))","(EXISTS ( SELECT 1
+   FROM orders o
+  WHERE ((o.id = order_items.order_id) AND (o.session_id IS NOT NULL) AND (o.user_id IS NULL) AND (o.session_id = get_request_guest_session()))))"
+public,order_items,Users can manage their own order items,{authenticated},ALL,"(EXISTS ( SELECT 1
+   FROM orders o
+  WHERE ((o.id = order_items.order_id) AND (o.user_id = auth.uid()))))","(EXISTS ( SELECT 1
+   FROM orders o
+  WHERE ((o.id = order_items.order_id) AND (o.user_id = auth.uid()))))"
+public,order_items,staff_tenant_order_items,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,order_items,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,orders,Anon can delete guest carts,{anon},DELETE,((session_id IS NOT NULL) AND (user_id IS NULL) AND (status = 'cart'::text) AND (session_id = get_request_guest_session())),
+public,orders,Anon can insert guest orders,{anon},INSERT,,((session_id IS NOT NULL) AND (user_id IS NULL) AND (session_id = get_request_guest_session()))
+public,orders,Anon can update guest orders,{anon},UPDATE,((session_id IS NOT NULL) AND (user_id IS NULL) AND (session_id = get_request_guest_session())),((session_id IS NOT NULL) AND (user_id IS NULL) AND (session_id = get_request_guest_session()))
+public,orders,Anon can view guest orders,{anon},SELECT,((session_id IS NOT NULL) AND (user_id IS NULL) AND (session_id = get_request_guest_session())),
+public,orders,Branch Staff Isolation,{authenticated},ALL,"((get_auth_user_role() = ANY (ARRAY['admin'::text, 'staff'::text, 'technician'::text])) AND (branch_id = get_auth_user_branch()))",
+public,orders,Filter_Soft_Deleted_Orders,{authenticated},SELECT,(deleted_at IS NULL),
+public,orders,Staff can insert orders for their tenant,{public},INSERT,,"(EXISTS ( SELECT 1
+   FROM profiles p
+  WHERE ((p.id = auth.uid()) AND (p.role = ANY (ARRAY['admin'::text, 'staff'::text, 'super_admin'::text, 'tenant_owner'::text])))))"
+public,orders,SuperAdmin Bypass All,{authenticated},ALL,(get_auth_user_role() = 'super_admin'::text),
+public,orders,Tenant Owner Isolation,{authenticated},ALL,((get_auth_user_role() = 'tenant_owner'::text) AND (tenant_id = get_auth_user_tenant())),
+public,orders,Users can delete their own carts,{authenticated},DELETE,((auth.uid() = user_id) AND (status = 'cart'::text)),
+public,orders,Users can insert their own orders,{authenticated},INSERT,,(((auth.uid() = user_id) OR (user_id IS NULL)) AND ((tenant_id = get_current_tenant_id()) OR is_super_admin()))
+public,orders,Users can update their own orders,{authenticated},UPDATE,(auth.uid() = user_id),(auth.uid() = user_id)
+public,orders,Users can view their own orders,{authenticated},SELECT,(auth.uid() = user_id),
+public,orders,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,page_templates,page_templates_tenant_isolation,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,page_templates,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,pages,pages_tenant_isolation,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,pages,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,payments,Staff and tenant owners can manage payments,{authenticated},ALL,"((get_auth_user_role() = ANY (ARRAY['admin'::text, 'staff'::text, 'super_admin'::text, 'tenant_owner'::text])) AND (tenant_id = get_auth_user_tenant()))","((get_auth_user_role() = ANY (ARRAY['admin'::text, 'staff'::text, 'super_admin'::text, 'tenant_owner'::text])) AND (tenant_id = get_auth_user_tenant()))"
+public,payments,SuperAdmin bypass payments,{authenticated},ALL,(get_auth_user_role() = 'super_admin'::text),(get_auth_user_role() = 'super_admin'::text)
+public,payments,Users can view their own payments,{authenticated},SELECT,"(EXISTS ( SELECT 1
+   FROM orders o
+  WHERE ((o.id = payments.order_id) AND (o.user_id = auth.uid()))))",
+public,post_comments,post_comments_admin_manage_policy,{authenticated},ALL,"(is_super_admin() OR ((tenant_id = get_current_tenant_id()) AND (get_auth_user_role() = ANY (ARRAY['admin'::text, 'tenant_owner'::text]))))","(is_super_admin() OR ((tenant_id = get_current_tenant_id()) AND (get_auth_user_role() = ANY (ARRAY['admin'::text, 'tenant_owner'::text]))))"
+public,post_comments,post_comments_insert_policy,{public},INSERT,,"((tenant_id IS NOT NULL) AND (EXISTS ( SELECT 1
+   FROM tenants t
+  WHERE ((t.id = post_comments.tenant_id) AND (t.is_active = true)))))"
+public,post_comments,post_comments_select_policy,{public},SELECT,"((((status)::text = 'approved'::text) AND (EXISTS ( SELECT 1
+   FROM tenants t
+  WHERE ((t.id = post_comments.tenant_id) AND (t.is_active = true))))) OR (tenant_id = get_current_tenant_id()) OR is_super_admin())",
+public,product_images,pi_delete,{authenticated},DELETE,((tenant_id = get_current_tenant_id()) OR is_super_admin()),
+public,product_images,pi_insert,{authenticated},INSERT,,((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,product_images,pi_select,{public},SELECT,"((EXISTS ( SELECT 1
+   FROM tenants t
+  WHERE ((t.id = product_images.tenant_id) AND (t.is_active = true)))) OR (tenant_id = get_current_tenant_id()) OR is_super_admin())",
+public,product_images,pi_update,{authenticated},UPDATE,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,product_images,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,product_reviews,pr_delete,{authenticated},DELETE,((tenant_id = get_current_tenant_id()) OR is_super_admin()),
+public,product_reviews,pr_insert,{authenticated},INSERT,,((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,product_reviews,pr_select,{public},SELECT,"((EXISTS ( SELECT 1
+   FROM tenants t
+  WHERE ((t.id = product_reviews.tenant_id) AND (t.is_active = true)))) OR (tenant_id = get_current_tenant_id()) OR is_super_admin())",
+public,product_reviews,pr_update,{authenticated},UPDATE,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,product_reviews,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,product_stock_per_branch,Public View - Stock,{anon},SELECT,true,
+public,product_stock_per_branch,Stock_Tenant_Isolation,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,product_variants,Variants_Tenant_Isolation,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,products,Products_Tenant_Isolation,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,products,Public View - Products,{anon},SELECT,((is_active = true) AND (deleted_at IS NULL)),
+public,profiles,Admins_All_Profiles,{public},ALL,is_admin(),
+public,profiles,Users_ReadUpdate_Own_Profile,{public},SELECT,(auth.uid() = id),
+public,profiles,Users_Update_Own_Profile,{public},UPDATE,(auth.uid() = id),
+public,profiles,profiles_delete_permission,{public},DELETE,(get_auth_user_role() = 'super_admin'::text),
+public,profiles,profiles_insert_own,{public},INSERT,,(id = auth.uid())
+public,profiles,profiles_insert_permission,{public},INSERT,,"(has_permission('customers:manage:branch'::text, branch_id) OR has_permission('customers:manage:global'::text, NULL::uuid) OR (get_auth_user_role() = 'super_admin'::text))"
+public,profiles,profiles_read_own,{public},SELECT,(id = auth.uid()),
+public,profiles,profiles_read_permission,{public},SELECT,"(has_permission('customers:manage:branch'::text, branch_id) OR has_permission('customers:manage:global'::text, NULL::uuid) OR (get_auth_user_role() = 'super_admin'::text))",
+public,profiles,profiles_tenant_isolation_restrictive,{public},ALL,((id = auth.uid()) OR (tenant_id = get_auth_user_tenant()) OR (get_auth_user_role() = 'super_admin'::text)),
+public,profiles,profiles_update_own,{public},UPDATE,(id = auth.uid()),(id = auth.uid())
+public,profiles,profiles_update_permission,{public},UPDATE,"(has_permission('customers:manage:branch'::text, branch_id) OR has_permission('customers:manage:global'::text, NULL::uuid) OR (get_auth_user_role() = 'super_admin'::text))","(has_permission('customers:manage:branch'::text, branch_id) OR has_permission('customers:manage:global'::text, NULL::uuid) OR (get_auth_user_role() = 'super_admin'::text))"
+public,purchase_items,purchase_items_tenant_isolation,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,purchase_items,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,purchases,Branch Staff Isolation,{authenticated},ALL,((get_auth_user_role() = 'super_admin'::text) OR (branch_id = get_my_branch())),
+public,purchases,SuperAdmin Bypass All,{authenticated},ALL,(get_auth_user_role() = 'super_admin'::text),
+public,purchases,Tenant Owner Isolation,{authenticated},ALL,((get_auth_user_role() = 'tenant_owner'::text) AND (tenant_id = get_auth_user_tenant())),
+public,purchases,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,repair_images,repair_images_tenant_isolation,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,repair_images,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,repair_number_sequences,repair_number_sequences_tenant_isolation,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,repair_number_sequences,service_role_all,{service_role},ALL,true,true
+public,repair_number_sequences,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,repair_parts_used,repair_parts_used_tenant_isolation,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,repair_parts_used,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,repair_status_history,repair_status_history_tenant_isolation,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,repair_status_history,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,repair_status_types,rst_unified_select,{public},SELECT,true,
+public,repair_status_types,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,repairs,Filter_Soft_Deleted_Repairs,{authenticated},SELECT,(deleted_at IS NULL),
+public,repairs,repairs_delete_permission,{public},DELETE,(get_auth_user_role() = 'super_admin'::text),
+public,repairs,repairs_insert_permission,{authenticated},INSERT,,"(((tenant_id = get_current_tenant_id()) OR is_super_admin()) AND (has_permission('repairs:create:branch'::text, branch_id) OR has_permission('repairs:create:global'::text, NULL::uuid) OR is_super_admin()))"
+public,repairs,repairs_read_permission,{authenticated},SELECT,"(((tenant_id = get_current_tenant_id()) OR is_super_admin()) AND (has_permission('repairs:read:branch'::text, branch_id) OR has_permission('repairs:read:global'::text, NULL::uuid) OR is_super_admin()))",
+public,repairs,repairs_tenant_isolation_all,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,repairs,repairs_update_permission,{authenticated},UPDATE,"(((tenant_id = get_current_tenant_id()) OR is_super_admin()) AND (has_permission('repairs:edit:branch'::text, branch_id) OR has_permission('repairs:edit:global'::text, NULL::uuid) OR is_super_admin()))","(((tenant_id = get_current_tenant_id()) OR is_super_admin()) AND (has_permission('repairs:edit:branch'::text, branch_id) OR has_permission('repairs:edit:global'::text, NULL::uuid) OR is_super_admin()))"
+public,role_permissions,role_permissions_read_authenticated,{authenticated},SELECT,true,
+public,role_permissions,role_permissions_write_super_admin,{authenticated},ALL,is_super_admin(),is_super_admin()
+public,roles,roles_read_authenticated,{authenticated},SELECT,true,
+public,roles,roles_write_super_admin,{authenticated},ALL,is_super_admin(),is_super_admin()
+public,service_blocks,service_blocks_admin_all,{authenticated},ALL,"(is_super_admin() OR (tenant_id = get_current_tenant_id()) OR (get_auth_user_role() = ANY (ARRAY['admin'::text, 'super_admin'::text, 'tenant_owner'::text])))","(is_super_admin() OR (tenant_id = get_current_tenant_id()) OR (get_auth_user_role() = ANY (ARRAY['admin'::text, 'super_admin'::text, 'tenant_owner'::text])))"
+public,service_blocks,service_blocks_anon_select,"{anon,authenticated}",SELECT,"((is_enabled = true) AND ((((owner_type)::text = 'service'::text) AND (EXISTS ( SELECT 1
+   FROM services s
+  WHERE ((s.id = service_blocks.owner_id) AND (s.is_published = true) AND (s.deleted_at IS NULL))))) OR (((owner_type)::text = 'post'::text) AND (EXISTS ( SELECT 1
+   FROM blog_posts p
+  WHERE ((p.id = service_blocks.owner_id) AND ((p.status)::text = 'published'::text)))))))",
+public,service_categories,service_categories_admin_all,{authenticated},ALL,(is_super_admin() OR (tenant_id = get_current_tenant_id())),(is_super_admin() OR (tenant_id = get_current_tenant_id()))
+public,service_categories,service_categories_public_select,{public},SELECT,true,
+public,service_features,service_features_admin_all,{authenticated},ALL,(is_super_admin() OR (tenant_id = get_current_tenant_id())),(is_super_admin() OR (tenant_id = get_current_tenant_id()))
+public,service_features,service_features_anon_select,"{anon,authenticated}",SELECT,"(EXISTS ( SELECT 1
+   FROM services s
+  WHERE ((s.id = service_features.service_id) AND (s.is_published = true) AND (s.deleted_at IS NULL))))",
+public,service_leads,service_leads_admin_all,{authenticated},ALL,(is_super_admin() OR (tenant_id = get_current_tenant_id())),(is_super_admin() OR (tenant_id = get_current_tenant_id()))
+public,service_leads,service_leads_anon_insert,"{anon,authenticated}",INSERT,,true
+public,services,Branch Staff Isolation,{authenticated},ALL,"((get_auth_user_role() = ANY (ARRAY['admin'::text, 'staff'::text, 'technician'::text])) AND (branch_id = get_auth_user_branch()))",
+public,services,SuperAdmin Bypass All,{authenticated},ALL,(get_auth_user_role() = 'super_admin'::text),
+public,services,Tenant Owner Isolation,{authenticated},ALL,((get_auth_user_role() = 'tenant_owner'::text) AND (tenant_id = get_auth_user_tenant())),
+public,services,services_admin_crud,{authenticated},ALL,(is_super_admin() OR (tenant_id = get_current_tenant_id())),(is_super_admin() OR (tenant_id = get_current_tenant_id()))
+public,services,services_anon_select,"{anon,authenticated}",SELECT,((is_published = true) AND (deleted_at IS NULL)),
+public,services,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,services_backup_20261018,services_backup_superadmin_only,{authenticated},ALL,is_super_admin(),is_super_admin()
+public,slug_redirects,slug_redirects_admin_all,{authenticated},ALL,(is_super_admin() OR (tenant_id = get_current_tenant_id())),(is_super_admin() OR (tenant_id = get_current_tenant_id()))
+public,slug_redirects,slug_redirects_anon_select,"{anon,authenticated}",SELECT,true,
+public,stock_history,stock_history_super_admin,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,stock_history,stock_history_tenant_isolation,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,suppliers,Branch Staff Isolation,{authenticated},ALL,"((get_auth_user_role() = ANY (ARRAY['admin'::text, 'staff'::text, 'technician'::text])) AND (branch_id = get_auth_user_branch()))",
+public,suppliers,SuperAdmin Bypass All,{authenticated},ALL,(get_auth_user_role() = 'super_admin'::text),
+public,suppliers,Tenant Owner Isolation,{authenticated},ALL,((get_auth_user_role() = 'tenant_owner'::text) AND (tenant_id = get_auth_user_tenant())),
+public,suppliers,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,suppliers,suppliers_tenant_isolation,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,technical_solutions,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,technical_solutions,technical_solutions_tenant_isolation,{authenticated},ALL,((tenant_id = get_current_tenant_id()) OR is_super_admin()),((tenant_id = get_current_tenant_id()) OR is_super_admin())
+public,tenants,Public View - Tenants,{anon},SELECT,(is_active = true),
+public,tenants,super_admin_all_access,{authenticated},ALL,(get_user_role() = 'super_admin'::text),(get_user_role() = 'super_admin'::text)
+public,tenants,tenants_select,{public},SELECT,true,
+public,tenants,tenants_select_policy,{public},SELECT,((is_active = true) OR (id = get_current_tenant_id()) OR is_super_admin()),
+public,tenants,tenants_unified_update,{authenticated},UPDATE,"((id = ( SELECT p.tenant_id
+   FROM profiles p
+  WHERE (p.id = ( SELECT auth.uid() AS uid)))) AND (( SELECT p.role
+   FROM profiles p
+  WHERE (p.id = ( SELECT auth.uid() AS uid))) = 'admin'::text))","((id = ( SELECT p.tenant_id
+   FROM profiles p
+  WHERE (p.id = ( SELECT auth.uid() AS uid)))) AND (( SELECT p.role
+   FROM profiles p
+  WHERE (p.id = ( SELECT auth.uid() AS uid))) = 'admin'::text))"
+public,user_roles,user_roles_tenant_isolation,{authenticated},ALL,(is_super_admin() OR (tenant_id = get_current_tenant_id()) OR (user_id = auth.uid())),"(is_super_admin() OR ((tenant_id = get_current_tenant_id()) AND (get_auth_user_role() = ANY (ARRAY['admin'::text, 'tenant_owner'::text]))))"
+storage,objects,Admin Delete,{public},DELETE,((bucket_id = 'repair-images'::text) AND (auth.role() = 'authenticated'::text)),
+storage,objects,Admin Insert,{public},INSERT,,((bucket_id = 'repair-images'::text) AND (auth.role() = 'authenticated'::text))
+storage,objects,Admin Update,{public},UPDATE,((bucket_id = 'repair-images'::text) AND (auth.role() = 'authenticated'::text)),
+storage,objects,Admins_Read_All_Receipts,{public},SELECT,((bucket_id = 'receipts'::text) AND is_admin()),
+storage,objects,Anyone can upload an avatar.,{public},INSERT,,(bucket_id = 'avatars'::text)
+storage,objects,Autenticados suben evidencia,{authenticated},INSERT,,(bucket_id = 'repair_evidence'::text)
+storage,objects,Autenticados suben facturas,{authenticated},INSERT,,(bucket_id = 'invoices_pdf'::text)
+storage,objects,Autenticados ven facturas,{authenticated},SELECT,(bucket_id = 'invoices_pdf'::text),
+storage,objects,Autenticados ven su evidencia,{authenticated},SELECT,(bucket_id = 'repair_evidence'::text),
+storage,objects,Authenticated Delete,{authenticated},DELETE,(bucket_id = 'public-assets'::text),
+storage,objects,Authenticated Update,{authenticated},UPDATE,(bucket_id = 'public-assets'::text),
+storage,objects,Authenticated Updates,{authenticated},UPDATE,(bucket_id = 'academy_certificates'::text),
+storage,objects,Authenticated Upload,{authenticated},INSERT,,(bucket_id = 'public-assets'::text)
+storage,objects,Authenticated Uploads,{authenticated},INSERT,,(bucket_id = 'academy_certificates'::text)
+storage,objects,Authenticated can upload avatars,{public},INSERT,,((bucket_id = 'avatars'::text) AND (auth.role() = 'authenticated'::text))
+storage,objects,Authenticated can upload evidence,{public},INSERT,,((bucket_id = 'evidence'::text) AND (auth.role() = 'authenticated'::text))
+storage,objects,Avatar images are publicly accessible.,{public},SELECT,(bucket_id = 'avatars'::text),
+storage,objects,Lectura Publica CVs,{public},SELECT,(bucket_id = 'cv-generados'::text),
+storage,objects,Permitir a invitados subir comprobantes,{anon},INSERT,,((bucket_id = 'public-assets'::text) AND (name ~~ '%/payment-proofs/%'::text))
+storage,objects,Public Access,{public},SELECT,(bucket_id = 'academy_certificates'::text),
+storage,objects,Public can read avatars,{public},SELECT,(bucket_id = 'avatars'::text),
+storage,objects,Public can read evidence,{public},SELECT,(bucket_id = 'evidence'::text),
+storage,objects,Public_Read_Covers,{public},SELECT,(bucket_id = 'course-covers'::text),
+storage,objects,Student_Insert_Receipt,{public},INSERT,,((bucket_id = 'receipts'::text) AND (auth.uid() = owner))
+storage,objects,Student_Read_Own_Receipt,{public},SELECT,((bucket_id = 'receipts'::text) AND (auth.uid() = owner)),
+zarx,active_news,zarx_news_all,{public},ALL,true,true
+zarx,active_tracking_sessions,zarx_tracking_all,{public},ALL,true,true
+zarx,emergencies,zarx_emergencies_all,{public},ALL,true,true
+zarx,notifications,zarx_notifications_all,{public},ALL,true,true
+zarx,profiles,Admins can delete any profile,{public},DELETE,zarx.is_admin(),
+zarx,profiles,Admins can update any profile,{public},UPDATE,zarx.is_admin(),
+zarx,profiles,Public profiles are viewable by everyone,{public},SELECT,true,
+zarx,profiles,Users can insert own profile,{public},INSERT,,(auth.uid() = id)
+zarx,profiles,Users can update own profile,{public},UPDATE,(auth.uid() = id),(auth.uid() = id)
+zarx,profiles,zarx_profiles_all,{public},ALL,true,true
+zarx,public_alerts,zarx_public_alerts_all,{public},ALL,true,true
+zarx,reports,zarx_reports_all,{public},ALL,true,true
+zarx,zones,zarx_zones_all,{public},ALL,true,true

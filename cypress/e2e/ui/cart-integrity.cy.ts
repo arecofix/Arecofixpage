@@ -47,7 +47,6 @@ describe('Carrito de Compras e Integridad de Datos (E2E)', () => {
   it('debería calcular el subtotal correctamente y permitir vaciar el carrito (QA #26-36)', () => {
     cy.visit('/productos');
     cy.wait('@getProducts');
-    cy.wait('@getProducts');
     
     // Add product A
     cy.get('product-card').contains('Producto A').parents('product-card').find('button').contains(/Añadir/i).click({ force: true });
@@ -65,9 +64,12 @@ describe('Carrito de Compras e Integridad de Datos (E2E)', () => {
       buildMockOrderItem(productB, 1)
     ]);
 
-    cy.intercept({ method: 'GET', url: '**/rest/v1/orders*', query: { status: 'eq.cart' } }, {
-      statusCode: 200,
-      body: cartOrder
+    cy.intercept({ method: 'GET', url: '**/rest/v1/orders*', query: { status: 'eq.cart' } }, (req) => {
+      const isObject = String(req.headers['accept'])?.includes('application/vnd.pgrst.object');
+      req.reply({
+        statusCode: 200,
+        body: isObject ? cartOrder : [cartOrder]
+      });
     }).as('getPopulatedCart');
 
     // Recargar o ir al checkout para forzar la lectura del backend
@@ -95,9 +97,12 @@ describe('Carrito de Compras e Integridad de Datos (E2E)', () => {
   it('debería rechazar un cupón inválido o expirado (QA #38)', () => {
     const cartOrder = buildMockOrder([buildMockOrderItem(productA, 1)]);
     
-    cy.intercept({ method: 'GET', url: '**/rest/v1/orders*', query: { status: 'eq.cart' } }, {
-      statusCode: 200,
-      body: cartOrder
+    cy.intercept({ method: 'GET', url: '**/rest/v1/orders*', query: { status: 'eq.cart' } }, (req) => {
+      const isObject = String(req.headers['accept'])?.includes('application/vnd.pgrst.object');
+      req.reply({
+        statusCode: 200,
+        body: isObject ? cartOrder : [cartOrder]
+      });
     }).as('getCartForCoupon');
 
     cy.visit('/checkout');

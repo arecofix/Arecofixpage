@@ -25,7 +25,7 @@ export interface ModuleContent {
   id?: string;
   module_id: string;
   type: 'video' | 'image' | 'document' | 'link' | 'text' | 'exam';
-  title: string;
+  title?: string;
   url: string;
   metadata?: any;
   order_index: number;
@@ -576,19 +576,36 @@ export interface ModuleContent {
           </h3>
 
           @if (editingExamContent) {
-            <div class="form-control mb-6">
-              <label class="label"
-                ><span class="label-text font-bold"
-                  >Puntaje mínimo para aprobar (%)</span
-                ></label
-              >
-              <input
-                type="number"
-                [(ngModel)]="editingExamContent.metadata.passing_score"
-                class="input input-bordered w-32"
-                min="1"
-                max="100"
-              />
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div class="form-control">
+                <label class="label"
+                  ><span class="label-text font-bold"
+                    >Puntaje mínimo para aprobar (%)</span
+                  ></label
+                >
+                <input
+                  type="number"
+                  [(ngModel)]="editingExamContent.metadata.passing_score"
+                  class="input input-bordered w-full"
+                  min="1"
+                  max="100"
+                />
+              </div>
+              <div class="form-control">
+                <label class="label"
+                  ><span class="label-text font-bold"
+                    >Tiempo límite (minutos)</span
+                  ></label
+                >
+                <input
+                  type="number"
+                  [(ngModel)]="editingExamContent.metadata.time_limit_minutes"
+                  class="input input-bordered w-full"
+                  min="1"
+                  max="180"
+                  placeholder="Ej: 15"
+                />
+              </div>
             </div>
 
             <div class="divider">
@@ -881,7 +898,7 @@ export class AdminCourseMaterialsPage implements OnInit {
     else if (type === 'exam') {
       newResource.title = 'Nuevo Examen';
       newResource.url = 'exam';
-      newResource.metadata = { passing_score: 60, questions: [] };
+      newResource.metadata = { passing_score: 60, time_limit_minutes: 15, questions: [] };
     } else newResource.title = 'Información Importante';
 
     this.contents.set([...current, newResource]);
@@ -911,9 +928,28 @@ export class AdminCourseMaterialsPage implements OnInit {
     this.contents.set(current);
   }
 
-  async uploadFile(event: any, contentRef: ModuleContent) {
-    const file: File = event.target.files?.[0];
+  async uploadFile(event: Event, contentRef: ModuleContent) {
+    const input = event.target as HTMLInputElement;
+    const file: File | undefined = input?.files?.[0];
     if (!file) return;
+
+    // Validate size (max 50MB)
+    const MAX_SIZE = 50 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      this.notification.showError('El archivo supera el tamaño máximo permitido de 50MB.');
+      if (input) input.value = '';
+      return;
+    }
+
+    // Validate extension
+    const allowedExtensions = ['.pdf', '.mp4', '.webm', '.png', '.jpg', '.jpeg', '.zip', '.doc', '.docx'];
+    const fileName = file.name.toLowerCase();
+    const isAllowed = allowedExtensions.some((ext) => fileName.endsWith(ext));
+    if (!isAllowed) {
+      this.notification.showError('Formato no permitido. Archivos válidos: PDF, MP4, WebM, PNG, JPG, ZIP, DOC.');
+      if (input) input.value = '';
+      return;
+    }
 
     this.notification.showSuccess('Subiendo archivo, aguarda un momento...');
     try {

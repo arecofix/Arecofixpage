@@ -5,12 +5,14 @@ import { map } from 'rxjs/operators';
 import { RepairRepository } from '../../domain/repositories/repair.repository';
 import { Repair, CreateRepairDto, UpdateRepairDto } from '../../domain/entities/repair.entity';
 
+import { environment } from '@env/environment';
+
 @Injectable({
     providedIn: 'root'
 })
 export class FlaskRepairRepository implements RepairRepository {
     private http = inject(HttpClient);
-    private apiUrl = 'http://localhost:5000/api/servicios';
+    private apiUrl = `${environment.flaskApiUrl}/servicios`;
 
     getById(id: string): Observable<Repair | null> {
         return this.http.get<{ data: Repair[]; total: number }>(this.apiUrl).pipe(
@@ -18,7 +20,13 @@ export class FlaskRepairRepository implements RepairRepository {
         );
     }
 
-    getAll(limit?: number, offset?: number): Observable<Repair[]> {
+    getAll(_options?: { column?: string; ascending?: boolean; select?: string }): Observable<Repair[]> {
+        return this.http.get<{ data: Repair[]; total: number }>(this.apiUrl).pipe(
+            map(res => res.data)
+        );
+    }
+
+    getRepairs(limit?: number, offset?: number, _branchId?: string): Observable<Repair[]> {
         return this.http.get<{ data: Repair[]; total: number }>(this.apiUrl).pipe(
             map(res => res.data)
         );
@@ -28,8 +36,8 @@ export class FlaskRepairRepository implements RepairRepository {
         return this.http.post<Repair>(this.apiUrl, repair);
     }
 
-    update(id: string, repair: UpdateRepairDto): Observable<void> {
-        return this.http.put<void>(`${this.apiUrl}/${id}`, repair);
+    update(id: string, repair: Partial<Repair>): Observable<Repair> {
+        return this.http.put<Repair>(`${this.apiUrl}/${id}`, repair);
     }
 
     delete(id: string): Observable<void> {
@@ -44,7 +52,7 @@ export class FlaskRepairRepository implements RepairRepository {
         const formData = new FormData();
         formData.append('file', file);
         try {
-            const res = await fetch('http://localhost:5000/api/upload', {
+            const res = await fetch(`${environment.flaskApiUrl}/upload`, {
                 method: 'POST',
                 body: formData
             });

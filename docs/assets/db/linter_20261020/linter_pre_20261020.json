@@ -1,0 +1,5623 @@
+[
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.accept_upsell_vidrio",
+    "detail": "p_tracking_code text"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.add_upsell_item_to_repair",
+    "detail": "p_tracking_code text, p_product_id uuid"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.admin_reactivate_certificate",
+    "detail": "p_cert_id uuid"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.admin_revoke_certificate",
+    "detail": "p_cert_id uuid, p_reason text"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.assign_user_as_employee",
+    "detail": "p_user_id uuid, p_role text, p_tenant_id uuid"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.auto_assign_cash_branch",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.auto_assign_order_branch",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.auto_assign_repair_branch",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.can_edit_profile",
+    "detail": "target_role text"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.check_and_notify_expiring_subscriptions",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.check_and_update_membership_status",
+    "detail": "p_user_id uuid"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.create_employee",
+    "detail": "p_first_name text, p_last_name text, p_email text, p_phone text"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.create_guest_profile",
+    "detail": "p_first_name text, p_last_name text, p_email text, p_phone text"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.custom_access_token_hook",
+    "detail": "event jsonb"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.delete_old_audit_logs",
+    "detail": "end_date timestamp without time zone"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.enforce_retail_price_for_guests",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.expire_stale_enrollments",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.fn_sync_d1_webhook",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.force_tenant_isolation",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_admin_business_dashboard_metrics",
+    "detail": "p_tenant_id uuid, p_range text, p_start_date timestamp with tim"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_admin_dashboard_analytics",
+    "detail": "p_range text, p_branch_id uuid"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_admin_database_health",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_auth_user_branch",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_auth_user_role",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_auth_user_tenant",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_current_tenant_id",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_dashboard_stats_v2",
+    "detail": "p_branch_id uuid"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_exam_questions",
+    "detail": "p_content_id uuid"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_financial_analytics_v3",
+    "detail": "p_tenant_id uuid, p_start_date timestamp with time zone, p_bran"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_my_permissions",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_my_tenant",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_public_certificate_data",
+    "detail": "p_cert_id uuid"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_repair_tracking",
+    "detail": "p_code text"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_request_guest_session",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_secure_branch_id",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_secure_tenant_id",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.handle_new_user",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.handle_order_status_change",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.has_permission",
+    "detail": "p_permission text, p_branch_id uuid"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.increment_product_sales",
+    "detail": "p_product_id uuid, amount integer"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.is_admin",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.is_admin_of_tenant",
+    "detail": "target_tenant_id uuid"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.is_admin_user",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.is_super_admin",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.mark_content_completed",
+    "detail": "p_content_id uuid"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.match_documents",
+    "detail": "query_embedding vector, match_threshold double precision, match"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.notify_n8n_new_product",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.process_course_enrollments",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.protect_sensitive_profile_columns",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.refresh_course_metrics",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.save_repair_order",
+    "detail": "p_payload jsonb"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.submit_exam",
+    "detail": "p_content_id uuid, p_answers jsonb"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.sync_order_items_stock",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.trg_contact_message_notify_admin",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.trigger_payment_status_change",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.update_order_total",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.calculate_danger_level",
+    "detail": "lat double precision, lng double precision, radius_meters doubl"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.delete_own_account",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.get_alerts_in_radius",
+    "detail": "center_lat double precision, center_lng double precision, radiu"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.get_heatmap_data",
+    "detail": "hours_ago integer"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.handle_new_user",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.is_admin",
+    "detail": ""
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.update_fcm_token",
+    "detail": "token text"
+  },
+  {
+    "category": "anon_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.validate_neighbor_report",
+    "detail": "target_report_id uuid, validator_id uuid"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.academy_email_notifications",
+    "detail": "tenant_academy_email_notifications_select"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.academy_payments",
+    "detail": "academy_payments_admin_manage_policy"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.academy_payments",
+    "detail": "academy_payments_select_policy"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.academy_plans",
+    "detail": "academy_plans_admin_manage_policy"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.academy_plans",
+    "detail": "academy_plans_select_policy"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.academy_subscriptions",
+    "detail": "academy_subscriptions_select_policy"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.academy_subscriptions",
+    "detail": "academy_subscriptions_admin_manage_policy"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.contact_messages",
+    "detail": "tenant_contact_messages_select"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.contact_messages",
+    "detail": "tenant_contact_messages_update"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.contact_messages",
+    "detail": "tenant_contact_messages_delete"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.course_certificates",
+    "detail": "Admins can view certificates"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.course_certificates",
+    "detail": "Students can view their own certificates"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.course_certificates",
+    "detail": "Admins can manage all certificates"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.course_enrollments",
+    "detail": "course_enrollments_select_policy"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.course_enrollments",
+    "detail": "course_enrollments_all_policy"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.course_exam_questions",
+    "detail": "Admins can manage exam questions"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.course_exam_submissions",
+    "detail": "Students can view their own submissions"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.course_exam_submissions",
+    "detail": "Admins can view exam submissions"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.course_instructors",
+    "detail": "Escritura para usuarios autenticados"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.course_lessons",
+    "detail": "Authors can manage course contents"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.course_lessons",
+    "detail": "course_lessons_select_policy"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.course_lessons",
+    "detail": "course_lessons_admin_all_policy"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.course_modules",
+    "detail": "Admins can manage course modules"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.course_modules",
+    "detail": "Authors can manage course modules"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.course_progress",
+    "detail": "Students manage own progress"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.courses",
+    "detail": "Authors can manage their courses"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.notifications",
+    "detail": "tenant_notifications_delete"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.notifications",
+    "detail": "tenant_notifications_select"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.order_items",
+    "detail": "Users can manage their own order items"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.orders",
+    "detail": "Staff can insert orders for their tenant"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.orders",
+    "detail": "Users can insert their own orders"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.orders",
+    "detail": "Users can view their own orders"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.orders",
+    "detail": "Users can update their own orders"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.orders",
+    "detail": "Users can delete their own carts"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.payments",
+    "detail": "Users can view their own payments"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.profiles",
+    "detail": "profiles_read_own"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.profiles",
+    "detail": "profiles_tenant_isolation_restrictive"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.profiles",
+    "detail": "profiles_update_own"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.profiles",
+    "detail": "profiles_insert_own"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.profiles",
+    "detail": "Users_ReadUpdate_Own_Profile"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.profiles",
+    "detail": "Users_Update_Own_Profile"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.tenants",
+    "detail": "tenants_unified_update"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.user_roles",
+    "detail": "user_roles_tenant_isolation"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "zarx.profiles",
+    "detail": "Users can update own profile"
+  },
+  {
+    "category": "auth_rls_initplan",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "zarx.profiles",
+    "detail": "Users can insert own profile"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.accept_upsell_vidrio",
+    "detail": "p_tracking_code text"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.add_upsell_item_to_repair",
+    "detail": "p_tracking_code text, p_product_id uuid"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.admin_reactivate_certificate",
+    "detail": "p_cert_id uuid"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.admin_revoke_certificate",
+    "detail": "p_cert_id uuid, p_reason text"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.assign_user_as_employee",
+    "detail": "p_user_id uuid, p_role text, p_tenant_id uuid"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.auto_assign_cash_branch",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.auto_assign_order_branch",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.auto_assign_repair_branch",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.can_edit_profile",
+    "detail": "target_role text"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.check_and_notify_expiring_subscriptions",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.check_and_update_membership_status",
+    "detail": "p_user_id uuid"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.create_employee",
+    "detail": "p_first_name text, p_last_name text, p_email text, p_phone text"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.create_guest_profile",
+    "detail": "p_first_name text, p_last_name text, p_email text, p_phone text"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.custom_access_token_hook",
+    "detail": "event jsonb"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.delete_old_audit_logs",
+    "detail": "end_date timestamp without time zone"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.enforce_retail_price_for_guests",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.expire_stale_enrollments",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.fn_sync_d1_webhook",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.force_tenant_isolation",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_admin_business_dashboard_metrics",
+    "detail": "p_tenant_id uuid, p_range text, p_start_date timestamp with tim"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_admin_dashboard_analytics",
+    "detail": "p_range text, p_branch_id uuid"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_admin_database_health",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_auth_user_branch",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_auth_user_role",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_auth_user_tenant",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_current_tenant_id",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_dashboard_stats_v2",
+    "detail": "p_branch_id uuid"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_exam_questions",
+    "detail": "p_content_id uuid"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_financial_analytics_v3",
+    "detail": "p_tenant_id uuid, p_start_date timestamp with time zone, p_bran"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_my_permissions",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_my_tenant",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_public_certificate_data",
+    "detail": "p_cert_id uuid"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_repair_tracking",
+    "detail": "p_code text"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_request_guest_session",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_secure_branch_id",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_secure_tenant_id",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.handle_new_user",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.handle_order_status_change",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.has_permission",
+    "detail": "p_permission text, p_branch_id uuid"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.increment_product_sales",
+    "detail": "p_product_id uuid, amount integer"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.is_admin",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.is_admin_of_tenant",
+    "detail": "target_tenant_id uuid"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.is_admin_user",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.is_super_admin",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.mark_content_completed",
+    "detail": "p_content_id uuid"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.match_documents",
+    "detail": "query_embedding vector, match_threshold double precision, match"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.notify_n8n_new_product",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.process_course_enrollments",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.protect_sensitive_profile_columns",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.refresh_course_metrics",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.save_repair_order",
+    "detail": "p_payload jsonb"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.submit_exam",
+    "detail": "p_content_id uuid, p_answers jsonb"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.sync_order_items_stock",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.trg_contact_message_notify_admin",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.trigger_payment_status_change",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.update_order_total",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.calculate_danger_level",
+    "detail": "lat double precision, lng double precision, radius_meters doubl"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.delete_own_account",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.get_alerts_in_radius",
+    "detail": "center_lat double precision, center_lng double precision, radiu"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.get_heatmap_data",
+    "detail": "hours_ago integer"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.handle_new_user",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.is_admin",
+    "detail": ""
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.update_fcm_token",
+    "detail": "token text"
+  },
+  {
+    "category": "authenticated_security_definer_function_executable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.validate_neighbor_report",
+    "detail": "target_report_id uuid, validator_id uuid"
+  },
+  {
+    "category": "duplicate_index",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "course_lessons",
+    "detail": "idx_course_lessons_module_id and idx_course_lessons_module"
+  },
+  {
+    "category": "duplicate_index",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "course_lessons",
+    "detail": "idx_course_lessons_module_id and idx_course_module_contents_les"
+  },
+  {
+    "category": "duplicate_index",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "course_lessons",
+    "detail": "idx_course_module_contents_lesson_id and idx_course_lessons_mod"
+  },
+  {
+    "category": "duplicate_index",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "course_modules",
+    "detail": "idx_course_modules_course_id and idx_course_modules_course"
+  },
+  {
+    "category": "duplicate_index",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "courses",
+    "detail": "idx_courses_tenant and idx_courses_tenant_id"
+  },
+  {
+    "category": "duplicate_index",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "product_stock_per_branch",
+    "detail": "idx_product_stock_product_id and idx_stock_product_id"
+  },
+  {
+    "category": "duplicate_index",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "product_stock_per_branch",
+    "detail": "idx_product_stock_branch_tenant_id and idx_product_stock_tenant"
+  },
+  {
+    "category": "duplicate_index",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "product_stock_per_branch",
+    "detail": "product_stock_per_branch_product_id_branch_id_key and idx_produ"
+  },
+  {
+    "category": "duplicate_index",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "products",
+    "detail": "idx_products_tenant_slug and idx_unique_product_slug_per_tenant"
+  },
+  {
+    "category": "duplicate_index",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "repairs",
+    "detail": "repairs_tracking_code_key and repairs_tracking_code_unique"
+  },
+  {
+    "category": "duplicate_index",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "repairs",
+    "detail": "idx_repairs_tracking_code and idx_repairs_tracking"
+  },
+  {
+    "category": "duplicate_index",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "repairs",
+    "detail": "idx_repairs_dashboard_lookup and idx_repairs_tenant_status"
+  },
+  {
+    "category": "duplicate_index",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "repairs",
+    "detail": "repairs_tracking_code_key and idx_repairs_tracking"
+  },
+  {
+    "category": "duplicate_index",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "repairs",
+    "detail": "repairs_tracking_code_unique and idx_repairs_tracking_code"
+  },
+  {
+    "category": "duplicate_index",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "repairs",
+    "detail": "repairs_tracking_code_unique and idx_repairs_tracking"
+  },
+  {
+    "category": "duplicate_index",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "repairs",
+    "detail": "repairs_tracking_code_key and idx_repairs_tracking_code"
+  },
+  {
+    "category": "duplicate_index",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "schema_migrations",
+    "detail": "schema_migrations_pkey and schema_migrations_version_idx"
+  },
+  {
+    "category": "extension_in_public",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "pg_net",
+    "detail": "public"
+  },
+  {
+    "category": "extension_in_public",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "unaccent",
+    "detail": "public"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.accept_upsell_vidrio",
+    "detail": "p_tracking_code text"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.add_upsell_item_to_repair",
+    "detail": "p_tracking_code text, p_product_id uuid"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.admin_reactivate_certificate",
+    "detail": "p_cert_id uuid"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.admin_revoke_certificate",
+    "detail": "p_cert_id uuid, p_reason text"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.assign_invoice_number_by_tenant",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.assign_user_as_employee",
+    "detail": "p_user_id uuid, p_role text, p_tenant_id uuid"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.auto_assign_cash_branch",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.auto_assign_order_branch",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.auto_assign_repair_branch",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.can_edit_profile",
+    "detail": "target_role text"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.check_and_notify_expiring_subscriptions",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.check_and_update_membership_status",
+    "detail": "p_user_id uuid"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.check_user_profile_exists",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.create_client",
+    "detail": "p_first_name text, p_last_name text, p_email text, p_phone text"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.create_employee",
+    "detail": "p_first_name text, p_last_name text, p_email text, p_phone text"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.create_guest_profile",
+    "detail": "p_first_name text, p_last_name text, p_email text, p_phone text"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.custom_access_token_hook",
+    "detail": "event jsonb"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.decrement_stock",
+    "detail": "row_id uuid, amount integer"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.deduct_product_stock_v3",
+    "detail": "p_product_id uuid, p_branch_id uuid, p_quantity_to_deduct integ"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.delete_old_audit_logs",
+    "detail": "end_date timestamp without time zone"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.enforce_retail_price_for_guests",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.expire_stale_enrollments",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.fix_repair_aggregates",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.fn_assign_tracking_code",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.fn_auto_generate_invoice",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.fn_calculate_invoice_taxes",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.fn_calculate_repair_margins",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.fn_calculate_repair_profit",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.fn_manage_stock_on_repair_part",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.fn_notify_repair_update",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.fn_sync_d1_webhook",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.fn_sync_repair_part_costs",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.fn_sync_repair_part_stock",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.fn_update_product_search",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.force_tenant_isolation",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_admin_business_dashboard_metrics",
+    "detail": "p_tenant_id uuid, p_range text, p_start_date timestamp with tim"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_admin_dashboard_analytics",
+    "detail": "p_range text, p_branch_id uuid"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_admin_database_health",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_auth_user_branch",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_auth_user_role",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_auth_user_tenant",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_current_tenant_id",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_current_user_role",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_dashboard_stats_v2",
+    "detail": "p_branch_id uuid"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_exam_questions",
+    "detail": "p_content_id uuid"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_financial_analytics_v2",
+    "detail": "p_tenant_id uuid, p_start_date timestamp with time zone, p_bran"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_financial_analytics_v3",
+    "detail": "p_tenant_id uuid, p_start_date timestamp with time zone, p_bran"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_master_analytics",
+    "detail": "p_tenant_id uuid, p_start_date date"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_my_branch",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_my_permissions",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_my_tenant",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_next_tenant_sequence",
+    "detail": "p_tenant_id uuid, p_table_name text, p_column_name text"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_public_certificate_data",
+    "detail": "p_cert_id uuid"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_recommended_accessories",
+    "detail": "p_tracking_code text"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_repair_by_tracking",
+    "detail": "t_code text"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_repair_financial_stats",
+    "detail": "p_tenant_id uuid, p_date_range text"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_repair_tracking",
+    "detail": "p_code text"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_request_guest_session",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_secure_branch_id",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_secure_tenant_id",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_unified_clients_list",
+    "detail": "p_tenant_id uuid"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_user_role",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.get_user_tenant_id",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.handle_new_user",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.handle_order_status_change",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.handle_order_status_stock_transition",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.handle_repair_status_change",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.handle_repair_status_history",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.has_permission",
+    "detail": "p_permission text, p_branch_id uuid"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.increment_product_sales",
+    "detail": "p_product_id uuid, amount integer"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.is_admin",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.is_admin_of_tenant",
+    "detail": "target_tenant_id uuid"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.is_admin_user",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.is_global_admin",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.is_platform_owner",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.is_super_admin",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.is_tenant_admin",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.is_tenant_staff_or_above",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.mark_content_completed",
+    "detail": "p_content_id uuid"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.match_documents",
+    "detail": "query_embedding vector, match_threshold double precision, match"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.next_invoice_number",
+    "detail": "p_tenant_id uuid"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.notify_admins_on_new_repair",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.notify_low_stock",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.notify_n8n_new_product",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.process_course_enrollments",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.process_order_refund_v2",
+    "detail": "p_order_id uuid, p_tenant_id uuid, p_branch_id uuid, p_reason t"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.process_pos_sale",
+    "detail": "p_tenant_id uuid, p_branch_id uuid, p_customer_id uuid, p_custo"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.process_purchase_reception_v2",
+    "detail": "p_purchase_id uuid, p_tenant_id uuid, p_branch_id uuid, p_items"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.protect_sensitive_profile_columns",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.refresh_course_metrics",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.retail_price",
+    "detail": "product_row products"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.save_repair_order",
+    "detail": "p_payload jsonb"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.set_repair_number",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.set_tenant_invoice_number",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.set_tenant_repair_number",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.set_updated_at",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.slugify",
+    "detail": "value text"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.soft_delete_account",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.submit_exam",
+    "detail": "p_content_id uuid, p_answers jsonb"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.sync_order_items_stock",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.sync_repair_parts_stock",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.trg_contact_message_notify_admin",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.trg_insert_admin_notifications",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.trg_invoice_number",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.trigger_courses_slug",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.trigger_payment_status_change",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.trigger_process_completed_order",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.trigger_set_updated_at",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.unaccent",
+    "detail": "text"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.unaccent",
+    "detail": "regdictionary, text"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.unaccent_init",
+    "detail": "internal"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.unaccent_lexize",
+    "detail": "internal, internal, internal, internal"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.update_inventory_on_repair_part",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.update_order_total",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.update_repair_bypass",
+    "detail": "p_id uuid, p_payload jsonb, p_tenant_id uuid"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.update_repair_total_cost",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.update_updated_at_column",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.validate_repair_delivery",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.calculate_danger_level",
+    "detail": "lat double precision, lng double precision, radius_meters doubl"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.delete_own_account",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.get_alerts_in_radius",
+    "detail": "center_lat double precision, center_lng double precision, radiu"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.get_heatmap_data",
+    "detail": "hours_ago integer"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.handle_new_user",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.is_admin",
+    "detail": ""
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.update_fcm_token",
+    "detail": "token text"
+  },
+  {
+    "category": "function_search_path_mutable",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.validate_neighbor_report",
+    "detail": "target_report_id uuid, validator_id uuid"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.audit_logs",
+    "detail": "Role authenticated has 2 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.auth_logs",
+    "detail": "Role authenticated has 2 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.bank_reconciliations",
+    "detail": "Role authenticated has 2 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.blog_categories",
+    "detail": "Role authenticated has 2 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.blog_post_tags",
+    "detail": "Role authenticated has 2 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.blog_tags",
+    "detail": "Role authenticated has 2 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.branches",
+    "detail": "Role authenticated has 4 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.brands",
+    "detail": "Role authenticated has 4 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.cash_movements",
+    "detail": "Role authenticated has 5 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.categories",
+    "detail": "Role authenticated has 6 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.course_certificates",
+    "detail": "Role public has 2 permissive policies for SELECT"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.course_certificates",
+    "detail": "Role authenticated has 2 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.course_enrollments",
+    "detail": "Role authenticated has 2 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.course_lessons",
+    "detail": "Role authenticated has 2 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.course_modules",
+    "detail": "Role authenticated has 4 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.courses",
+    "detail": "Role anon has 2 permissive policies for SELECT"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.courses",
+    "detail": "Role authenticated has 2 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.customer_devices",
+    "detail": "Role authenticated has 2 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.invoices",
+    "detail": "Role authenticated has 2 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.order_items",
+    "detail": "Role authenticated has 3 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.orders",
+    "detail": "Role authenticated has 4 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.page_templates",
+    "detail": "Role authenticated has 2 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.pages",
+    "detail": "Role authenticated has 2 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.payments",
+    "detail": "Role authenticated has 2 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.profiles",
+    "detail": "Role public has 2 permissive policies for INSERT"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.profiles",
+    "detail": "Role public has 3 permissive policies for SELECT"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.profiles",
+    "detail": "Role public has 3 permissive policies for UPDATE"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.purchase_items",
+    "detail": "Role authenticated has 2 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.purchases",
+    "detail": "Role authenticated has 4 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.repair_images",
+    "detail": "Role authenticated has 2 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.repair_number_sequences",
+    "detail": "Role authenticated has 2 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.repair_parts_used",
+    "detail": "Role authenticated has 2 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.repair_status_history",
+    "detail": "Role authenticated has 2 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.services",
+    "detail": "Role authenticated has 5 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.stock_history",
+    "detail": "Role authenticated has 2 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.suppliers",
+    "detail": "Role authenticated has 5 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.technical_solutions",
+    "detail": "Role authenticated has 2 permissive policies for ALL"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "public.tenants",
+    "detail": "Role public has 2 permissive policies for SELECT"
+  },
+  {
+    "category": "multiple_permissive_policies",
+    "level": "WARN",
+    "type": "PERFORMANCE",
+    "object": "zarx.profiles",
+    "detail": "Role public has 2 permissive policies for UPDATE"
+  },
+  {
+    "category": "no_primary_key",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.blog_posts_backup_20261018",
+    "detail": "Missing primary key"
+  },
+  {
+    "category": "no_primary_key",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.course_certificates",
+    "detail": "Missing primary key"
+  },
+  {
+    "category": "no_primary_key",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.course_enrollments",
+    "detail": "Missing primary key"
+  },
+  {
+    "category": "no_primary_key",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.services_backup_20261018",
+    "detail": "Missing primary key"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.academy_email_notifications",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.academy_payments",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.academy_plans",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.academy_students_view",
+    "detail": "VIEW"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.academy_subscriptions",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.admin_notifications",
+    "detail": "VIEW"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.app_settings",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.audit_logs",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.auth_logs",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.available_users_for_employee",
+    "detail": "VIEW"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.bank_reconciliations",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.blog_categories",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.blog_post_tags",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.blog_posts",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.blog_tags",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.branches",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.brands",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.cash_movements",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.categories",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.cola_tiktok",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.contact_messages",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.course_certificates",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.course_enrollments",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.course_exam_questions",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.course_exam_submissions",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.course_instructors",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.course_lessons",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.course_modules",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.course_progress",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.courses",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.customer_devices",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.educacion_y_skills",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.experiencia_laboral",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.invoices",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.knowledge_base",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.models",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.notifications",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.order_items",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.orders",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.page_templates",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.pages",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.payments",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.post_comments",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.product_images",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.product_reviews",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.product_stock_per_branch",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.product_variants",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.products",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.profiles",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.purchase_items",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.purchases",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.repair_images",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.repair_number_sequences",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.repair_parts_used",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.repair_status_history",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.repair_status_types",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.repairs",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.role_permissions",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.roles",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.safe_profiles_view",
+    "detail": "VIEW"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.schema_migrations",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.service_blocks",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.service_categories",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.service_features",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.service_leads",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.services",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.slug_redirects",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.staff_orders_view",
+    "detail": "VIEW"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.stock_history",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.suppliers",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.technical_solutions",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.tenants",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.user_roles",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.v_monthly_financials",
+    "detail": "VIEW"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.v_unified_clients",
+    "detail": "VIEW"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.view_products_inventory",
+    "detail": "VIEW"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.vw_cashflow_real",
+    "detail": "VIEW"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.active_heatmap",
+    "detail": "VIEW"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.active_news",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.active_tracking_sessions",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.emergencies",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.emergency_tracking",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.hourly_risk_stats",
+    "detail": "VIEW"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.notifications",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.profiles",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.public_alerts",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.reports",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.reputation_history",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_anon_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.zones",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.academy_email_notifications",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.academy_payments",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.academy_plans",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.academy_students_view",
+    "detail": "VIEW"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.academy_subscriptions",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.admin_notifications",
+    "detail": "VIEW"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.app_settings",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.audit_logs",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.auth_logs",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.available_users_for_employee",
+    "detail": "VIEW"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.bank_reconciliations",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.blog_categories",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.blog_post_tags",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.blog_posts",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.blog_tags",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.branches",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.brands",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.cash_movements",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.categories",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.cola_tiktok",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.contact_messages",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.course_certificates",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.course_enrollments",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.course_exam_questions",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.course_exam_submissions",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.course_instructors",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.course_lessons",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.course_modules",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.course_progress",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.courses",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.customer_devices",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.educacion_y_skills",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.experiencia_laboral",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.invoices",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.knowledge_base",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.models",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.notifications",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.order_items",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.orders",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.page_templates",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.pages",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.payments",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.post_comments",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.product_images",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.product_reviews",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.product_stock_per_branch",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.product_variants",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.products",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.profiles",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.purchase_items",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.purchases",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.repair_images",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.repair_number_sequences",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.repair_parts_used",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.repair_status_history",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.repair_status_types",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.repairs",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.role_permissions",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.roles",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.safe_profiles_view",
+    "detail": "VIEW"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.schema_migrations",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.service_blocks",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.service_categories",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.service_features",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.service_leads",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.services",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.slug_redirects",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.staff_orders_view",
+    "detail": "VIEW"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.stock_history",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.suppliers",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.technical_solutions",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.tenants",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.user_roles",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.v_monthly_financials",
+    "detail": "VIEW"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.v_unified_clients",
+    "detail": "VIEW"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.view_products_inventory",
+    "detail": "VIEW"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.vw_cashflow_real",
+    "detail": "VIEW"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.active_heatmap",
+    "detail": "VIEW"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.active_news",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.active_tracking_sessions",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.emergencies",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.emergency_tracking",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.hourly_risk_stats",
+    "detail": "VIEW"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.notifications",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.profiles",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.public_alerts",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.reports",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.reputation_history",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "pg_graphql_authenticated_table_exposed",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.zones",
+    "detail": "BASE TABLE"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "academy_certificates",
+    "detail": "Public can read evidence"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "academy_certificates",
+    "detail": "Student_Read_Own_Receipt"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "academy_certificates",
+    "detail": "Avatar images are publicly accessible."
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "academy_certificates",
+    "detail": "Admins_Read_All_Receipts"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "academy_certificates",
+    "detail": "Public_Read_Covers"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "academy_certificates",
+    "detail": "Lectura Publica CVs"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "academy_certificates",
+    "detail": "Autenticados ven su evidencia"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "academy_certificates",
+    "detail": "Autenticados ven facturas"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "academy_certificates",
+    "detail": "Public can read avatars"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "academy_certificates",
+    "detail": "Public Access"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "avatars",
+    "detail": "Public can read evidence"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "avatars",
+    "detail": "Public_Read_Covers"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "avatars",
+    "detail": "Autenticados ven su evidencia"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "avatars",
+    "detail": "Lectura Publica CVs"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "avatars",
+    "detail": "Public can read avatars"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "avatars",
+    "detail": "Autenticados ven facturas"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "avatars",
+    "detail": "Avatar images are publicly accessible."
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "avatars",
+    "detail": "Admins_Read_All_Receipts"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "avatars",
+    "detail": "Public Access"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "avatars",
+    "detail": "Student_Read_Own_Receipt"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "course-covers",
+    "detail": "Lectura Publica CVs"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "course-covers",
+    "detail": "Student_Read_Own_Receipt"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "course-covers",
+    "detail": "Autenticados ven su evidencia"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "course-covers",
+    "detail": "Public_Read_Covers"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "course-covers",
+    "detail": "Avatar images are publicly accessible."
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "course-covers",
+    "detail": "Public can read evidence"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "course-covers",
+    "detail": "Public Access"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "course-covers",
+    "detail": "Admins_Read_All_Receipts"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "course-covers",
+    "detail": "Public can read avatars"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "course-covers",
+    "detail": "Autenticados ven facturas"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "cv-generados",
+    "detail": "Public can read evidence"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "cv-generados",
+    "detail": "Public_Read_Covers"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "cv-generados",
+    "detail": "Admins_Read_All_Receipts"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "cv-generados",
+    "detail": "Lectura Publica CVs"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "cv-generados",
+    "detail": "Autenticados ven su evidencia"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "cv-generados",
+    "detail": "Public Access"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "cv-generados",
+    "detail": "Avatar images are publicly accessible."
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "cv-generados",
+    "detail": "Student_Read_Own_Receipt"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "cv-generados",
+    "detail": "Autenticados ven facturas"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "cv-generados",
+    "detail": "Public can read avatars"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "evidence",
+    "detail": "Public can read evidence"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "evidence",
+    "detail": "Autenticados ven su evidencia"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "evidence",
+    "detail": "Autenticados ven facturas"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "evidence",
+    "detail": "Admins_Read_All_Receipts"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "evidence",
+    "detail": "Student_Read_Own_Receipt"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "evidence",
+    "detail": "Public_Read_Covers"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "evidence",
+    "detail": "Public Access"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "evidence",
+    "detail": "Avatar images are publicly accessible."
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "evidence",
+    "detail": "Public can read avatars"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "evidence",
+    "detail": "Lectura Publica CVs"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "product_gallery",
+    "detail": "Student_Read_Own_Receipt"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "product_gallery",
+    "detail": "Public can read avatars"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "product_gallery",
+    "detail": "Avatar images are publicly accessible."
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "product_gallery",
+    "detail": "Public Access"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "product_gallery",
+    "detail": "Public can read evidence"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "product_gallery",
+    "detail": "Autenticados ven facturas"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "product_gallery",
+    "detail": "Public_Read_Covers"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "product_gallery",
+    "detail": "Admins_Read_All_Receipts"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "product_gallery",
+    "detail": "Autenticados ven su evidencia"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "product_gallery",
+    "detail": "Lectura Publica CVs"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public-assets",
+    "detail": "Autenticados ven facturas"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public-assets",
+    "detail": "Public can read evidence"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public-assets",
+    "detail": "Avatar images are publicly accessible."
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public-assets",
+    "detail": "Lectura Publica CVs"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public-assets",
+    "detail": "Admins_Read_All_Receipts"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public-assets",
+    "detail": "Student_Read_Own_Receipt"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public-assets",
+    "detail": "Public can read avatars"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public-assets",
+    "detail": "Public Access"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public-assets",
+    "detail": "Public_Read_Covers"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public-assets",
+    "detail": "Autenticados ven su evidencia"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "repair-images",
+    "detail": "Lectura Publica CVs"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "repair-images",
+    "detail": "Public can read avatars"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "repair-images",
+    "detail": "Autenticados ven su evidencia"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "repair-images",
+    "detail": "Admins_Read_All_Receipts"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "repair-images",
+    "detail": "Public Access"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "repair-images",
+    "detail": "Autenticados ven facturas"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "repair-images",
+    "detail": "Student_Read_Own_Receipt"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "repair-images",
+    "detail": "Public can read evidence"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "repair-images",
+    "detail": "Avatar images are publicly accessible."
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "repair-images",
+    "detail": "Public_Read_Covers"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "tenant_assets",
+    "detail": "Lectura Publica CVs"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "tenant_assets",
+    "detail": "Student_Read_Own_Receipt"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "tenant_assets",
+    "detail": "Public can read evidence"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "tenant_assets",
+    "detail": "Admins_Read_All_Receipts"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "tenant_assets",
+    "detail": "Public Access"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "tenant_assets",
+    "detail": "Autenticados ven facturas"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "tenant_assets",
+    "detail": "Avatar images are publicly accessible."
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "tenant_assets",
+    "detail": "Public can read avatars"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "tenant_assets",
+    "detail": "Autenticados ven su evidencia"
+  },
+  {
+    "category": "public_bucket_allows_listing",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "tenant_assets",
+    "detail": "Public_Read_Covers"
+  },
+  {
+    "category": "rls_enabled_no_policy",
+    "level": "INFO",
+    "type": "SECURITY",
+    "object": "public.educacion_y_skills",
+    "detail": "Table has RLS enabled but no policies"
+  },
+  {
+    "category": "rls_enabled_no_policy",
+    "level": "INFO",
+    "type": "SECURITY",
+    "object": "public.experiencia_laboral",
+    "detail": "Table has RLS enabled but no policies"
+  },
+  {
+    "category": "rls_enabled_no_policy",
+    "level": "INFO",
+    "type": "SECURITY",
+    "object": "public.schema_migrations",
+    "detail": "Table has RLS enabled but no policies"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.app_settings",
+    "detail": "Public profiles can read app_settings"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.branches",
+    "detail": "branches_select"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.cola_tiktok",
+    "detail": "Permitir inserción en cola_tiktok"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.cola_tiktok",
+    "detail": "Permitir lectura de cola_tiktok a roles de servicio"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.cola_tiktok",
+    "detail": "Permitir actualización de cola_tiktok a roles de servicio"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.course_certificates",
+    "detail": "Instructors can insert course_certificates"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.course_certificates",
+    "detail": "Public can view course_certificates"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.course_certificates",
+    "detail": "Public can verify certificates"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.course_instructors",
+    "detail": "Lectura publica de instructores"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.product_stock_per_branch",
+    "detail": "Public View - Stock"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.repair_number_sequences",
+    "detail": "service_role_all"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.repair_status_types",
+    "detail": "rst_unified_select"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.role_permissions",
+    "detail": "role_permissions_read_authenticated"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.roles",
+    "detail": "roles_read_authenticated"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.service_categories",
+    "detail": "service_categories_public_select"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.service_leads",
+    "detail": "service_leads_anon_insert"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.slug_redirects",
+    "detail": "slug_redirects_anon_select"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "public.tenants",
+    "detail": "tenants_select"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.active_news",
+    "detail": "zarx_news_all"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.active_tracking_sessions",
+    "detail": "zarx_tracking_all"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.emergencies",
+    "detail": "zarx_emergencies_all"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.notifications",
+    "detail": "zarx_notifications_all"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.profiles",
+    "detail": "Public profiles are viewable by everyone"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.profiles",
+    "detail": "zarx_profiles_all"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.public_alerts",
+    "detail": "zarx_public_alerts_all"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.reports",
+    "detail": "zarx_reports_all"
+  },
+  {
+    "category": "rls_policy_always_true",
+    "level": "WARN",
+    "type": "SECURITY",
+    "object": "zarx.zones",
+    "detail": "zarx_zones_all"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "academy_email_notifications",
+    "detail": "academy_email_notifications_tenant_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "academy_email_notifications",
+    "detail": "academy_email_notifications_user_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "academy_payments",
+    "detail": "academy_payments_plan_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "academy_payments",
+    "detail": "academy_payments_tenant_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "academy_plans",
+    "detail": "academy_plans_tenant_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "academy_subscriptions",
+    "detail": "academy_subscriptions_plan_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "academy_subscriptions",
+    "detail": "academy_subscriptions_tenant_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "blog_posts",
+    "detail": "blog_posts_author_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "brands",
+    "detail": "brands_branch_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "categories",
+    "detail": "categories_branch_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "course_certificates",
+    "detail": "course_certificates_tenant_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "course_exam_questions",
+    "detail": "course_exam_questions_tenant_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "course_exam_submissions",
+    "detail": "course_exam_submissions_tenant_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "course_lessons",
+    "detail": "course_module_contents_tenant_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "course_progress",
+    "detail": "course_progress_tenant_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "course_progress",
+    "detail": "course_progress_content_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "post_comments",
+    "detail": "post_comments_post_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "post_comments",
+    "detail": "post_comments_tenant_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "products",
+    "detail": "products_branch_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "repairs",
+    "detail": "repairs_supplier_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "service_blocks",
+    "detail": "service_blocks_tenant_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "service_features",
+    "detail": "service_features_tenant_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "service_leads",
+    "detail": "service_leads_tenant_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "services",
+    "detail": "services_branch_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "stock_history",
+    "detail": "stock_history_branch_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "stock_history",
+    "detail": "stock_history_created_by_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "suppliers",
+    "detail": "suppliers_branch_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "user_roles",
+    "detail": "user_roles_role_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "user_roles",
+    "detail": "user_roles_branch_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "user_roles",
+    "detail": "user_roles_tenant_id_fkey"
+  },
+  {
+    "category": "unindexed_foreign_keys",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "zarx.reports",
+    "detail": "fk_reports_profiles"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.academy_email_notifications",
+    "detail": "idx_academy_notifications_ref (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.academy_payments",
+    "detail": "idx_academy_payments_user (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.academy_payments",
+    "detail": "idx_academy_payments_sub (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.academy_subscriptions",
+    "detail": "idx_academy_subscriptions_user_unique (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.audit_logs",
+    "detail": "idx_audit_logs_entity (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.audit_logs",
+    "detail": "idx_audit_logs_changed_by (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.auth_logs",
+    "detail": "idx_auth_logs_user_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.bank_reconciliations",
+    "detail": "idx_bank_recon_unmatched (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.bank_reconciliations",
+    "detail": "idx_bank_reconciliations_matched_invoice_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.blog_categories",
+    "detail": "idx_blog_cat_tenant_slug (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.blog_post_tags",
+    "detail": "idx_blog_post_tags_tag_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.blog_posts",
+    "detail": "idx_blog_posts_tenant_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.blog_posts",
+    "detail": "idx_blog_posts_slug (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.blog_posts",
+    "detail": "idx_blog_posts_category_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.blog_tags",
+    "detail": "idx_blog_tag_tenant_slug (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.branches",
+    "detail": "branches_slug_unique (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.cash_movements",
+    "detail": "idx_cash_movements_tenant_branch (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.cash_movements",
+    "detail": "idx_cash_movements_branch_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.cash_movements",
+    "detail": "idx_cash_movements_created_by (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.cash_movements",
+    "detail": "idx_cash_movements_tenant_date (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.cash_movements",
+    "detail": "idx_cash_movements_branch_date (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.categories",
+    "detail": "idx_categories_parent_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.categories",
+    "detail": "idx_categories_tenant_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.cola_tiktok",
+    "detail": "idx_cola_tiktok_estado_fecha (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.course_certificates",
+    "detail": "idx_course_certificates_course_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.course_certificates",
+    "detail": "idx_course_certificates_email (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.course_certificates",
+    "detail": "idx_course_certificates_user_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.course_certificates",
+    "detail": "idx_course_certificates_status (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.course_enrollments",
+    "detail": "idx_course_enrollments_tenant_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.course_enrollments",
+    "detail": "idx_course_enrollments_unique_course_email (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.course_exam_questions",
+    "detail": "idx_course_exam_questions_content_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.course_exam_submissions",
+    "detail": "idx_course_exam_submissions_content_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.course_exam_submissions",
+    "detail": "idx_course_exam_submissions_email (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.course_instructors",
+    "detail": "idx_course_instructors_instructor (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.course_lessons",
+    "detail": "idx_course_lessons_module_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.course_modules",
+    "detail": "idx_course_modules_tenant_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.course_modules",
+    "detail": "idx_course_modules_unlock_date (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.course_progress",
+    "detail": "idx_course_progress_email (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.courses",
+    "detail": "idx_courses_tenant_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.courses",
+    "detail": "idx_courses_tenant (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.courses",
+    "detail": "idx_courses_instructor_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.customer_devices",
+    "detail": "idx_customer_devices_serial (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.customer_devices",
+    "detail": "idx_customer_devices_model_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.customer_devices",
+    "detail": "idx_customer_devices_imei (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.invoices",
+    "detail": "idx_invoices_repair_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.invoices",
+    "detail": "idx_invoices_status (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.invoices",
+    "detail": "idx_invoices_order_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.invoices",
+    "detail": "idx_invoices_number (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.invoices",
+    "detail": "idx_invoices_customer_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.invoices",
+    "detail": "idx_invoices_tenant_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.invoices",
+    "detail": "idx_invoices_tenant_repair (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.knowledge_base",
+    "detail": "idx_kb_metadata (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.knowledge_base",
+    "detail": "idx_kb_embedding_hnsw (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.knowledge_base",
+    "detail": "idx_kb_source_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.models",
+    "detail": "idx_models_active (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.notifications",
+    "detail": "idx_notifications_user (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.notifications",
+    "detail": "idx_notifications_unread (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.order_items",
+    "detail": "idx_order_items_course_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.orders",
+    "detail": "idx_orders_tracking_code (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.orders",
+    "detail": "idx_orders_payment_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.orders",
+    "detail": "idx_orders_preference_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.pages",
+    "detail": "idx_pages_tenant_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.pages",
+    "detail": "idx_pages_active_slug (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.pages",
+    "detail": "idx_unique_page_slug_per_tenant (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.payments",
+    "detail": "idx_payments_tenant_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.payments",
+    "detail": "uq_payments_payment_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.payments",
+    "detail": "idx_payments_status (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.product_reviews",
+    "detail": "idx_product_reviews_product_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.product_reviews",
+    "detail": "idx_product_reviews_tenant_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.product_stock_per_branch",
+    "detail": "idx_product_stock_tenant_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.product_stock_per_branch",
+    "detail": "idx_product_stock_product_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.product_stock_per_branch",
+    "detail": "unq_stock_branch_product (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.product_stock_per_branch",
+    "detail": "idx_product_stock_branch_tenant_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.product_stock_per_branch",
+    "detail": "idx_stock_available (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.products",
+    "detail": "idx_products_brand_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.products",
+    "detail": "idx_products_model_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.products",
+    "detail": "idx_products_search_tsv (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.products",
+    "detail": "idx_products_tenant_slug (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.products",
+    "detail": "idx_products_total_units_sold (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.products",
+    "detail": "idx_products_tenant_active_deleted_created (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.purchase_items",
+    "detail": "idx_purchase_items_purchase_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.purchase_items",
+    "detail": "idx_purchase_items_tenant_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.purchase_items",
+    "detail": "idx_purchase_items_product_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.purchases",
+    "detail": "idx_purchases_supplier_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.purchases",
+    "detail": "idx_purchases_branch_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.purchases",
+    "detail": "idx_purchases_tenant_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.repair_images",
+    "detail": "idx_repair_images_tenant_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.repair_images",
+    "detail": "idx_repair_images_repair_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.repair_parts_used",
+    "detail": "idx_repair_parts_used_product_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.repair_status_history",
+    "detail": "idx_repair_status_history_changed_by (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.repair_status_history",
+    "detail": "idx_repair_status_history_status_type_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.repair_status_history",
+    "detail": "idx_repair_status_history_tenant_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.repairs",
+    "detail": "idx_repairs_assigned_technician_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.repairs",
+    "detail": "idx_repairs_dashboard_lookup (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.repairs",
+    "detail": "idx_repairs_tracking (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.repairs",
+    "detail": "idx_repairs_tracking_code (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.repairs",
+    "detail": "idx_repairs_tenant_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.repairs",
+    "detail": "idx_repairs_received_by (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.repairs",
+    "detail": "idx_repairs_deleted_at (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.repairs",
+    "detail": "repairs_tracking_code_unique (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.schema_migrations",
+    "detail": "schema_migrations_version_idx (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.service_categories",
+    "detail": "uq_service_cat_tenant_slug (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.service_leads",
+    "detail": "idx_service_leads_status_created (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.services",
+    "detail": "idx_services_is_published (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.services",
+    "detail": "idx_unique_service_slug_per_tenant (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.services",
+    "detail": "idx_services_category_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.services",
+    "detail": "services_slug_uniq (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.stock_history",
+    "detail": "idx_stock_history_created_at (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.stock_history",
+    "detail": "idx_stock_history_product_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.stock_history",
+    "detail": "idx_stock_history_tenant_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.suppliers",
+    "detail": "idx_suppliers_tenant_id (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.technical_solutions",
+    "detail": "idx_technical_solutions_search_tsv (idx_scan: 0)"
+  },
+  {
+    "category": "unused_index",
+    "level": "INFO",
+    "type": "PERFORMANCE",
+    "object": "public.tenants",
+    "detail": "idx_tenants_owner_id (idx_scan: 0)"
+  }
+]

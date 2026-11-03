@@ -1,0 +1,197 @@
+ schemaname |        tablename         | action |      role      | n |                                                                                    policies                                                                                     
+------------+--------------------------+--------+----------------+---+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ public     | academy_payments         | SELECT | authenticated  | 2 | academy_payments_admin_manage_policy | academy_payments_select_policy
+ public     | academy_plans            | SELECT | authenticated  | 2 | academy_plans_admin_manage_policy | academy_plans_select_policy
+ public     | academy_subscriptions    | SELECT | authenticated  | 2 | academy_subscriptions_admin_manage_policy | academy_subscriptions_select_policy
+ zarx       | active_news              | SELECT | authenticated  | 2 | zarx_news_admin_all | zarx_news_select
+ public     | audit_logs               | DELETE | authenticated  | 3 | Deny all client access on audit_logs | audit_logs_tenant_isolation | super_admin_all_access
+ public     | audit_logs               | INSERT | authenticated  | 3 | Deny all client access on audit_logs | audit_logs_tenant_isolation | super_admin_all_access
+ public     | audit_logs               | SELECT | authenticated  | 3 | Deny all client access on audit_logs | audit_logs_tenant_isolation | super_admin_all_access
+ public     | audit_logs               | UPDATE | authenticated  | 3 | Deny all client access on audit_logs | audit_logs_tenant_isolation | super_admin_all_access
+ public     | auth_logs                | DELETE | authenticated  | 2 | auth_logs_tenant_isolation | super_admin_all_access
+ public     | auth_logs                | INSERT | authenticated  | 2 | auth_logs_tenant_isolation | super_admin_all_access
+ public     | auth_logs                | SELECT | authenticated  | 2 | auth_logs_tenant_isolation | super_admin_all_access
+ public     | auth_logs                | UPDATE | authenticated  | 2 | auth_logs_tenant_isolation | super_admin_all_access
+ public     | bank_reconciliations     | DELETE | authenticated  | 2 | bank_reconciliations_tenant_isolation | super_admin_all_access
+ public     | bank_reconciliations     | INSERT | authenticated  | 2 | bank_reconciliations_tenant_isolation | super_admin_all_access
+ public     | bank_reconciliations     | SELECT | authenticated  | 2 | bank_reconciliations_tenant_isolation | super_admin_all_access
+ public     | bank_reconciliations     | UPDATE | authenticated  | 2 | bank_reconciliations_tenant_isolation | super_admin_all_access
+ public     | blog_categories          | DELETE | authenticated  | 2 | blog_categories_tenant_isolation | super_admin_all_access
+ public     | blog_categories          | INSERT | authenticated  | 2 | blog_categories_tenant_isolation | super_admin_all_access
+ public     | blog_categories          | SELECT | authenticated  | 2 | blog_categories_tenant_isolation | super_admin_all_access
+ public     | blog_categories          | UPDATE | authenticated  | 2 | blog_categories_tenant_isolation | super_admin_all_access
+ public     | blog_post_tags           | DELETE | authenticated  | 2 | blog_post_tags_tenant_isolation | super_admin_all_access
+ public     | blog_post_tags           | INSERT | authenticated  | 2 | blog_post_tags_tenant_isolation | super_admin_all_access
+ public     | blog_post_tags           | SELECT | authenticated  | 2 | blog_post_tags_tenant_isolation | super_admin_all_access
+ public     | blog_post_tags           | UPDATE | authenticated  | 2 | blog_post_tags_tenant_isolation | super_admin_all_access
+ public     | blog_posts               | DELETE | authenticated  | 2 | bp_delete | super_admin_all_access
+ public     | blog_posts               | INSERT | authenticated  | 2 | bp_insert | super_admin_all_access
+ public     | blog_posts               | SELECT | authenticated  | 2 | bp_select | super_admin_all_access
+ public     | blog_posts               | UPDATE | authenticated  | 2 | bp_update | super_admin_all_access
+ public     | blog_tags                | DELETE | authenticated  | 2 | blog_tags_tenant_isolation | super_admin_all_access
+ public     | blog_tags                | INSERT | authenticated  | 2 | blog_tags_tenant_isolation | super_admin_all_access
+ public     | blog_tags                | SELECT | authenticated  | 2 | blog_tags_tenant_isolation | super_admin_all_access
+ public     | blog_tags                | UPDATE | authenticated  | 2 | blog_tags_tenant_isolation | super_admin_all_access
+ public     | branches                 | SELECT | anon           | 2 | branches_public_select | branches_select
+ public     | branches                 | DELETE | authenticated  | 4 | Branch Staff Isolation | SuperAdmin Bypass All | branches_tenant_isolation | super_admin_all_access
+ public     | branches                 | INSERT | authenticated  | 4 | Branch Staff Isolation | SuperAdmin Bypass All | branches_tenant_isolation | super_admin_all_access
+ public     | branches                 | SELECT | authenticated  | 5 | Branch Staff Isolation | SuperAdmin Bypass All | branches_select | branches_tenant_isolation | super_admin_all_access
+ public     | branches                 | UPDATE | authenticated  | 4 | Branch Staff Isolation | SuperAdmin Bypass All | branches_tenant_isolation | super_admin_all_access
+ public     | brands                   | SELECT | authenticated  | 2 | brands_unified_select_auth | brands_unified_write_admin
+ public     | cash_movements           | DELETE | authenticated  | 5 | Branch Staff Isolation | SuperAdmin Bypass All | Tenant Owner Isolation | cash_movements_tenant_isolation | super_admin_all_access
+ public     | cash_movements           | INSERT | authenticated  | 5 | Branch Staff Isolation | SuperAdmin Bypass All | Tenant Owner Isolation | cash_movements_tenant_isolation | super_admin_all_access
+ public     | cash_movements           | SELECT | authenticated  | 5 | Branch Staff Isolation | SuperAdmin Bypass All | Tenant Owner Isolation | cash_movements_tenant_isolation | super_admin_all_access
+ public     | cash_movements           | UPDATE | authenticated  | 5 | Branch Staff Isolation | SuperAdmin Bypass All | Tenant Owner Isolation | cash_movements_tenant_isolation | super_admin_all_access
+ public     | categories               | SELECT | authenticated  | 2 | categories_unified_select_auth | categories_unified_write_admin
+ public     | contact_messages         | DELETE | authenticated  | 2 | super_admin_contact_messages_all | tenant_contact_messages_delete
+ public     | contact_messages         | INSERT | authenticated  | 2 | super_admin_contact_messages_all | tenant_contact_messages_insert_auth
+ public     | contact_messages         | SELECT | authenticated  | 2 | super_admin_contact_messages_all | tenant_contact_messages_select
+ public     | contact_messages         | UPDATE | authenticated  | 2 | super_admin_contact_messages_all | tenant_contact_messages_update
+ public     | course_certificates      | INSERT | authenticated  | 2 | Admins can manage all certificates | course_certificates_instructor_insert
+ public     | course_certificates      | SELECT | authenticated  | 3 | Admins can manage all certificates | Students can view their own certificates | course_certificates_public_verify
+ public     | course_enrollments       | DELETE | authenticated  | 2 | course_enrollments_all_policy | super_admin_all_access
+ public     | course_enrollments       | INSERT | authenticated  | 2 | course_enrollments_all_policy | super_admin_all_access
+ public     | course_enrollments       | SELECT | authenticated  | 3 | course_enrollments_all_policy | course_enrollments_select_policy | super_admin_all_access
+ public     | course_enrollments       | UPDATE | authenticated  | 2 | course_enrollments_all_policy | super_admin_all_access
+ public     | course_exam_submissions  | SELECT | authenticated  | 2 | Admins can view exam submissions | Students can view their own submissions
+ public     | course_instructors       | SELECT | authenticated  | 2 | Escritura para usuarios autenticados | Lectura publica de instructores
+ public     | course_lessons           | DELETE | authenticated  | 2 | Authors can manage course contents | course_lessons_admin_all_policy
+ public     | course_lessons           | INSERT | authenticated  | 2 | Authors can manage course contents | course_lessons_admin_all_policy
+ public     | course_lessons           | SELECT | authenticated  | 3 | Authors can manage course contents | course_lessons_admin_all_policy | course_lessons_select_policy
+ public     | course_lessons           | UPDATE | authenticated  | 2 | Authors can manage course contents | course_lessons_admin_all_policy
+ public     | course_modules           | DELETE | authenticated  | 4 | Admins can manage course modules | Authors can manage course modules | modules_tenant_isolation | super_admin_all_access
+ public     | course_modules           | INSERT | authenticated  | 4 | Admins can manage course modules | Authors can manage course modules | modules_tenant_isolation | super_admin_all_access
+ public     | course_modules           | SELECT | authenticated  | 5 | Admins can manage course modules | Authors can manage course modules | course_modules_select_policy | modules_tenant_isolation | super_admin_all_access
+ public     | course_modules           | UPDATE | authenticated  | 4 | Admins can manage course modules | Authors can manage course modules | modules_tenant_isolation | super_admin_all_access
+ public     | courses                  | DELETE | authenticated  | 2 | Authors can manage their courses | courses_unified_write_admin
+ public     | courses                  | INSERT | authenticated  | 2 | Authors can manage their courses | courses_unified_write_admin
+ public     | courses                  | SELECT | authenticated  | 3 | Authors can manage their courses | courses_unified_select_auth | courses_unified_write_admin
+ public     | courses                  | UPDATE | authenticated  | 2 | Authors can manage their courses | courses_unified_write_admin
+ public     | customer_devices         | DELETE | authenticated  | 2 | customer_devices_tenant_isolation | super_admin_all_access
+ public     | customer_devices         | INSERT | authenticated  | 2 | customer_devices_tenant_isolation | super_admin_all_access
+ public     | customer_devices         | SELECT | authenticated  | 2 | customer_devices_tenant_isolation | super_admin_all_access
+ public     | customer_devices         | UPDATE | authenticated  | 2 | customer_devices_tenant_isolation | super_admin_all_access
+ public     | educacion_y_skills       | SELECT | authenticated  | 2 | educacion_y_skills_admin_all | educacion_y_skills_public_select
+ public     | experiencia_laboral      | SELECT | authenticated  | 2 | experiencia_laboral_admin_all | experiencia_laboral_public_select
+ public     | invoices                 | DELETE | authenticated  | 2 | invoices_tenant_isolation_all | super_admin_all_access
+ public     | invoices                 | INSERT | authenticated  | 2 | invoices_tenant_isolation_all | super_admin_all_access
+ public     | invoices                 | SELECT | authenticated  | 2 | invoices_tenant_isolation_all | super_admin_all_access
+ public     | invoices                 | UPDATE | authenticated  | 2 | invoices_tenant_isolation_all | super_admin_all_access
+ public     | models                   | DELETE | authenticated  | 2 | mod_delete | super_admin_all_access
+ public     | models                   | INSERT | authenticated  | 2 | mod_insert | super_admin_all_access
+ public     | models                   | SELECT | authenticated  | 2 | mod_select | super_admin_all_access
+ public     | models                   | UPDATE | authenticated  | 2 | mod_update | super_admin_all_access
+ public     | notifications            | DELETE | authenticated  | 2 | super_admin_notifications_all | tenant_notifications_delete
+ public     | notifications            | INSERT | authenticated  | 2 | super_admin_notifications_all | tenant_notifications_insert
+ public     | notifications            | SELECT | authenticated  | 2 | super_admin_notifications_all | tenant_notifications_select
+ public     | notifications            | UPDATE | authenticated  | 2 | super_admin_notifications_all | tenant_notifications_update
+ public     | order_items              | DELETE | authenticated  | 3 | Users can manage their own order items | staff_tenant_order_items | super_admin_all_access
+ public     | order_items              | INSERT | authenticated  | 3 | Users can manage their own order items | staff_tenant_order_items | super_admin_all_access
+ public     | order_items              | SELECT | authenticated  | 3 | Users can manage their own order items | staff_tenant_order_items | super_admin_all_access
+ public     | order_items              | UPDATE | authenticated  | 3 | Users can manage their own order items | staff_tenant_order_items | super_admin_all_access
+ public     | orders                   | DELETE | authenticated  | 5 | Branch Staff Isolation | SuperAdmin Bypass All | Tenant Owner Isolation | Users can delete their own carts | super_admin_all_access
+ public     | orders                   | INSERT | authenticated  | 6 | Branch Staff Isolation | Staff can insert orders for their tenant | SuperAdmin Bypass All | Tenant Owner Isolation | Users can insert their own orders | super_admin_all_access
+ public     | orders                   | SELECT | authenticated  | 5 | Branch Staff Isolation | SuperAdmin Bypass All | Tenant Owner Isolation | Users can view their own orders | super_admin_all_access
+ public     | orders                   | UPDATE | authenticated  | 5 | Branch Staff Isolation | SuperAdmin Bypass All | Tenant Owner Isolation | Users can update their own orders | super_admin_all_access
+ public     | page_templates           | DELETE | authenticated  | 2 | page_templates_tenant_isolation | super_admin_all_access
+ public     | page_templates           | INSERT | authenticated  | 2 | page_templates_tenant_isolation | super_admin_all_access
+ public     | page_templates           | SELECT | authenticated  | 2 | page_templates_tenant_isolation | super_admin_all_access
+ public     | page_templates           | UPDATE | authenticated  | 2 | page_templates_tenant_isolation | super_admin_all_access
+ public     | pages                    | DELETE | authenticated  | 2 | pages_tenant_isolation | super_admin_all_access
+ public     | pages                    | INSERT | authenticated  | 2 | pages_tenant_isolation | super_admin_all_access
+ public     | pages                    | SELECT | authenticated  | 2 | pages_tenant_isolation | super_admin_all_access
+ public     | pages                    | UPDATE | authenticated  | 2 | pages_tenant_isolation | super_admin_all_access
+ public     | payments                 | DELETE | authenticated  | 2 | Staff and tenant owners can manage payments | SuperAdmin bypass payments
+ public     | payments                 | INSERT | authenticated  | 2 | Staff and tenant owners can manage payments | SuperAdmin bypass payments
+ public     | payments                 | SELECT | authenticated  | 3 | Staff and tenant owners can manage payments | SuperAdmin bypass payments | Users can view their own payments
+ public     | payments                 | UPDATE | authenticated  | 2 | Staff and tenant owners can manage payments | SuperAdmin bypass payments
+ public     | post_comments            | INSERT | authenticated  | 2 | post_comments_admin_manage_policy | post_comments_insert_policy
+ public     | post_comments            | SELECT | authenticated  | 2 | post_comments_admin_manage_policy | post_comments_select_policy
+ public     | product_images           | DELETE | authenticated  | 2 | pi_delete | super_admin_all_access
+ public     | product_images           | INSERT | authenticated  | 2 | pi_insert | super_admin_all_access
+ public     | product_images           | SELECT | authenticated  | 2 | pi_select | super_admin_all_access
+ public     | product_images           | UPDATE | authenticated  | 2 | pi_update | super_admin_all_access
+ public     | product_reviews          | DELETE | authenticated  | 2 | pr_delete | super_admin_all_access
+ public     | product_reviews          | INSERT | authenticated  | 2 | pr_insert | super_admin_all_access
+ public     | product_reviews          | SELECT | authenticated  | 2 | pr_select | super_admin_all_access
+ public     | product_reviews          | UPDATE | authenticated  | 2 | pr_update | super_admin_all_access
+ public     | product_stock_per_branch | SELECT | authenticated  | 2 | Public View - Stock | Stock_Tenant_Isolation
+ public     | profiles                 | DELETE | anon           | 2 | Admins_All_Profiles | profiles_delete_permission
+ public     | profiles                 | INSERT | anon           | 2 | Admins_All_Profiles | profiles_insert_permission
+ public     | profiles                 | SELECT | anon           | 2 | Admins_All_Profiles | profiles_read_permission
+ public     | profiles                 | UPDATE | anon           | 2 | Admins_All_Profiles | profiles_update_permission
+ public     | profiles                 | DELETE | authenticated  | 2 | Admins_All_Profiles | profiles_delete_permission
+ public     | profiles                 | INSERT | authenticated  | 3 | Admins_All_Profiles | profiles_insert_own | profiles_insert_permission
+ public     | profiles                 | SELECT | authenticated  | 3 | Admins_All_Profiles | profiles_read_own | profiles_read_permission
+ public     | profiles                 | UPDATE | authenticated  | 3 | Admins_All_Profiles | profiles_update_own | profiles_update_permission
+ zarx       | profiles                 | UPDATE | authenticated  | 2 | Admins can update any profile | Users can update own profile
+ public     | profiles                 | DELETE | authenticator  | 2 | Admins_All_Profiles | profiles_delete_permission
+ public     | profiles                 | INSERT | authenticator  | 2 | Admins_All_Profiles | profiles_insert_permission
+ public     | profiles                 | SELECT | authenticator  | 2 | Admins_All_Profiles | profiles_read_permission
+ public     | profiles                 | UPDATE | authenticator  | 2 | Admins_All_Profiles | profiles_update_permission
+ public     | profiles                 | DELETE | dashboard_user | 2 | Admins_All_Profiles | profiles_delete_permission
+ public     | profiles                 | INSERT | dashboard_user | 2 | Admins_All_Profiles | profiles_insert_permission
+ public     | profiles                 | SELECT | dashboard_user | 2 | Admins_All_Profiles | profiles_read_permission
+ public     | profiles                 | UPDATE | dashboard_user | 2 | Admins_All_Profiles | profiles_update_permission
+ zarx       | public_alerts            | SELECT | authenticated  | 2 | zarx_alerts_admin_all | zarx_alerts_select
+ public     | purchase_items           | DELETE | authenticated  | 2 | purchase_items_tenant_isolation | super_admin_all_access
+ public     | purchase_items           | INSERT | authenticated  | 2 | purchase_items_tenant_isolation | super_admin_all_access
+ public     | purchase_items           | SELECT | authenticated  | 2 | purchase_items_tenant_isolation | super_admin_all_access
+ public     | purchase_items           | UPDATE | authenticated  | 2 | purchase_items_tenant_isolation | super_admin_all_access
+ public     | purchases                | DELETE | authenticated  | 4 | Branch Staff Isolation | SuperAdmin Bypass All | Tenant Owner Isolation | super_admin_all_access
+ public     | purchases                | INSERT | authenticated  | 4 | Branch Staff Isolation | SuperAdmin Bypass All | Tenant Owner Isolation | super_admin_all_access
+ public     | purchases                | SELECT | authenticated  | 4 | Branch Staff Isolation | SuperAdmin Bypass All | Tenant Owner Isolation | super_admin_all_access
+ public     | purchases                | UPDATE | authenticated  | 4 | Branch Staff Isolation | SuperAdmin Bypass All | Tenant Owner Isolation | super_admin_all_access
+ public     | repair_images            | DELETE | authenticated  | 2 | repair_images_tenant_isolation | super_admin_all_access
+ public     | repair_images            | INSERT | authenticated  | 2 | repair_images_tenant_isolation | super_admin_all_access
+ public     | repair_images            | SELECT | authenticated  | 2 | repair_images_tenant_isolation | super_admin_all_access
+ public     | repair_images            | UPDATE | authenticated  | 2 | repair_images_tenant_isolation | super_admin_all_access
+ public     | repair_number_sequences  | DELETE | authenticated  | 3 | repair_number_sequences_admin_all | repair_number_sequences_tenant_isolation | super_admin_all_access
+ public     | repair_number_sequences  | INSERT | authenticated  | 3 | repair_number_sequences_admin_all | repair_number_sequences_tenant_isolation | super_admin_all_access
+ public     | repair_number_sequences  | SELECT | authenticated  | 3 | repair_number_sequences_admin_all | repair_number_sequences_tenant_isolation | super_admin_all_access
+ public     | repair_number_sequences  | UPDATE | authenticated  | 3 | repair_number_sequences_admin_all | repair_number_sequences_tenant_isolation | super_admin_all_access
+ public     | repair_parts_used        | DELETE | authenticated  | 2 | repair_parts_used_tenant_isolation | super_admin_all_access
+ public     | repair_parts_used        | INSERT | authenticated  | 2 | repair_parts_used_tenant_isolation | super_admin_all_access
+ public     | repair_parts_used        | SELECT | authenticated  | 2 | repair_parts_used_tenant_isolation | super_admin_all_access
+ public     | repair_parts_used        | UPDATE | authenticated  | 2 | repair_parts_used_tenant_isolation | super_admin_all_access
+ public     | repair_status_history    | DELETE | authenticated  | 2 | repair_status_history_tenant_isolation | super_admin_all_access
+ public     | repair_status_history    | INSERT | authenticated  | 2 | repair_status_history_tenant_isolation | super_admin_all_access
+ public     | repair_status_history    | SELECT | authenticated  | 2 | repair_status_history_tenant_isolation | super_admin_all_access
+ public     | repair_status_history    | UPDATE | authenticated  | 2 | repair_status_history_tenant_isolation | super_admin_all_access
+ public     | repair_status_types      | SELECT | authenticated  | 2 | rst_unified_select | super_admin_all_access
+ public     | repairs                  | DELETE | authenticated  | 2 | repairs_delete_permission | repairs_tenant_isolation_all
+ public     | repairs                  | INSERT | authenticated  | 2 | repairs_insert_permission | repairs_tenant_isolation_all
+ public     | repairs                  | SELECT | authenticated  | 2 | repairs_read_permission | repairs_tenant_isolation_all
+ public     | repairs                  | UPDATE | authenticated  | 2 | repairs_tenant_isolation_all | repairs_update_permission
+ public     | role_permissions         | SELECT | authenticated  | 2 | role_permissions_read_authenticated | role_permissions_write_super_admin
+ public     | roles                    | SELECT | authenticated  | 2 | roles_read_authenticated | roles_write_super_admin
+ public     | service_blocks           | DELETE | authenticated  | 2 | service_blocks_admin_all | service_blocks_unified_write
+ public     | service_blocks           | INSERT | authenticated  | 2 | service_blocks_admin_all | service_blocks_unified_write
+ public     | service_blocks           | SELECT | authenticated  | 3 | service_blocks_admin_all | service_blocks_unified_select | service_blocks_unified_write
+ public     | service_blocks           | UPDATE | authenticated  | 2 | service_blocks_admin_all | service_blocks_unified_write
+ public     | service_categories       | SELECT | authenticated  | 2 | service_categories_admin_all | service_categories_public_select
+ public     | service_features         | DELETE | authenticated  | 2 | service_features_admin_all | service_features_unified_write
+ public     | service_features         | INSERT | authenticated  | 2 | service_features_admin_all | service_features_unified_write
+ public     | service_features         | SELECT | authenticated  | 3 | service_features_admin_all | service_features_unified_select | service_features_unified_write
+ public     | service_features         | UPDATE | authenticated  | 2 | service_features_admin_all | service_features_unified_write
+ public     | service_leads            | INSERT | authenticated  | 2 | service_leads_admin_all | service_leads_anon_insert
+ public     | services                 | SELECT | authenticated  | 2 | services_unified_select_auth | services_unified_write_admin
+ public     | slug_redirects           | SELECT | authenticated  | 2 | slug_redirects_admin_all | slug_redirects_anon_select
+ public     | stock_history            | DELETE | authenticated  | 2 | stock_history_super_admin | stock_history_tenant_isolation
+ public     | stock_history            | INSERT | authenticated  | 2 | stock_history_super_admin | stock_history_tenant_isolation
+ public     | stock_history            | SELECT | authenticated  | 2 | stock_history_super_admin | stock_history_tenant_isolation
+ public     | stock_history            | UPDATE | authenticated  | 2 | stock_history_super_admin | stock_history_tenant_isolation
+ public     | suppliers                | DELETE | authenticated  | 5 | Branch Staff Isolation | SuperAdmin Bypass All | Tenant Owner Isolation | super_admin_all_access | suppliers_tenant_isolation
+ public     | suppliers                | INSERT | authenticated  | 5 | Branch Staff Isolation | SuperAdmin Bypass All | Tenant Owner Isolation | super_admin_all_access | suppliers_tenant_isolation
+ public     | suppliers                | SELECT | authenticated  | 5 | Branch Staff Isolation | SuperAdmin Bypass All | Tenant Owner Isolation | super_admin_all_access | suppliers_tenant_isolation
+ public     | suppliers                | UPDATE | authenticated  | 5 | Branch Staff Isolation | SuperAdmin Bypass All | Tenant Owner Isolation | super_admin_all_access | suppliers_tenant_isolation
+ public     | technical_solutions      | DELETE | authenticated  | 2 | super_admin_all_access | technical_solutions_tenant_isolation
+ public     | technical_solutions      | INSERT | authenticated  | 2 | super_admin_all_access | technical_solutions_tenant_isolation
+ public     | technical_solutions      | SELECT | authenticated  | 2 | super_admin_all_access | technical_solutions_tenant_isolation
+ public     | technical_solutions      | UPDATE | authenticated  | 2 | super_admin_all_access | technical_solutions_tenant_isolation
+ public     | tenants                  | SELECT | anon           | 3 | Public View - Tenants | tenants_select | tenants_select_policy
+ public     | tenants                  | SELECT | authenticated  | 3 | super_admin_all_access | tenants_select | tenants_select_policy
+ public     | tenants                  | UPDATE | authenticated  | 2 | super_admin_all_access | tenants_unified_update
+ zarx       | zones                    | SELECT | authenticated  | 2 | zarx_zones_admin_all | zarx_zones_select
+(193 rows)
+

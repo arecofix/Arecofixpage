@@ -12,6 +12,11 @@ export const ADMIN_COURSES_ROUTES: Routes = [
     loadComponent: () => import('./enrollments/admin-course-enrollments-page').then(m => m.AdminCourseEnrollmentsPage)
   },
   {
+    path: 'subscriptions',
+    title: 'Membresías de Academia',
+    loadComponent: () => import('./subscriptions/admin-academy-subscriptions-page').then(m => m.AdminAcademySubscriptionsPage)
+  },
+  {
     path: 'review',
     title: 'Revisión de Propuestas',
     loadComponent: () => import('./review/admin-course-review.component').then(m => m.AdminCourseReviewComponent)

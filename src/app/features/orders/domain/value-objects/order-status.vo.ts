@@ -13,7 +13,10 @@ export const DB_ORDER_STATUSES = [
   'preparing',
   'shipped',
   'completed',
+  'delivered',
   'cancelled',
+  'refunded',
+  'returned',
 ] as const;
 
 export type DbOrderStatus = (typeof DB_ORDER_STATUSES)[number];
@@ -30,16 +33,43 @@ export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   preparing: 'En preparación',
   shipped: 'Enviado',
   completed: 'Completado',
+  delivered: 'Entregado',
   cancelled: 'Cancelado',
+  refunded: 'Reembolsado',
+  returned: 'Devuelto',
 };
 
 export const TERMINAL_ORDER_STATUSES: readonly OrderStatus[] = [
-  'paid',
   'completed',
+  'delivered',
   'cancelled',
-  'shipped',
-  'preparing',
+  'refunded',
 ] as const;
+
+/**
+ * Valid transitions between order statuses.
+ * Enforces strict business lifecycle and prevents invalid jumps.
+ */
+export const VALID_TRANSITIONS: Record<OrderStatus, readonly OrderStatus[]> = {
+  cart: ['pending', 'pending_payment', 'paid', 'cancelled'],
+  pending: ['paid', 'cancelled'],
+  pending_payment: ['paid', 'cancelled'],
+  awaiting_verification: ['paid', 'cancelled'],
+  paid: ['preparing', 'shipped', 'cancelled', 'refunded'],
+  preparing: ['shipped', 'cancelled'],
+  shipped: ['completed', 'delivered', 'returned'],
+  completed: ['returned'],
+  delivered: ['returned'],
+  cancelled: [],
+  refunded: [],
+  returned: ['refunded'],
+};
+
+export function isValidTransition(from: OrderStatus, to: OrderStatus): boolean {
+  if (from === to) return true; // Idempotent same-state is allowed
+  const validTargets = VALID_TRANSITIONS[from];
+  return validTargets ? validTargets.includes(to) : false;
+}
 
 export function isOrderStatus(value: string | null | undefined): value is OrderStatus {
   return !!value && (DB_ORDER_STATUSES as readonly string[]).includes(value);
@@ -51,6 +81,8 @@ export function normalizeOrderStatus(value: string | null | undefined): OrderSta
     processing: 'preparing',
     COMPLETADO: 'completed',
     completado: 'completed',
+    entregado: 'delivered',
+    reembolsado: 'refunded',
   };
   return legacy[value ?? ''] ?? 'pending';
 }

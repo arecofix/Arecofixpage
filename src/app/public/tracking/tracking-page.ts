@@ -318,7 +318,8 @@ export class TrackingPage implements OnInit, OnDestroy {
     y += 8;
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
-    doc.text(`TALÓN DE RETIRO # ${r.repair_number || 'S/N'}`, 40, y, {
+    const identifier = r.repair_number ? `# ${r.repair_number}` : r.tracking_code;
+    doc.text(`TALÓN DE RETIRO ${identifier}`, 40, y, {
       align: 'center',
     });
 
@@ -406,7 +407,7 @@ export class TrackingPage implements OnInit, OnDestroy {
     doc.text('arecofix.com.ar', 40, y, { align: 'center' });
 
     doc.save(
-      `Arecofix_Talon_${r.repair_number || 'S-N'}_${r.tracking_code}.pdf`,
+      `Arecofix_Talon_${r.repair_number || r.tracking_code}.pdf`,
     );
   }
 

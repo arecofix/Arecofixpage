@@ -107,6 +107,7 @@ import { AuthService } from '@app/core/services/auth.service';
                     [src]="course.image_url || 'assets/img/branding/inicio.jpg'"
                     alt="Course Image"
                     class="w-full h-full object-cover group-hover:scale-110 group-hover:rotate-1 transition-transform duration-700"
+                    (error)="onImgError($event)"
                   />
 
                   <!-- Status Badge -->
@@ -268,6 +269,14 @@ export class InstructorDashboardComponent implements OnInit {
       console.error(e);
     } finally {
       this.loading.set(false);
+    }
+  }
+
+  /** Fallback when a course image fails to load from CDN */
+  onImgError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    if (img && img.src !== 'assets/img/branding/inicio.jpg') {
+      img.src = 'assets/img/branding/inicio.jpg';
     }
   }
 }

@@ -31,6 +31,11 @@ export const routes: Routes = [
         loadComponent: () => import('@app/public/payment-required/payment-required.component').then(m => m.PaymentRequiredComponent)
     },
     {
+        title: 'Acceso Denegado | Arecofix',
+        path: '403',
+        redirectTo: 'admin/dashboard'
+    },
+    {
         title: 'Home',
         path: '',
         loadChildren: () => import('@app/public/public.routes'),

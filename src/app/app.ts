@@ -1,3 +1,4 @@
+import { environment } from '@env/environment';
 import {
   Component,
   inject,
@@ -7,10 +8,12 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   ChangeDetectionStrategy,
 } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
 import { ToastComponent } from './shared/components/toast/toast.component';
 import { RibbonMenuComponent } from './shared/components/ribbon-menu/ribbon-menu.component';
+import { WawWidgetComponent } from './shared/components/waw-widget/waw-widget.component';
 import { AnalyticsService } from './core/services/analytics.service';
 import { LoggerService } from './core/services/logger.service';
 import { SeoService } from './core/services/seo.service';
@@ -21,6 +24,10 @@ import { ShortcutService } from './core/services/shortcut.service';
 import { SupabaseService } from './core/services/supabase.service';
 import { SwUpdate } from '@angular/service-worker';
 import { AiChatbotComponent } from './shared/ai-chatbot/ai-chatbot.component';
+import { CashMovementsSubscriberService } from './application/cash-movements/cash-movements-subscriber.service';
+import { InvoiceSubscriberService } from './application/invoice/invoice-subscriber.service';
+import { SuppliersSubscriberService } from './application/suppliers/suppliers-subscriber.service';
+import { IEventBus } from './domain/events/event-bus.interface';
 
 @Component({
   selector: 'app-root',
@@ -29,9 +36,10 @@ import { AiChatbotComponent } from './shared/ai-chatbot/ai-chatbot.component';
     RouterOutlet,
     ToastComponent,
     RibbonMenuComponent,
+    WawWidgetComponent,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  changeDetection: ChangeDetectionStrategy.Eager,
+  changeDetection: ChangeDetectionStrategy.Default,
   templateUrl: './app.html',
 })
 export class App implements OnInit {
@@ -49,8 +57,22 @@ export class App implements OnInit {
 
   private supabase = inject(SupabaseService);
   private swUpdate = inject(SwUpdate, { optional: true });
+  private router = inject(Router);
+
+  // Domain event subscribers & bus
+  private cashSubscriber = inject(CashMovementsSubscriberService);
+  private invoiceSubscriber = inject(InvoiceSubscriberService);
+  private suppliersSubscriber = inject(SuppliersSubscriberService);
+  private eventBus = inject(IEventBus, { optional: true });
 
   ngOnInit() {
+    this.cashSubscriber.init();
+    this.invoiceSubscriber.init();
+    this.suppliersSubscriber.init();
+
+    if (isPlatformBrowser(this.platformId) && typeof window !== 'undefined') {
+      (window as unknown as { __EVENT_BUS__?: unknown }).__EVENT_BUS__ = this.eventBus;
+    }
     this.seoService.initialize();
     if (typeof document !== 'undefined') {
       const loader = document.querySelector('.initial-loader');
@@ -81,6 +103,22 @@ export class App implements OnInit {
           );
           window.location.reload();
         });
+
+        // Comprobación y activación de actualización en cada navegación
+        this.router.events
+          .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+          .subscribe(async () => {
+            try {
+              const hasUpdate = await this.swUpdate!.checkForUpdate();
+              if (hasUpdate) {
+                this.logger.info('[PWA] Actualización disponible detectada en navegación. Activando...');
+                await this.swUpdate!.activateUpdate();
+                window.location.reload();
+              }
+            } catch (err) {
+              // Silencioso ante fallos temporales de red
+            }
+          });
       }
 
       // SEO Redirection Rule Heredada
@@ -141,7 +179,7 @@ export class App implements OnInit {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 2000);
-      const response = await fetch('http://localhost:5000/api/login', {
+      const response = await fetch(`${environment.flaskApiUrl}/login`, {
         method: 'OPTIONS', // Fast preflight
         signal: controller.signal,
       });

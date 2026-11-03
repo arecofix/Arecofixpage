@@ -17,6 +17,7 @@ import {
 } from './services/tenant-isolated-dashboard.service';
 import { AuthService } from '@app/core/services/auth.service';
 import { TenantService } from '@app/core/services/tenant.service';
+import { BranchService } from '@app/core/services/branch.service';
 import { FinanceDashboardService } from '@app/features/finance/application/services/finance-dashboard.service';
 import { firstValueFrom } from 'rxjs';
 
@@ -31,6 +32,7 @@ export class BranchDashboardComponent implements OnInit {
   private dashboardService = inject(TenantIsolatedDashboardService);
   private authService = inject(AuthService);
   private tenantService = inject(TenantService);
+  private branchService = inject(BranchService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   public financeService = inject(FinanceDashboardService);
@@ -190,7 +192,7 @@ export class BranchDashboardComponent implements OnInit {
     this.loading.set(true);
     this.error.set(null);
 
-    const branchSlug = this.route.snapshot.paramMap.get('branch-slug');
+    const branchSlug = this.getEffectiveBranchSlug();
     this.loadStats$.next(branchSlug || undefined);
 
     // Cargar estadísticas de Inteligencia Financiera para el mes en curso
@@ -268,6 +270,18 @@ export class BranchDashboardComponent implements OnInit {
   }
 
   /**
+   * Obtiene el slug de sucursal efectivo desde la ruta o el servicio
+   */
+  private getEffectiveBranchSlug(): string {
+    return (
+      this.route.snapshot.paramMap.get('branchSlug') ||
+      this.route.snapshot.paramMap.get('branch-slug') ||
+      this.branchService.currentBranch()?.slug ||
+      ''
+    );
+  }
+
+  /**
    * Recarga las estadísticas
    */
   refreshStats(): void {
@@ -278,9 +292,11 @@ export class BranchDashboardComponent implements OnInit {
    * Navega a la gestión de productos de la sucursal
    */
   goToProducts(): void {
-    const branchSlug = this.route.snapshot.paramMap.get('branch-slug');
+    const branchSlug = this.getEffectiveBranchSlug();
     if (branchSlug) {
       this.router.navigate([`/${branchSlug}/admin/products`]);
+    } else {
+      this.router.navigate(['/admin/products']);
     }
   }
 
@@ -288,9 +304,11 @@ export class BranchDashboardComponent implements OnInit {
    * Navega a la gestión de órdenes de la sucursal
    */
   goToOrders(): void {
-    const branchSlug = this.route.snapshot.paramMap.get('branch-slug');
+    const branchSlug = this.getEffectiveBranchSlug();
     if (branchSlug) {
       this.router.navigate([`/${branchSlug}/admin/orders`]);
+    } else {
+      this.router.navigate(['/admin/orders']);
     }
   }
 
@@ -298,9 +316,11 @@ export class BranchDashboardComponent implements OnInit {
    * Navega a la configuración de la sucursal
    */
   goToSettings(): void {
-    const branchSlug = this.route.snapshot.paramMap.get('branch-slug');
+    const branchSlug = this.getEffectiveBranchSlug();
     if (branchSlug) {
-      this.router.navigate([`/${branchSlug}/admin/settings`]);
+      this.router.navigate([`/${branchSlug}/admin/company`]);
+    } else {
+      this.router.navigate(['/admin/company']);
     }
   }
 

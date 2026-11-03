@@ -8,7 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { rxResource, toObservable } from '@angular/core/rxjs-interop';
+import { rxResource, toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map, switchMap, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Subject, combineLatest, of } from 'rxjs';
 import { TenantService } from '@app/core/services/tenant.service';
@@ -20,6 +20,7 @@ import { ProductsGridComponent } from '@app/public/products/components';
 import { BreadcrumbsComponent, BreadcrumbItem } from '@app/shared/components/breadcrumbs/breadcrumbs.component';
 import { Product } from '@app/public/products/interfaces';
 import { GsmService } from '@app/public/gsm/services/gsm.service';
+import { FormatPricePipe } from '@app/shared/pipes/format-price.pipe';
 
 @Component({
   selector: 'app-products-all-page',
@@ -29,7 +30,8 @@ import { GsmService } from '@app/public/gsm/services/gsm.service';
     RouterModule,
     FormsModule,
     CommonModule,
-    BreadcrumbsComponent
+    BreadcrumbsComponent,
+    FormatPricePipe,
   ],
   templateUrl: './products-all-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -69,7 +71,8 @@ export class ProductsAllPage {
 
     this.searchSubject.pipe(
       debounceTime(400),
-      distinctUntilChanged()
+      distinctUntilChanged(),
+      takeUntilDestroyed()
     ).subscribe(q => {
       this.updateQueryParams({ q: q || null, _page: 1 });
     });
@@ -93,10 +96,12 @@ export class ProductsAllPage {
         const max_price = params['max_price'] ? +params['max_price'] : undefined;
         const q = params['q'] || undefined;
 
-        // Sync local signals with URL params (useful for direct URL access)
+        // Sync local signals with URL params (useful for direct URL access and reactive updates)
         if (this.searchQuery() !== (q || '')) this.searchQuery.set(q || '');
-        if (this.minPriceInput() === null && min_price) this.minPriceInput.set(min_price);
-        if (this.maxPriceInput() === null && max_price) this.maxPriceInput.set(max_price);
+        const minP = min_price ?? null;
+        if (this.minPriceInput() !== minP) this.minPriceInput.set(minP);
+        const maxP = max_price ?? null;
+        if (this.maxPriceInput() !== maxP) this.maxPriceInput.set(maxP);
 
         return this.productService.getData({
           _page: currentPage,

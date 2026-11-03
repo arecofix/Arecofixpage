@@ -64,8 +64,10 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
             const expenses = additionalCosts.expensesByMonth.get(m.period) || 0;
             const trueRepairsRev = additionalCosts.repairsRevenueByMonth.get(m.period) || 0;
             
-            // Override repairs_revenue completely to ignore buggy RPC sum (which includes unfinished/cancelled repairs)
-            m.repairs_revenue = trueRepairsRev;
+            // Reconcile repairs revenue: keep the authoritative calculation (highest valid revenue)
+            if (trueRepairsRev > 0 || m.repairs_revenue === 0) {
+                m.repairs_revenue = Math.max(m.repairs_revenue, trueRepairsRev);
+            }
             
             // Recalculate gross revenue explicitly
             m.gross_revenue = m.sales_revenue + m.repairs_revenue;
@@ -103,23 +105,29 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
             total_cost_safe = explicit_total_cost + total_sales_cost_all_time;
         }
 
-        // True all-time gross includes explicit repairs revenue from all time (since RPC has bugs with repairs)
+        // True all-time gross includes explicit repairs revenue from all time
         const total_sales_revenue_all_time = allTimeBreakdown.reduce((s, m) => s + m.sales_revenue, 0);
-        const true_total_gross_all_time = total_sales_revenue_all_time + additionalCosts.repairsRevenueTotal;
+        const repairs_revenue_all_time = Math.max(
+            Number(rawAllTimeFinance.total_repairs_revenue || 0),
+            allTimeBreakdown.reduce((s, m) => s + m.repairs_revenue, 0),
+            additionalCosts.repairsRevenueTotal
+        );
+        const true_total_gross_all_time = total_sales_revenue_all_time + repairs_revenue_all_time;
         const safe_total_net = true_total_gross_all_time - total_cost_safe;
 
         // Calculate all-time true repairs profit
-        const true_repairs_profit_all_time = additionalCosts.repairsRevenueTotal - additionalCosts.partsTotal;
+        const true_repairs_profit_all_time = repairs_revenue_all_time - additionalCosts.partsTotal;
 
         return {
           users: legacyData.users || 0,
           products: legacyData.products || 0,
-          sales: legacyData.sales || 0,
-          revenue: true_total_gross_all_time,
+          sales: statsData.total_sales,
+          revenue: total_sales_revenue_all_time,
           repairs_month: cm ? cm.repairs_revenue : 0,
-          repairs_revenue: additionalCosts.repairsRevenueTotal,
+          repairs_revenue: repairs_revenue_all_time,
           repairs_profit: true_repairs_profit_all_time,
-          devices_fixed: legacyData.devices_fixed || 0,
+          devices_fixed: statsData.devices_fixed || Number(legacyData.devices_fixed || 0),
+          pending_approvals: statsData.pending_approvals,
           total_gross_revenue: true_total_gross_all_time,
           total_cost: total_cost_safe,
           total_net_profit: safe_total_net,
@@ -151,13 +159,21 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
             .select('amount, created_at')
             .eq('tenant_id', tenantId)
             .eq('type', 'expense');
-        if (branchId) expQuery = expQuery.eq('branch_id', branchId);
+        if (branchId) {
+            expQuery = typeof (expQuery as any).or === 'function'
+                ? expQuery.or(`branch_id.eq.${branchId},branch_id.is.null`)
+                : expQuery.eq('branch_id', branchId);
+        }
 
         let partsQuery = this.supabase
             .from('repairs')
-            .select(`created_at, current_status_id, final_cost, completed_at, repair_parts_used(quantity, cost_at_time, unit_price_at_time)`)
+            .select(`created_at, current_status_id, final_cost, estimated_cost, completed_at, repair_parts_used(quantity, cost_at_time, unit_price_at_time)`)
             .eq('tenant_id', tenantId);
-        if (branchId) partsQuery = partsQuery.eq('branch_id', branchId);
+        if (branchId) {
+            partsQuery = typeof (partsQuery as any).or === 'function'
+                ? partsQuery.or(`branch_id.eq.${branchId},branch_id.is.null`)
+                : partsQuery.eq('branch_id', branchId);
+        }
 
         const [expRes, partsRes] = await Promise.all([expQuery, partsQuery]);
 
@@ -179,7 +195,7 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
                     const revDate = repair.completed_at || repair.created_at || new Date().toISOString();
                     const date = new Date(revDate);
                     const period = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-                    const rev = Number(repair.final_cost || 0);
+                    const rev = Number(repair.final_cost || repair.estimated_cost || 0);
                     result.repairsRevenueTotal += rev;
                     result.repairsRevenueByMonth.set(period, (result.repairsRevenueByMonth.get(period) || 0) + rev);
                 }
@@ -206,7 +222,7 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
     return result;
   }
 
-  private async fetchProductsAndCategoryStats(tenantId: string, branchId: string | null): Promise<{products_chart: ChartItem[], category_chart: ChartItem[]}> {
+  private async fetchProductsAndCategoryStats(tenantId: string, branchId: string | null): Promise<{products_chart: ChartItem[], category_chart: ChartItem[], total_sales: number, devices_fixed: number, pending_approvals: number}> {
     try {
       const productStats = new Map<string, number>();
       const categoryStats = new Map<string, number>();
@@ -218,7 +234,11 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
         .eq('tenant_id', tenantId)
         .in('status', ['paid', 'completed', 'delivered']);
         
-      if (branchId) ordersQuery = ordersQuery.eq('branch_id', branchId);
+      if (branchId) {
+        ordersQuery = typeof (ordersQuery as any).or === 'function'
+            ? ordersQuery.or(`branch_id.eq.${branchId},branch_id.is.null`)
+            : ordersQuery.eq('branch_id', branchId);
+      }
       
       const { data: orders } = await ordersQuery;
       
@@ -250,7 +270,11 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
         .eq('tenant_id', tenantId)
         .in('current_status_id', [5, 6]);
         
-      if (branchId) repairsQuery = repairsQuery.eq('branch_id', branchId);
+      if (branchId) {
+        repairsQuery = typeof (repairsQuery as any).or === 'function'
+            ? repairsQuery.or(`branch_id.eq.${branchId},branch_id.is.null`)
+            : repairsQuery.eq('branch_id', branchId);
+      }
       
       const { data: repairs } = await repairsQuery;
       
@@ -286,10 +310,28 @@ export class SupabaseAnalyticsRepository implements AnalyticsRepository {
         .slice(0, 5)
         .map(([name, count]) => ({ name, count }));
         
-      return { products_chart, category_chart };
+      // 3. Count Pending Approvals (Pending Diagnosis = 1, Supply Management = 2, In Progress = 3)
+      let pendingQuery = this.supabase
+        .from('repairs')
+        .select('id', { count: 'exact', head: true })
+        .eq('tenant_id', tenantId)
+        .in('current_status_id', [1, 2, 3]);
+      
+      if (branchId) {
+        pendingQuery = typeof (pendingQuery as any).or === 'function'
+            ? pendingQuery.or(`branch_id.eq.${branchId},branch_id.is.null`)
+            : pendingQuery.eq('branch_id', branchId);
+      }
+      
+      const { count: pending_approvals } = await pendingQuery;
+
+      const total_sales = orders ? orders.length : 0;
+      const devices_fixed = repairs ? repairs.length : 0;
+
+      return { products_chart, category_chart, total_sales, devices_fixed, pending_approvals: pending_approvals || 0 };
     } catch (e) {
       console.error('Error fetching stats data', e);
-      return { products_chart: [], category_chart: [] };
+      return { products_chart: [], category_chart: [], total_sales: 0, devices_fixed: 0, pending_approvals: 0 };
     }
   }
 

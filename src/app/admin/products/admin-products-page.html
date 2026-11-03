@@ -252,7 +252,7 @@
                       <div class="flex items-center gap-4">
                         <div class="avatar">
                           <div class="mask mask-squircle w-12 h-12 bg-gray-100 dark:bg-gray-700">
-                            <img [src]="product.image_url || 'assets/img/no-image.svg'" [alt]="product.name" class="object-contain p-0.5" />
+                            <img [src]="product.image_url || 'assets/img/no-image.svg'" appFallback="/assets/img/no-image.svg" [alt]="product.name" class="object-contain p-0.5" />
                           </div>
                         </div>
                         <div>
@@ -284,7 +284,7 @@
                         </div>
                       </td>
                       <td class="font-mono font-bold text-indigo-600 dark:text-indigo-400">
-                        {{ product.price | currency: product.currency || 'ARS' }}
+                        {{ product.price | formatPrice:product.currency }}
                       </td>
                       <td (click)="$event.stopPropagation()">
                         <div class="flex items-center gap-2">
@@ -294,7 +294,7 @@
                                      #stockInput
                                      class="input input-xs input-bordered w-16 text-center" 
                                      [value]="tempStock()"
-                                     (input)="tempStock.set($any($event.target).value)"
+                                     (input)="tempStock.set(stockInput.valueAsNumber || 0)"
                                      (keydown.enter)="saveStock(product.id)"
                                      (keydown.escape)="cancelStockEdit()"
                                      min="0"
@@ -332,6 +332,9 @@
                         </div>
                       </td>
                       <td class="text-right" (click)="$event.stopPropagation()">
+                        <button class="btn btn-ghost btn-sm btn-circle tooltip tooltip-left" data-tip="Historial Stock" (click)="openStockHistory(product, $event)">
+                          <i class="fas fa-history text-gray-500 hover:text-amber-500"></i>
+                        </button>
                         <button class="btn btn-ghost btn-sm btn-circle tooltip tooltip-left" data-tip="Sincronizar ML" (click)="syncWithMercadoLibre(product)" [disabled]="syncingMl() === product.id">
                           @if (syncingMl() === product.id) {
                             <span class="loading loading-spinner loading-xs"></span>
@@ -342,6 +345,9 @@
                         <a [routerLink]="['/admin/products', product.id]" class="btn btn-ghost btn-sm btn-circle tooltip tooltip-left" data-tip="Editar">
                           <i class="fas fa-pen text-gray-500 hover:text-indigo-500"></i>
                         </a>
+                        <button class="btn btn-ghost btn-sm btn-circle text-error tooltip tooltip-left" data-tip="Eliminar" (click)="confirmDeleteProduct(product, $event)">
+                          <i class="fas fa-trash-alt"></i>
+                        </button>
                       </td>
                     </tr>
                   }
@@ -374,7 +380,7 @@
 
                         <!-- Image -->
                         <div class="avatar rounded-xl w-20 h-20 bg-gray-100 shrink-0">
-                          <img [src]="product.image_url || 'assets/img/no-image.svg'" class="object-contain rounded-xl p-0.5" />
+                          <img [src]="product.image_url || 'assets/img/no-image.svg'" appFallback="/assets/img/no-image.svg" class="object-contain rounded-xl p-0.5" />
                         </div>
 
                         <!-- Content -->
@@ -391,7 +397,7 @@
                           <div class="flex justify-between items-end mt-2">
                             <div>
                               <span class="block text-xs text-gray-400">{{ t().products.table.price }}</span>
-                              <span class="text-lg font-bold text-indigo-600 dark:text-indigo-400">{{ product.price | currency: product.currency || 'ARS' }}</span>
+                              <span class="text-lg font-bold text-indigo-600 dark:text-indigo-400">{{ product.price | formatPrice:product.currency }}</span>
                             </div>
                             <div class="text-right">
                               <span class="block text-xs text-gray-400">{{ t().products.table.stock }}</span>
@@ -402,13 +408,11 @@
                       </div>
                       <!-- Card Actions -->
                       <div class="card-actions border-t border-gray-100 dark:border-gray-700 p-2 flex justify-end gap-2 bg-gray-50 dark:bg-gray-800/50 rounded-b-2xl">
-                        <button class="btn btn-sm btn-ghost" (click)="syncWithMercadoLibre(product)" [disabled]="syncingMl() === product.id">
-                          @if (syncingMl() === product.id) {
-                            <span class="loading loading-spinner loading-xs"></span>
-                          } @else {
-                            <i class="fas fa-sync" [class.text-green-500]="product.ml_sync_status === 'synced'" [class.text-red-500]="product.ml_sync_status === 'error'" [class.text-gray-400]="!product.ml_sync_status || product.ml_sync_status === 'pending'"></i>
-                          }
-                          ML Sync
+                        <button class="btn btn-sm btn-ghost" (click)="openStockHistory(product, $event)">
+                          <i class="fas fa-history text-amber-500 mr-1"></i> Stock
+                        </button>
+                        <button class="btn btn-sm btn-ghost text-error" (click)="confirmDeleteProduct(product, $event)">
+                          <i class="fas fa-trash-alt mr-1"></i> Eliminar
                         </button>
                         <a [routerLink]="['/admin/products', product.id]" class="btn btn-sm btn-ghost">
                           {{ t().products.mobile.editDetails }} <i class="fas fa-arrow-right ml-2 opacity-50"></i>
@@ -507,6 +511,102 @@
                 </div>
               </div>
             }
+
+<!-- DELETE CONFIRMATION MODAL -->
+@if (productToDelete()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fade-in">
+    <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-md w-full shadow-2xl border border-gray-100 dark:border-gray-700">
+      <div class="w-12 h-12 rounded-2xl bg-red-50 dark:bg-red-500/10 text-red-500 flex items-center justify-center mb-4 text-xl">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h3 class="text-xl font-black text-gray-900 dark:text-white mb-2">¿Eliminar producto?</h3>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">
+        El producto <strong class="text-gray-800 dark:text-gray-200">{{ productToDelete()?.name }}</strong> se dará de baja (soft delete). Dejará de estar visible en la tienda pública sin romper el historial de pedidos existentes.
+      </p>
+      <div class="flex justify-end gap-3">
+        <button class="btn btn-ghost rounded-2xl" (click)="cancelDeleteProduct()" [disabled]="deletingProduct()">
+          Cancelar
+        </button>
+        <button class="btn btn-error text-white rounded-2xl shadow-lg shadow-red-500/20" (click)="executeDeleteProduct()" [disabled]="deletingProduct()">
+          @if (deletingProduct()) {
+            <span class="loading loading-spinner loading-xs mr-1"></span> Eliminando...
+          } @else {
+            <i class="fas fa-trash-alt mr-1"></i> Sí, eliminar
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- STOCK HISTORY MODAL -->
+@if (selectedProductForHistory()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-fade-in">
+    <div class="bg-white dark:bg-gray-800 rounded-3xl p-6 max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl border border-gray-100 dark:border-gray-700">
+      <div class="flex justify-between items-center mb-4 pb-3 border-b border-gray-100 dark:border-gray-700">
+        <div>
+          <h3 class="text-lg font-black text-gray-900 dark:text-white flex items-center gap-2">
+            <i class="fas fa-history text-amber-500"></i> Historial de Movimientos de Stock
+          </h3>
+          <p class="text-xs text-gray-500">{{ selectedProductForHistory()?.name }} (Stock actual: {{ selectedProductForHistory()?.stock || 0 }})</p>
+        </div>
+        <button class="btn btn-circle btn-sm btn-ghost" (click)="closeStockHistory()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <div class="overflow-y-auto flex-1 custom-scrollbar">
+        @if (loadingHistory()) {
+          <div class="flex justify-center items-center py-12">
+            <span class="loading loading-spinner text-amber-500"></span>
+          </div>
+        } @else if (stockHistoryLogs().length === 0) {
+          <div class="text-center py-12 text-gray-400">
+            <i class="fas fa-box-open text-3xl mb-2 opacity-40"></i>
+            <p class="text-sm">No hay movimientos de stock registrados para este producto.</p>
+          </div>
+        } @else {
+          <table class="table table-sm w-full text-xs">
+            <thead class="bg-gray-50 dark:bg-gray-700/50 text-gray-500">
+              <tr>
+                <th>Fecha</th>
+                <th>Variación</th>
+                <th>Anterior &rarr; Nuevo</th>
+                <th>Motivo</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (log of stockHistoryLogs(); track log.id) {
+                <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-700/30">
+                  <td class="whitespace-nowrap">{{ log.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                  <td>
+                    <span class="font-bold px-2 py-0.5 rounded text-[11px]"
+                          [class.bg-emerald-50]="log.delta > 0"
+                          [class.text-emerald-600]="log.delta > 0"
+                          [class.bg-red-50]="log.delta < 0"
+                          [class.text-red-600]="log.delta < 0">
+                      {{ log.delta > 0 ? '+' + log.delta : log.delta }}
+                    </span>
+                  </td>
+                  <td>{{ log.previousStock }} &rarr; <strong>{{ log.newStock }}</strong></td>
+                  <td>
+                    <span class="badge badge-ghost badge-xs">{{ log.reason }}</span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+
+      <div class="pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-end">
+        <button class="btn btn-sm btn-ghost rounded-xl" (click)="closeStockHistory()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+}
+
+
 
 
 

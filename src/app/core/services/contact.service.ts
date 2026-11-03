@@ -43,16 +43,6 @@ export class ContactService {
             
             if (error) {
                 this.logger.error('Supabase ContactService Error:', error);
-            } else {
-                // Insert explicit notification for admins
-                await this.supabase.from('notifications').insert({
-                    title: '✉️ Nuevo Mensaje de Contacto',
-                    message: `${msg.name} ha enviado un mensaje: ${msg.subject ? '(' + msg.subject + ')' : ''} ${msg.message.substring(0, 50)}...`,
-                    type: 'info',
-                    scope: 'admin',
-                    is_read: false,
-                    tenant_id: this.tenantService.getTenantId()
-                });
             }
 
             return { error };
@@ -154,16 +144,6 @@ export class ContactService {
             
             if (error) {
                 this.logger.error('Supabase ContactService Error (Reservation):', error);
-            } else {
-                // Insert explicit notification for admins
-                await this.supabase.from('notifications').insert({
-                    title: '🔧 Nuevo Turno Solicitado',
-                    message: `${reservation.name} solicitó un turno el ${reservation.date} a las ${reservation.slot} para reparar un ${reservation.deviceModel || 'equipo'}.`,
-                    type: 'info',
-                    scope: 'admin',
-                    is_read: false,
-                    tenant_id: this.tenantService.getTenantId()
-                });
             }
 
             return { error };

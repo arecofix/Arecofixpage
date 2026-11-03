@@ -15,9 +15,9 @@ export const productSeoResolver: ResolveFn<Product | null> = (route, state) => {
   const slug = route.paramMap.get('productSlug');
   if (!slug) return of(null);
 
-  return productService.getData({ _page: 1, slug: slug }).pipe(
-    map(response => {
-      let product = response.data && response.data.length > 0 ? response.data[0] : null;
+  return productService.getBySlug(slug).pipe(
+    map(productFromDb => {
+      let product: Product | null = productFromDb as Product | null;
       if (!product) {
         product = fallbackService.getFallbackProduct(slug) || null;
       }

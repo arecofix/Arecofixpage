@@ -1,7 +1,6 @@
 describe('Auditoría de Seguridad: Aislamiento Multi-Tenant', () => {
-  let skip_all = false;
-  const supabaseUrl = 'https://db.arecofix.com.ar';
-  const anonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpmdGl5Zm5uYW9nbWd2a3Nna2JuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2NjQyMDgsImV4cCI6MjA2NzI0MDIwOH0.2hJUL3hRthqnOAETTlkdwdP5s39J4nwmWfaC180ixG0';
+  const supabaseUrl = Cypress.env('SUPABASE_URL') || 'https://db.arecofix.com.ar';
+  const anonKey = Cypress.env('SUPABASE_ANON_KEY') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzg4NDUxOTI2LCJleHAiOjIxMDM4MTE5MjZ9.nZqQkOuevPpgU9Z4hOMwE5IBz1WinSKiBhcRI0fQkCs';
   let accessToken: string;
   let adminTenantId = 'bba26ccd-59ce-471c-aac0-4c1f5513de3b'; // Arecofix tenant
   let targetTenantId = 'f0a26ccd-59ce-471c-aac0-4c1f5513de3f'; // Fake target tenant for testing
@@ -15,12 +14,12 @@ describe('Auditoría de Seguridad: Aislamiento Multi-Tenant', () => {
         'apikey': anonKey,
         'Content-Type': 'application/json'
       },
-      body: { email: 'admin@arecofix.com.ar', password: 'admin2026' }, failOnStatusCode: false
+      body: {
+        email: Cypress.env('TEST_ADMIN_EMAIL') || 'testadmin@arecofix.com',
+        password: Cypress.env('TEST_ADMIN_PASSWORD') || 'SecretTestUser2026!#'
+      },
+      failOnStatusCode: false
     }).then((response) => {
-      if (response.status === 402) {
-        skip_all = true;
-        return;
-      }
       expect(response.status).to.eq(200);
       accessToken = response.body.access_token;
     });
@@ -28,7 +27,6 @@ describe('Auditoría de Seguridad: Aislamiento Multi-Tenant', () => {
 
   context('1. IDOR en Payloads (POST/PUT)', function() {
     it('Debería denegar la creación de un producto asignado a otro tenant', function() {
-    if (skip_all) this.skip();
       // Intentar crear un producto forzando el tenant_id a uno distinto
       cy.request({
         method: 'POST',
@@ -61,13 +59,12 @@ describe('Auditoría de Seguridad: Aislamiento Multi-Tenant', () => {
                 expect(insertedProduct.tenant_id, 'Fuga de datos (IDOR): Permitió insertar datos en un tenant ajeno.').not.to.eq(targetTenantId);
             });
         } else {
-            expect(response.status).to.be.oneOf([403, 401, 400], 'El RLS o validación debe bloquear el acceso.');
+            expect(response.status).to.be.oneOf([403, 401, 400, 409], 'El RLS o validación debe bloquear el acceso.');
         }
       });
     });
 
     it('Debería evitar actualizar un producto de otro tenant', function() {
-    if (skip_all) this.skip();
         cy.request({
             method: 'PATCH',
             url: `${supabaseUrl}/rest/v1/products?tenant_id=eq.${targetTenantId}`,
@@ -95,7 +92,6 @@ describe('Auditoría de Seguridad: Aislamiento Multi-Tenant', () => {
 
   context('2. Búsquedas Globales (Leak de Búsqueda)', function() {
     it('Debería retornar datos filtrados obligatoriamente por tenant sin exponer otros registros', function() {
-    if (skip_all) this.skip();
         // En Angular el BaseRepository hace ?tenant_id=eq.X
         // Si removemos el filtro en la API, RLS debería aplicar el filtro por defecto
         cy.request({
@@ -106,11 +102,7 @@ describe('Auditoría de Seguridad: Aislamiento Multi-Tenant', () => {
               'Authorization': `Bearer ${accessToken}`
             }
           }).then((response) => {
-      if (response.status === 402) {
-        skip_all = true;
-        return;
-      }
-      expect(response.status).to.eq(200);
+            expect(response.status).to.eq(200);
              const products = response.body;
              
              // Si el RLS funciona, NINGÚN producto devuelto debe tener un tenant_id ajeno

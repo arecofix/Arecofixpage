@@ -1,0 +1,274 @@
+category,level,type,object,detail
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.academy_email_notifications,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.academy_payments,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.academy_plans,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.academy_students_view,VIEW
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.academy_subscriptions,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.admin_notifications,VIEW
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.app_settings,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.available_users_for_employee,VIEW
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.blog_categories,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.blog_post_tags,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.blog_posts,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.blog_tags,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.branches,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.brands,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.categories,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.contact_messages,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.course_certificates,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.course_enrollments,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.course_exam_questions,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.course_exam_submissions,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.course_instructors,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.course_lessons,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.course_modules,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.course_progress,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.courses,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.customer_devices,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.educacion_y_skills,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.experiencia_laboral,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.knowledge_base,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.models,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.notifications,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.order_items,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.orders,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.page_templates,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.pages,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.payments,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.post_comments,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.product_images,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.product_reviews,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.product_stock_per_branch,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.product_variants,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.products,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.profiles,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.repair_images,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.repair_parts_used,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.repair_status_history,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.repair_status_types,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.repairs,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.role_permissions,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.roles,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.safe_profiles_view,VIEW
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.service_blocks,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.service_categories,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.service_features,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.service_leads,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.services,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.slug_redirects,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.staff_orders_view,VIEW
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.suppliers,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.technical_solutions,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.tenants,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.user_roles,BASE TABLE
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.v_monthly_financials,VIEW
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.v_unified_clients,VIEW
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.view_products_inventory,VIEW
+pg_graphql_anon_table_exposed,WARN,SECURITY,public.vw_cashflow_real,VIEW
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.academy_email_notifications,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.academy_payments,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.academy_plans,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.academy_students_view,VIEW
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.academy_subscriptions,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.admin_notifications,VIEW
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.app_settings,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.audit_logs,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.auth_logs,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.available_users_for_employee,VIEW
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.bank_reconciliations,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.blog_categories,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.blog_post_tags,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.blog_posts,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.blog_tags,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.branches,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.brands,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.cash_movements,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.categories,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.cola_tiktok,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.contact_messages,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.course_certificates,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.course_enrollments,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.course_exam_questions,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.course_exam_submissions,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.course_instructors,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.course_lessons,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.course_modules,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.course_progress,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.courses,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.customer_devices,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.educacion_y_skills,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.experiencia_laboral,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.invoices,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.knowledge_base,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.models,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.notifications,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.order_items,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.orders,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.page_templates,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.pages,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.payments,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.post_comments,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.product_images,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.product_reviews,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.product_stock_per_branch,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.product_variants,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.products,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.profiles,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.purchase_items,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.purchases,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.repair_images,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.repair_number_sequences,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.repair_parts_used,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.repair_status_history,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.repair_status_types,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.repairs,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.role_permissions,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.roles,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.safe_profiles_view,VIEW
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.schema_migrations,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.service_blocks,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.service_categories,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.service_features,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.service_leads,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.services,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.slug_redirects,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.staff_orders_view,VIEW
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.stock_history,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.suppliers,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.technical_solutions,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.tenants,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.user_roles,BASE TABLE
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.v_monthly_financials,VIEW
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.v_unified_clients,VIEW
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.view_products_inventory,VIEW
+pg_graphql_authenticated_table_exposed,WARN,SECURITY,public.vw_cashflow_real,VIEW
+unused_index,INFO,PERFORMANCE,public.academy_email_notifications,idx_fk_academy_email_notifications_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.academy_email_notifications,idx_academy_notifications_ref (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.academy_email_notifications,idx_fk_academy_email_notifications_user_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.academy_payments,idx_academy_payments_user (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.academy_payments,idx_fk_academy_payments_plan_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.academy_payments,idx_academy_payments_sub (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.academy_plans,idx_fk_academy_plans_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.academy_subscriptions,idx_academy_subscriptions_user_unique (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.academy_subscriptions,idx_fk_academy_subscriptions_plan_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.audit_logs,idx_audit_logs_entity (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.audit_logs,idx_audit_logs_changed_by (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.auth_logs,idx_auth_logs_user_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.bank_reconciliations,idx_bank_reconciliations_matched_invoice_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.bank_reconciliations,idx_bank_recon_unmatched (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.blog_categories,idx_blog_cat_tenant_slug (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.blog_post_tags,idx_blog_post_tags_tag_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.blog_posts,idx_blog_posts_slug (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.blog_posts,idx_blog_posts_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.blog_posts,idx_blog_posts_category_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.blog_posts,idx_fk_blog_posts_author_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.blog_tags,idx_blog_tag_tenant_slug (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.branches,branches_slug_unique (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.brands,idx_fk_brands_branch_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.cash_movements,idx_cash_movements_tenant_branch (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.cash_movements,idx_cash_movements_branch_date (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.cash_movements,idx_cash_movements_branch_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.cash_movements,idx_cash_movements_created_by (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.cash_movements,idx_cash_movements_tenant_date (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.categories,idx_fk_categories_branch_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.categories,idx_categories_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.categories,idx_categories_parent_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.cola_tiktok,idx_cola_tiktok_estado_fecha (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.course_certificates,idx_course_certificates_user_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.course_certificates,idx_course_certificates_email (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.course_certificates,idx_course_certificates_course_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.course_certificates,idx_fk_course_certificates_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.course_certificates,idx_course_certificates_status (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.course_enrollments,idx_course_enrollments_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.course_enrollments,idx_course_enrollments_unique_course_email (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.course_exam_questions,idx_course_exam_questions_content_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.course_exam_questions,idx_fk_course_exam_questions_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.course_exam_submissions,idx_course_exam_submissions_email (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.course_exam_submissions,idx_fk_course_exam_submissions_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.course_exam_submissions,idx_course_exam_submissions_content_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.course_instructors,idx_course_instructors_instructor (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.course_lessons,idx_fk_course_lessons_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.course_lessons,idx_course_lessons_module_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.course_modules,idx_course_modules_unlock_date (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.course_modules,idx_course_modules_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.course_progress,idx_fk_course_progress_content_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.course_progress,idx_course_progress_email (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.course_progress,idx_fk_course_progress_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.courses,idx_courses_instructor_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.courses,idx_courses_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.customer_devices,idx_customer_devices_serial (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.customer_devices,idx_customer_devices_model_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.customer_devices,idx_customer_devices_imei (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.invoices,idx_invoices_status (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.invoices,idx_invoices_customer_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.invoices,idx_invoices_number (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.invoices,idx_invoices_order_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.invoices,idx_invoices_repair_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.invoices,idx_invoices_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.invoices,idx_invoices_tenant_repair (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.knowledge_base,idx_kb_metadata (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.knowledge_base,idx_kb_embedding_hnsw (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.knowledge_base,idx_kb_source_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.notifications,idx_notifications_user (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.notifications,idx_notifications_unread (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.order_items,idx_order_items_course_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.orders,idx_orders_tracking_code (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.orders,idx_orders_payment_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.orders,idx_orders_preference_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.pages,idx_pages_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.pages,idx_unique_page_slug_per_tenant (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.pages,idx_pages_active_slug (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.payments,uq_payments_payment_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.payments,idx_payments_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.payments,idx_payments_status (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.post_comments,idx_fk_post_comments_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.post_comments,idx_fk_post_comments_post_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.product_reviews,idx_product_reviews_product_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.product_stock_per_branch,idx_product_stock_branch_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.product_stock_per_branch,idx_stock_available (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.product_stock_per_branch,unq_stock_branch_product (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.products,idx_products_brand_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.products,idx_fk_products_branch_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.products,idx_products_search_tsv (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.products,idx_products_model_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.products,idx_products_tenant_active_deleted_created (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.purchase_items,idx_purchase_items_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.purchase_items,idx_purchase_items_purchase_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.purchase_items,idx_purchase_items_product_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.purchases,idx_purchases_branch_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.purchases,idx_purchases_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.purchases,idx_purchases_supplier_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.repair_images,idx_repair_images_repair_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.repair_images,idx_repair_images_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.repair_parts_used,idx_repair_parts_used_product_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.repair_status_history,idx_repair_status_history_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.repair_status_history,idx_repair_status_history_changed_by (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.repair_status_history,idx_repair_status_history_status_type_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.repairs,repairs_tracking_code_unique (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.repairs,idx_repairs_deleted_at (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.repairs,idx_repairs_assigned_technician_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.repairs,idx_repairs_received_by (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.repairs,idx_fk_repairs_supplier_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.repairs,idx_repairs_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.service_blocks,idx_fk_service_blocks_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.service_categories,uq_service_cat_tenant_slug (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.service_features,idx_fk_service_features_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.service_leads,idx_service_leads_status_created (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.service_leads,idx_fk_service_leads_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.services,idx_unique_service_slug_per_tenant (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.services,services_slug_uniq (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.services,idx_fk_services_branch_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.services,idx_services_category_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.stock_history,idx_fk_stock_history_branch_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.stock_history,idx_stock_history_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.stock_history,idx_stock_history_product_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.stock_history,idx_fk_stock_history_created_by (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.stock_history,idx_stock_history_created_at (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.suppliers,idx_fk_suppliers_branch_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.suppliers,idx_suppliers_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.technical_solutions,idx_technical_solutions_search_tsv (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.tenants,idx_tenants_owner_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.user_roles,idx_fk_user_roles_branch_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.user_roles,idx_fk_user_roles_role_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,public.user_roles,idx_fk_user_roles_tenant_id (idx_scan: 0)
+unused_index,INFO,PERFORMANCE,zarx.reports,idx_fk_zarx_reports_user_id (idx_scan: 0)

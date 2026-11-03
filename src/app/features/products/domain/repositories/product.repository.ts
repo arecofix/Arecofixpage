@@ -34,9 +34,11 @@ export abstract class ProductRepository {
     abstract getAll(branch_id?: string): Observable<Product[]>;
     abstract getAllForImport(): Observable<ImportProductSummary[]>;
     abstract getById(id: string): Observable<Product | null>;
+    abstract getBySlug(slug: string): Observable<Product | null>;
     abstract create(product: Product): Observable<Product>;
     abstract update(id: string, product: Partial<Product>): Observable<Product>;
     abstract delete(id: string): Observable<void>;
+    abstract softDelete(id: string): Observable<void>;
     
     abstract uploadImage(file: File): Promise<string>;
     abstract upsertMany(products: Partial<Product>[]): Observable<Product[]>;

@@ -22,7 +22,7 @@
       </h2>
       <button
         (click)="preferencesService.closeSidebar()"
-        class="p-2 hover:bg-white/10 rounded-lg transition-all"
+        class="p-2 hover:bg-white/10 rounded-lg transition-all cursor-pointer"
         [attr.aria-label]="(preferencesService.language$ | async) === 'es' ? 'Cerrar' : 'Close'"
       >
         <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
@@ -32,7 +32,7 @@
     </div>
   </div>
 
-  <!-- Contenido scrollable — -webkit-overflow-scrolling para momentum iOS -->
+  <!-- Contenido scrollable -->
   <div
     class="flex-1 overflow-y-auto overscroll-contain p-4 space-y-6"
     style="-webkit-overflow-scrolling: touch; padding-bottom: max(1.5rem, env(safe-area-inset-bottom));"
@@ -47,7 +47,7 @@
           (click)="preferencesService.setLanguage('es')"
           [class.bg-brand-blue]="(preferencesService.language$ | async) === 'es'"
           [class.bg-gray-700]="(preferencesService.language$ | async) !== 'es'"
-          class="w-full px-3 py-2 rounded-lg text-white font-bold text-sm transition-all hover:bg-brand-blue/80 ring-offset-gray-900 focus:ring-2 focus:ring-white"
+          class="w-full px-3 py-2 rounded-lg text-white font-bold text-sm transition-all hover:bg-brand-blue/80 ring-offset-gray-900 focus:ring-2 focus:ring-white cursor-pointer"
           [attr.aria-pressed]="(preferencesService.language$ | async) === 'es'"
           aria-label="Seleccionar idioma Español"
         >
@@ -57,7 +57,7 @@
           (click)="preferencesService.setLanguage('en')"
           [class.bg-brand-blue]="(preferencesService.language$ | async) === 'en'"
           [class.bg-gray-700]="(preferencesService.language$ | async) !== 'en'"
-          class="w-full px-3 py-2 rounded-lg text-white font-bold text-sm transition-all hover:bg-brand-blue/80 ring-offset-gray-900 focus:ring-2 focus:ring-white"
+          class="w-full px-3 py-2 rounded-lg text-white font-bold text-sm transition-all hover:bg-brand-blue/80 ring-offset-gray-900 focus:ring-2 focus:ring-white cursor-pointer"
           [attr.aria-pressed]="(preferencesService.language$ | async) === 'en'"
           aria-label="Select English language"
         >
@@ -76,7 +76,7 @@
           <button
             (click)="preferencesService.setTheme(bg.id)"
             [class.ring-2]="(preferencesService.theme$ | async) === bg.id"
-            class="p-3 rounded-lg transition-all hover:ring-2 ring-brand-blue group"
+            class="p-3 rounded-lg transition-all hover:ring-2 ring-brand-blue group cursor-pointer"
             [attr.title]="bg.name"
             [attr.aria-pressed]="(preferencesService.theme$ | async) === bg.id"
           >
@@ -96,7 +96,7 @@
         <button
           (click)="preferencesService.decreaseFontSize()"
           [disabled]="(preferencesService.fontSize$ | async)! <= 12"
-          class="px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-all"
+          class="px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-all cursor-pointer"
           [attr.aria-label]="(preferencesService.language$ | async) === 'es' ? 'Reducir tamaño' : 'Decrease size'"
         >
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -109,7 +109,7 @@
         <button
           (click)="preferencesService.increaseFontSize()"
           [disabled]="(preferencesService.fontSize$ | async)! >= 24"
-          class="px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-all"
+          class="px-3 py-2 rounded-lg bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-all cursor-pointer"
           [attr.aria-label]="(preferencesService.language$ | async) === 'es' ? 'Aumentar tamaño' : 'Increase size'"
         >
           <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -128,7 +128,7 @@
         (click)="preferencesService.toggleHighContrast()"
         [class.bg-brand-blue]="(preferencesService.highContrast$ | async)"
         [class.bg-gray-700]="!(preferencesService.highContrast$ | async)"
-        class="w-full px-4 py-2 rounded-lg text-white transition-all hover:opacity-80 flex items-center justify-center gap-2"
+        class="w-full px-4 py-2 rounded-lg text-white transition-all hover:opacity-80 flex items-center justify-center gap-2 cursor-pointer"
         [attr.aria-pressed]="(preferencesService.highContrast$ | async)"
       >
         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
@@ -139,14 +139,228 @@
             : ((preferencesService.language$ | async) === 'es' ? 'Desactivado' : 'Disabled') }}
       </button>
     </div>
+
+    <!-- Herramientas Avanzadas WAW -->
+    <div class="space-y-3 pt-3 border-t border-brand-blue/20">
+      <div class="flex items-center justify-between">
+        <label class="text-sm font-semibold text-gray-300 block">
+          {{ (preferencesService.language$ | async) === 'es' ? 'Herramientas Avanzadas' : 'Advanced Tools' }}
+        </label>
+        <span class="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-brand-blue/30 text-brand-blue border border-brand-blue/40">WAW</span>
+      </div>
+
+      <!-- Botón para abrir el panel completo de WAW -->
+      <button
+        type="button"
+        id="btn-open-full-waw"
+        (click)="openFullWawPanel($event)"
+        class="w-full px-4 py-2.5 rounded-lg text-white font-semibold text-sm bg-brand-blue hover:bg-brand-dark-blue transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer focus:ring-2 focus:ring-white"
+        title="Abrir panel completo WAW"
+      >
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+        </svg>
+        <span>{{ (preferencesService.language$ | async) === 'es' ? 'Abrir Panel WAW Completo' : 'Open Full WAW Panel' }}</span>
+      </button>
+
+      <!-- Accesos directos rápidos reactivos con bypass de inert y badges ON/OFF -->
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <!-- Modo Dislexia -->
+        <button
+          type="button"
+          id="btn-quick-dyslexia"
+          (click)="toggleDyslexia($event)"
+          [class.bg-brand-blue/30]="wawService.isDyslexiaActive()"
+          [class.border-brand-blue]="wawService.isDyslexiaActive()"
+          [class.text-white]="wawService.isDyslexiaActive()"
+          [class.bg-gray-800]="!wawService.isDyslexiaActive()"
+          [class.border-gray-700]="!wawService.isDyslexiaActive()"
+          class="px-2 py-2 rounded-lg text-xs text-gray-200 text-center transition-all flex flex-col items-center gap-1 border hover:border-brand-blue cursor-pointer"
+          [attr.aria-pressed]="wawService.isDyslexiaActive()"
+          title="Fuente apta para dislexia"
+        >
+          <div class="flex items-center justify-between w-full px-1">
+            <span class="font-bold text-sm leading-none">Aa</span>
+            <span
+              class="text-[9px] px-1 py-0.5 rounded font-bold uppercase transition-colors"
+              [class.bg-emerald-500]="wawService.isDyslexiaActive()"
+              [class.text-black]="wawService.isDyslexiaActive()"
+              [class.bg-gray-700]="!wawService.isDyslexiaActive()"
+              [class.text-gray-400]="!wawService.isDyslexiaActive()"
+            >
+              {{ wawService.isDyslexiaActive() ? 'ON' : 'OFF' }}
+            </span>
+          </div>
+          <span class="text-[11px] font-medium">{{ (preferencesService.language$ | async) === 'es' ? 'Modo Dislexia' : 'Dyslexia' }}</span>
+        </button>
+
+        <!-- Guía de Lectura -->
+        <button
+          type="button"
+          id="btn-quick-reading-line"
+          (click)="toggleReadingLine($event)"
+          [class.bg-brand-blue/30]="wawService.isReadingLineActive()"
+          [class.border-brand-blue]="wawService.isReadingLineActive()"
+          [class.text-white]="wawService.isReadingLineActive()"
+          [class.bg-gray-800]="!wawService.isReadingLineActive()"
+          [class.border-gray-700]="!wawService.isReadingLineActive()"
+          class="px-2 py-2 rounded-lg text-xs text-gray-200 text-center transition-all flex flex-col items-center gap-1 border hover:border-brand-blue cursor-pointer"
+          [attr.aria-pressed]="wawService.isReadingLineActive()"
+          title="Guía de lectura horizontal"
+        >
+          <div class="flex items-center justify-between w-full px-1">
+            <span class="font-bold text-sm leading-none">&#9135;&#9135;</span>
+            <span
+              class="text-[9px] px-1 py-0.5 rounded font-bold uppercase transition-colors"
+              [class.bg-emerald-500]="wawService.isReadingLineActive()"
+              [class.text-black]="wawService.isReadingLineActive()"
+              [class.bg-gray-700]="!wawService.isReadingLineActive()"
+              [class.text-gray-400]="!wawService.isReadingLineActive()"
+            >
+              {{ wawService.isReadingLineActive() ? 'ON' : 'OFF' }}
+            </span>
+          </div>
+          <span class="text-[11px] font-medium">{{ (preferencesService.language$ | async) === 'es' ? 'Guía Lectura' : 'Reading Line' }}</span>
+        </button>
+
+        <!-- Máscara de Lectura -->
+        <button
+          type="button"
+          id="btn-quick-reading-mask"
+          (click)="toggleReadingMask($event)"
+          [class.bg-brand-blue/30]="wawService.isReadingMaskActive()"
+          [class.border-brand-blue]="wawService.isReadingMaskActive()"
+          [class.text-white]="wawService.isReadingMaskActive()"
+          [class.bg-gray-800]="!wawService.isReadingMaskActive()"
+          [class.border-gray-700]="!wawService.isReadingMaskActive()"
+          class="px-2 py-2 rounded-lg text-xs text-gray-200 text-center transition-all flex flex-col items-center gap-1 border hover:border-brand-blue cursor-pointer"
+          [attr.aria-pressed]="wawService.isReadingMaskActive()"
+          title="Máscara de lectura"
+        >
+          <div class="flex items-center justify-between w-full px-1">
+            <span class="font-bold text-sm leading-none">&#9646;&#9647;&#9646;</span>
+            <span
+              class="text-[9px] px-1 py-0.5 rounded font-bold uppercase transition-colors"
+              [class.bg-emerald-500]="wawService.isReadingMaskActive()"
+              [class.text-black]="wawService.isReadingMaskActive()"
+              [class.bg-gray-700]="!wawService.isReadingMaskActive()"
+              [class.text-gray-400]="!wawService.isReadingMaskActive()"
+            >
+              {{ wawService.isReadingMaskActive() ? 'ON' : 'OFF' }}
+            </span>
+          </div>
+          <span class="text-[11px] font-medium">{{ (preferencesService.language$ | async) === 'es' ? 'Máscara' : 'Mask' }}</span>
+        </button>
+
+        <!-- Cursor Grande -->
+        <button
+          type="button"
+          id="btn-quick-big-cursor"
+          (click)="toggleBigCursor($event)"
+          [class.bg-brand-blue/30]="wawService.isBigCursorActive()"
+          [class.border-brand-blue]="wawService.isBigCursorActive()"
+          [class.text-white]="wawService.isBigCursorActive()"
+          [class.bg-gray-800]="!wawService.isBigCursorActive()"
+          [class.border-gray-700]="!wawService.isBigCursorActive()"
+          class="px-2 py-2 rounded-lg text-xs text-gray-200 text-center transition-all flex flex-col items-center gap-1 border hover:border-brand-blue cursor-pointer"
+          [attr.aria-pressed]="wawService.isBigCursorActive()"
+          title="Cursor grande de alta visibilidad"
+        >
+          <div class="flex items-center justify-between w-full px-1">
+            <span class="font-bold text-sm leading-none">&#10148;</span>
+            <span
+              class="text-[9px] px-1 py-0.5 rounded font-bold uppercase transition-colors"
+              [class.bg-emerald-500]="wawService.isBigCursorActive()"
+              [class.text-black]="wawService.isBigCursorActive()"
+              [class.bg-gray-700]="!wawService.isBigCursorActive()"
+              [class.text-gray-400]="!wawService.isBigCursorActive()"
+            >
+              {{ wawService.isBigCursorActive() ? 'ON' : 'OFF' }}
+            </span>
+          </div>
+          <span class="text-[11px] font-medium">{{ (preferencesService.language$ | async) === 'es' ? 'Cursor Grande' : 'Big Cursor' }}</span>
+        </button>
+
+        <!-- Lector de Voz -->
+        <button
+          type="button"
+          id="btn-quick-screen-reader"
+          (click)="toggleScreenReader($event)"
+          [class.bg-brand-blue/30]="wawService.isScreenReaderActive()"
+          [class.border-brand-blue]="wawService.isScreenReaderActive()"
+          [class.text-white]="wawService.isScreenReaderActive()"
+          [class.bg-gray-800]="!wawService.isScreenReaderActive()"
+          [class.border-gray-700]="!wawService.isScreenReaderActive()"
+          class="px-2 py-2 rounded-lg text-xs text-gray-200 text-center transition-all flex flex-col items-center gap-1 border hover:border-brand-blue cursor-pointer"
+          [attr.aria-pressed]="wawService.isScreenReaderActive()"
+          title="Lector de pantalla por voz"
+        >
+          <div class="flex items-center justify-between w-full px-1">
+            <span class="font-bold text-sm leading-none">&#128266;</span>
+            <span
+              class="text-[9px] px-1 py-0.5 rounded font-bold uppercase transition-colors"
+              [class.bg-emerald-500]="wawService.isScreenReaderActive()"
+              [class.text-black]="wawService.isScreenReaderActive()"
+              [class.bg-gray-700]="!wawService.isScreenReaderActive()"
+              [class.text-gray-400]="!wawService.isScreenReaderActive()"
+            >
+              {{ wawService.isScreenReaderActive() ? 'ON' : 'OFF' }}
+            </span>
+          </div>
+          <span class="text-[11px] font-medium">{{ (preferencesService.language$ | async) === 'es' ? 'Lector de Voz' : 'Screen Reader' }}</span>
+        </button>
+
+        <!-- Pausar Animaciones -->
+        <button
+          type="button"
+          id="btn-quick-stop-animations"
+          (click)="toggleStopAnimations($event)"
+          [class.bg-brand-blue/30]="wawService.isAnimationsStopped()"
+          [class.border-brand-blue]="wawService.isAnimationsStopped()"
+          [class.text-white]="wawService.isAnimationsStopped()"
+          [class.bg-gray-800]="!wawService.isAnimationsStopped()"
+          [class.border-gray-700]="!wawService.isAnimationsStopped()"
+          class="px-2 py-2 rounded-lg text-xs text-gray-200 text-center transition-all flex flex-col items-center gap-1 border hover:border-brand-blue cursor-pointer"
+          [attr.aria-pressed]="wawService.isAnimationsStopped()"
+          title="Detener animaciones y gifs"
+        >
+          <div class="flex items-center justify-between w-full px-1">
+            <span class="font-bold text-sm leading-none">&#10074;&#10074;</span>
+            <span
+              class="text-[9px] px-1 py-0.5 rounded font-bold uppercase transition-colors"
+              [class.bg-emerald-500]="wawService.isAnimationsStopped()"
+              [class.text-black]="wawService.isAnimationsStopped()"
+              [class.bg-gray-700]="!wawService.isAnimationsStopped()"
+              [class.text-gray-400]="!wawService.isAnimationsStopped()"
+            >
+              {{ wawService.isAnimationsStopped() ? 'ON' : 'OFF' }}
+            </span>
+          </div>
+          <span class="text-[11px] font-medium">{{ (preferencesService.language$ | async) === 'es' ? 'Pausar Anim.' : 'Pause Anim.' }}</span>
+        </button>
+      </div>
+
+      <!-- Restablecer todas las preferencias -->
+      <button
+        type="button"
+        id="btn-reset-all-accessibility"
+        (click)="resetAll()"
+        class="w-full mt-2 px-3 py-2 rounded-lg text-xs text-gray-300 hover:text-white bg-gray-900 hover:bg-gray-800 border border-gray-700 hover:border-red-500/60 transition text-center cursor-pointer flex items-center justify-center gap-1.5"
+      >
+        <svg class="w-3.5 h-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <span>{{ (preferencesService.language$ | async) === 'es' ? 'Restablecer todas las preferencias' : 'Reset all preferences' }}</span>
+      </button>
+    </div>
   </div>
 </div>
 
-<!-- Botón toggle — visible cuando panel cerrado -->
+<!-- Botón toggle — visible cuando panel cerrado y WAW cerrado -->
 <button
   (click)="preferencesService.toggleSidebar()"
   class="fixed right-0 top-32 z-2000 p-3 bg-brand-blue hover:bg-brand-dark-blue text-white rounded-l-lg transition-all shadow-lg cursor-pointer"
-  [class.hidden]="(preferencesService.sidebarOpen$ | async)"
+  [class.hidden]="(preferencesService.sidebarOpen$ | async) || wawService.isWawOpen()"
   [attr.aria-label]="(preferencesService.language$ | async) === 'es' ? 'Abrir panel de accesibilidad' : 'Open accessibility panel'"
   title="Accessibility"
 >

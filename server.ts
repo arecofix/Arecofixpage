@@ -20,7 +20,7 @@ if (typeof globalThis.WebSocket === 'undefined') {
     dispatchEvent() { return true; }
   };
 }
-// --- FIN PARCHE SUPABASE SSR ---
+import 'dotenv/config';
 import { APP_BASE_HREF } from '@angular/common';
 import { CommonEngine } from '@angular/ssr/node';
 import express from 'express';
@@ -30,14 +30,46 @@ import bootstrap from './src/main.server';
 import { securityMiddleware } from './server/middleware/security.middleware';
 import { sitemapRoutes } from './server/routes/sitemap.routes';
 import { feedRoutes } from './server/routes/feed.routes';
+import { mercadopagoRoutes } from './server/routes/mercadopago.routes';
+import { academySubscriptionRoutes } from './server/routes/academy-subscription.routes';
+import { adminDashboardRoutes } from './server/routes/admin-dashboard.routes';
+import { servicesRoutes } from './server/routes/services.routes';
+import { chatbotRoutes } from './server/routes/chatbot.routes';
 
 // The Express app is exported so that it can be used by serverless Functions.
 export function app(): express.Express {
   const server = express();
   server.disable('x-powered-by'); // Prevent backend stack leakage
 
+  // CORS middleware allowing Authorization header on /api routes (placed before securityMiddleware)
+  server.use('/api', (req, res, next) => {
+    const origin = req.headers.origin;
+    const allowedOrigins = [
+      'https://arecofix.com.ar',
+      'https://www.arecofix.com.ar',
+      'https://staging.arecofix.com.ar',
+      'http://localhost:4200',
+      'http://127.0.0.1:4200'
+    ];
+    if (origin && allowedOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type, Accept, X-Requested-With, apikey');
+    }
+    if (req.method === 'OPTIONS') {
+      res.sendStatus(204);
+      return;
+    }
+    next();
+  });
+
   // Aplicar middlewares de seguridad y CSP
   server.use(securityMiddleware);
+
+  // Parse JSON and form bodies for API routes
+  server.use(express.json({ limit: '2mb' }));
+  server.use(express.urlencoded({ extended: true, limit: '2mb' }));
 
   const serverDistFolder = dirname(fileURLToPath(import.meta.url));
   const browserDistFolder = resolve(serverDistFolder, '../browser');
@@ -47,6 +79,7 @@ export function app(): express.Express {
     allowedHosts: [
       'arecofix.com.ar',
       'www.arecofix.com.ar',
+      'staging.arecofix.com.ar',
       '137.131.131.98',
       'localhost',
       '127.0.0.1',
@@ -58,9 +91,61 @@ export function app(): express.Express {
   server.set('view engine', 'html');
   server.set('views', browserDistFolder);
 
-  // Rutas modulares (Sitemap, Feeds, etc.)
+  // Rutas modulares (Sitemap, Feeds, Mercado Pago API, Servicios, etc.)
   server.use('/', sitemapRoutes);
   server.use('/feed', feedRoutes);
+  server.use('/api/mercadopago', mercadopagoRoutes);
+  server.use('/api/academy', academySubscriptionRoutes);
+  server.use('/api/admin/dashboard', adminDashboardRoutes);
+  server.use('/api/chatbot', chatbotRoutes);
+  server.use('/', servicesRoutes);
+  server.use('/api/webhooks/mercadopago-academy', (req, res, next) => {
+    req.url = '/webhook';
+    academySubscriptionRoutes(req, res, next);
+  });
+
+  // Interceptor 301 SSR para servicios con slug renombrado (preserva SEO)
+  server.get('/servicios/:slug', async (req, res, next) => {
+    try {
+      const slug = String(req.params['slug'] || '');
+      const supabaseUrl = (process.env['SUPABASE_URL'] || 'https://db.arecofix.com.ar').replace(/\/+$/, '');
+      const serviceKey = process.env['SUPABASE_SERVICE_ROLE_KEY'] || process.env['SUPABASE_KEY'] || '';
+      if (serviceKey && slug) {
+        const redirRes = await fetch(
+          `${supabaseUrl}/rest/v1/slug_redirects?entity_type=eq.service&old_slug=eq.${encodeURIComponent(slug)}&order=created_at.desc&limit=1`,
+          { headers: { apikey: serviceKey, Authorization: `Bearer ${serviceKey}` } }
+        );
+        if (redirRes.ok) {
+          const redirs = await redirRes.json();
+          if (redirs && redirs.length > 0 && redirs[0].new_slug) {
+            return res.redirect(301, `/servicios/${redirs[0].new_slug}`);
+          }
+        }
+      }
+    } catch {
+      // Continue to next handler
+    }
+    next();
+  });
+
+  // 301 Permanent Redirects para rutas consolidadas (SEO preservation)
+  server.get(['/prueba', '/free-trial'], (req, res) => {
+    const query = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+    return res.redirect(301, `/prueba-gratis${query}`);
+  });
+
+  // 301 Permanent Redirects para /services y /services/:slug -> /servicios
+  server.get('/services', (req, res) => {
+    const query = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+    return res.redirect(301, `/servicios${query}`);
+  });
+
+  server.get('/services/:slug', (req, res) => {
+    const slug = String(req.params['slug'] || '');
+    const query = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+    return res.redirect(301, `/servicios/${encodeURIComponent(slug)}${query}`);
+  });
+
 
 
   // Página de recuperación de emergencia para clientes trabados
@@ -151,7 +236,8 @@ export function app(): express.Express {
           '/login', '/register', '/admin', '/upgrade-required', '/diagnostico',
           '/Zona-Norte',
         ];
-        const isKnownRoute = validPrefixes.some(
+        const isBranchRoute = /^\/[a-zA-Z0-9_-]+(\/admin(\/.*)?)?$/.test(pathname);
+        const isKnownRoute = isBranchRoute || validPrefixes.some(
           (prefix) => pathname === prefix || pathname.startsWith(prefix + '/')
         );
         if (!isKnownRoute) {
@@ -159,7 +245,10 @@ export function app(): express.Express {
         }
         res.send(html);
       })
-      .catch((err) => next(err));
+      .catch((err) => {
+        console.error('[SSR Render Error] Falling back to client-side rendering for URL:', fullUrl, err?.message || err);
+        res.sendFile(join(browserDistFolder, 'index.html'));
+      });
   });
 
   return server;

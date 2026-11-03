@@ -30,10 +30,7 @@ describe('Carrito y Checkout (E2E) - Happy Path Modularizado', () => {
     cy.intercept('DELETE', '**/rest/v1/order*', { statusCode: 204 });
     cy.intercept('DELETE', '**/rest/v1/order_items*', { statusCode: 200, body: [] }).as('deleteOrderItems');
 
-    cy.intercept({ method: 'GET', url: '**/rest/v1/orders*', query: { status: 'eq.cart' } }, {
-      statusCode: 200,
-      body: cartOrder
-    }).as('getActiveCart');
+    cy.intercept({ method: 'GET', url: '**/rest/v1/orders*', query: { status: 'eq.cart' } }, { statusCode: 200, body: [cartOrder] }).as('getActiveCart');
 
     cy.intercept('POST', '**/rest/v1/order*', {
       statusCode: 201,
@@ -57,7 +54,7 @@ describe('Carrito y Checkout (E2E) - Happy Path Modularizado', () => {
 
     cy.intercept({
       method: 'POST',
-      url: /mercadopago-preferences/
+      url: /(mercadopago-preferences|create-preference)/
     }, {
       statusCode: 200,
       body: {
@@ -178,3 +175,4 @@ describe('Carrito y Checkout (E2E) - Happy Path Modularizado', () => {
     cy.get('app-toast span').contains(/permisos|Error al procesar/i, { timeout: 8000 }).should('exist');
   });
 });
+

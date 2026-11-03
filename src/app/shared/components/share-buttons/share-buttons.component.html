@@ -1,0 +1,135 @@
+<div
+  class="share-buttons-container relative"
+  [ngClass]="[variant, customClass]"
+  role="group"
+  aria-label="Compartir esta página"
+>
+  <!-- 1. VARIANTE INLINE -->
+  @if (variant === 'inline') {
+    <div class="flex flex-wrap items-center gap-2">
+      @for (net of activeNetworks; track net.id) {
+        <button
+          type="button"
+          (click)="onShareNetwork(net.id)"
+          [attr.aria-label]="net.ariaLabel"
+          [title]="net.ariaLabel"
+          class="share-btn inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 transition-all duration-200 cursor-pointer shadow-xs focus:outline-none focus:ring-2 focus:ring-brand-blue"
+          [ngClass]="net.colorClass"
+        >
+          @if (net.id === 'copy' && copied()) {
+            <i class="fa-solid fa-check text-emerald-500 scale-110 transition-transform" aria-hidden="true"></i>
+            <span class="text-emerald-500 font-semibold">¡Copiado!</span>
+          } @else {
+            <i [class]="net.iconClass" class="text-sm" aria-hidden="true"></i>
+            @if (showLabels) {
+              <span>{{ net.name }}</span>
+            }
+          }
+        </button>
+      }
+    </div>
+  }
+
+  <!-- 2. VARIANTE MENU (DROPDOWN) -->
+  @if (variant === 'menu') {
+    <div class="relative inline-block text-left">
+      <button
+        #triggerBtn
+        type="button"
+        (click)="triggerNativeOrMenu()"
+        [attr.aria-expanded]="isMenuOpen()"
+        aria-haspopup="true"
+        aria-label="Opciones para compartir esta página"
+        class="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-semibold bg-brand-blue text-white hover:bg-brand-dark transition-all duration-200 shadow-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-blue"
+      >
+        <i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
+        <span>Compartir</span>
+        <i
+          class="fa-solid fa-chevron-down text-xs transition-transform duration-200"
+          [class.rotate-180]="isMenuOpen()"
+          aria-hidden="true"
+        ></i>
+      </button>
+
+      @if (isMenuOpen()) {
+        <div
+          class="absolute left-0 sm:right-0 sm:left-auto mt-2 w-56 rounded-xl bg-white dark:bg-gray-900 shadow-2xl border border-gray-200 dark:border-gray-800 py-2 z-50 animate-fadeIn"
+          role="menu"
+          aria-orientation="vertical"
+        >
+          <div class="px-3 py-1.5 border-b border-gray-100 dark:border-gray-800 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
+            Compartir en
+          </div>
+
+          <div class="p-1 space-y-0.5">
+            @for (net of activeNetworks; track net.id) {
+              <button
+                type="button"
+                (click)="onShareNetwork(net.id)"
+                role="menuitem"
+                [attr.aria-label]="net.ariaLabel"
+                class="w-full flex items-center justify-between px-3 py-2 text-xs rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer text-left focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800"
+              >
+                <div class="flex items-center gap-2.5">
+                  <i [class]="net.iconClass" class="w-4 text-center text-sm" aria-hidden="true"></i>
+                  <span class="font-medium">{{ net.name }}</span>
+                </div>
+                @if (net.id === 'copy' && copied()) {
+                  <span class="text-emerald-500 font-bold text-[10px] uppercase">¡Copiado!</span>
+                }
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- 3. VARIANTE FLOATING (BOTÓN FLOTANTE EN ESQUINA) -->
+  @if (variant === 'floating') {
+    <div class="fixed bottom-24 left-6 z-1000 flex flex-col items-center gap-2">
+      @if (isMenuOpen()) {
+        <div
+          class="flex flex-col items-center gap-2 mb-2 p-2 rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-2xl border border-gray-200 dark:border-gray-800 animate-fadeIn"
+          role="menu"
+          aria-label="Redes para compartir"
+        >
+          @for (net of activeNetworks; track net.id) {
+            <button
+              type="button"
+              (click)="onShareNetwork(net.id)"
+              [attr.aria-label]="net.ariaLabel"
+              [title]="net.ariaLabel"
+              class="w-10 h-10 rounded-full flex items-center justify-center text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 transition-all duration-200 cursor-pointer shadow-xs"
+              [ngClass]="net.colorClass"
+            >
+              @if (net.id === 'copy' && copied()) {
+                <i class="fa-solid fa-check text-emerald-500" aria-hidden="true"></i>
+              } @else {
+                <i [class]="net.iconClass" class="text-sm" aria-hidden="true"></i>
+              }
+            </button>
+          }
+        </div>
+      }
+
+      <button
+        #triggerBtn
+        type="button"
+        (click)="triggerNativeOrMenu()"
+        [attr.aria-expanded]="isMenuOpen()"
+        aria-label="Abrir opciones para compartir"
+        title="Compartir"
+        class="w-12 h-12 rounded-full bg-brand-blue hover:bg-brand-dark text-white flex items-center justify-center shadow-lg transition-transform duration-200 hover:scale-105 active:scale-95 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-blue"
+      >
+        <i
+          class="fa-solid text-lg transition-transform duration-200"
+          [class.fa-share-nodes]="!isMenuOpen()"
+          [class.fa-xmark]="isMenuOpen()"
+          aria-hidden="true"
+        ></i>
+      </button>
+    </div>
+  }
+</div>
+

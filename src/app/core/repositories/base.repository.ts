@@ -6,6 +6,7 @@ import { Observable, from, map } from 'rxjs';
 import { TENANT_CONSTANTS } from '../constants/tenant.constants';
 import { LoggerService } from '../services/logger.service';
 import { BranchContextService } from '../services/branch-context.service';
+import { assertUuid } from '../utils/uuid.utils';
 
 /**
  * Base Repository (SaaS Architecture)
@@ -41,10 +42,11 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
         let enhancedQuery: any = query;
 
         if (!this.isGlobalTable) {
-            const tenantId = this.tenantService.getTenantId();
-            if (tenantId !== TENANT_CONSTANTS.FALLBACK_ID) {
+            const rawTenantId = this.tenantService.getTenantId();
+            const validTenantId = assertUuid(rawTenantId);
+            if (validTenantId && validTenantId !== TENANT_CONSTANTS.FALLBACK_ID) {
                 if (enhancedQuery && typeof enhancedQuery.eq === 'function') {
-                    enhancedQuery = enhancedQuery.eq('tenant_id', tenantId);
+                    enhancedQuery = enhancedQuery.eq('tenant_id', validTenantId);
                 } else if (enhancedQuery) {
                     console.warn(`[BaseRepository] applyTenantFilter: .eq() missing on query for ${this.tableName}`);
                 }
@@ -58,15 +60,16 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
         }
 
         if (this.branchContextService) {
-            const branchId = this.branchContextService.getBranchId();
+            const rawBranchId = this.branchContextService.getBranchId();
+            const validBranchId = assertUuid(rawBranchId);
             // La sucursal central ve absolutamente todo (bypassea el aislamiento por sucursal)
-            const isCentralBranch = branchId === 'de967f68-7b15-44c0-bc98-952ccf06e1e5' || !branchId;
+            const isCentralBranch = validBranchId === 'de967f68-7b15-44c0-bc98-952ccf06e1e5' || !validBranchId;
             
-            if (branchId && enhancedQuery && !isCentralBranch) {
+            if (validBranchId && enhancedQuery && !isCentralBranch) {
                 if (this.useStrictBranchIsolation && typeof enhancedQuery.eq === 'function') {
-                    enhancedQuery = enhancedQuery.eq('branch_id', branchId);
+                    enhancedQuery = enhancedQuery.eq('branch_id', validBranchId);
                 } else if (this.useBranchIsolation && typeof enhancedQuery.or === 'function') {
-                    enhancedQuery = enhancedQuery.or(`branch_id.eq.${branchId},branch_id.is.null`);
+                    enhancedQuery = enhancedQuery.or(`branch_id.eq.${validBranchId},branch_id.is.null`);
                 }
             }
         }
@@ -81,15 +84,17 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
         if (this.isGlobalTable) return { ...item };
         
         let payload = { ...item } as Record<string, unknown>;
-        const tenantId = this.tenantService.getTenantId();
-        if (tenantId !== TENANT_CONSTANTS.FALLBACK_ID) {
-            payload['tenant_id'] = tenantId;
+        const rawTenantId = this.tenantService.getTenantId();
+        const validTenantId = assertUuid(rawTenantId);
+        if (validTenantId && validTenantId !== TENANT_CONSTANTS.FALLBACK_ID) {
+            payload['tenant_id'] = validTenantId;
         }
         
         if ((this.useBranchIsolation || this.useStrictBranchIsolation) && this.branchContextService) {
-            const branchId = this.branchContextService.getBranchId();
-            if (branchId) {
-                payload['branch_id'] = payload['branch_id'] || branchId;
+            const rawBranchId = this.branchContextService.getBranchId();
+            const validBranchId = assertUuid(rawBranchId);
+            if (validBranchId) {
+                payload['branch_id'] = payload['branch_id'] || validBranchId;
             }
         }
         
@@ -194,7 +199,6 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
                 .single()
         ).pipe(
             map(({ data, error }) => {
-                console.error(`[CYPRESS DEBUG] BaseRepository.create ${this.tableName}:`, { data, error });
                 if (error) {
                     this.errorHandler.handleError(error, `create ${this.tableName}`, this.suppressAuthNotifications);
                 }
@@ -204,11 +208,20 @@ export abstract class BaseRepository<T extends { id?: string; tenant_id?: string
     }
 
     update(id: string, item: Partial<T>): Observable<T> {
-        const payload = { ...item };
-        delete payload.tenant_id;
-        delete payload.id;
+        const cleanPayload: Record<string, unknown> = {};
+        for (const [key, value] of Object.entries(item as Record<string, unknown>)) {
+            if (key !== 'id' && key !== 'tenant_id' && value !== undefined) {
+                cleanPayload[key] = value;
+            }
+        }
 
-        let query = this.supabase.from(this.tableName).update(payload as never).eq('id', id);
+        if (Object.keys(cleanPayload).length === 0) {
+            return this.getById(id).pipe(
+                map((data) => (data || item) as T)
+            );
+        }
+
+        let query = this.supabase.from(this.tableName).update(cleanPayload as never).eq('id', id);
         query = this.applyTenantFilter(query);
 
         return from(query.select().single()).pipe(

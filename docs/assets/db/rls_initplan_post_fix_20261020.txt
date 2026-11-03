@@ -1,0 +1,46 @@
+================================================================================
+ARECOFIX SAAS MULTI-TENANT ECOSYSTEM - RLS INITPLAN FORENSIC AUDIT (POST-FIX)
+Timestamp: 2026-10-20T17:52:16-03:00
+Target: db.arecofix.com.ar (PostgreSQL 15 / Supabase self-hosted)
+Migración Aplicada: 20261022080000_fix_auth_rls_initplan_course_enrollments.sql
+================================================================================
+
+1. POLÍTICA REPARADA ESPECÍFICA (FASE 0.1):
+SELECT schemaname, tablename, policyname, cmd, roles, qual, with_check
+FROM pg_policies
+WHERE policyname = 'course_enrollments_select_unified';
+
+OUTPUT:
+ schemaname |     tablename      |            policyname             |  cmd   |      roles      |                                                                             qual                                                                             | with_check 
+------------+--------------------+-----------------------------------+--------+-----------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------+------------
+ public     | course_enrollments | course_enrollments_select_unified | SELECT | {authenticated} | (( SELECT is_super_admin() AS is_super_admin) OR (tenant_id = ((( SELECT jwt() AS jwt) ->> 'tenant_id'::text))::uuid) OR (user_id = ( SELECT uid() AS uid))) | 
+(1 row)
+
+CONFIRMACIÓN:
+- 100% de las funciones auth y roles (`is_super_admin()`, `jwt()`, `uid()`) se encuentran encapsuladas en subconsultas escalares `(SELECT ...)`.
+- La optimización de InitPlan en PostgreSQL compila los valores una única vez por ejecución de statement (caching escalar), eliminando la evaluación fila por fila.
+
+--------------------------------------------------------------------------------
+
+2. QUERY FORENSE GENERAL EN TODOS LOS ESQUEMAS (PUBLIC, ZARX, STORAGE):
+SELECT schemaname, tablename, policyname, cmd, roles, qual, with_check
+FROM pg_policies
+WHERE (
+    (qual ~* '(auth\.(uid|jwt|role)|uid|jwt)\(\)' AND qual !~* '\(\s*SELECT\s+(auth\.)?(uid|jwt|role)\(\)')
+    OR
+    (with_check ~* '(auth\.(uid|jwt|role)|uid|jwt)\(\)' AND with_check !~* '\(\s*SELECT\s+(auth\.)?(uid|jwt|role)\(\)')
+    OR
+    (qual ~* 'current_setting\(' AND qual !~* '\(\s*SELECT\s+current_setting\(')
+    OR
+    (with_check ~* 'current_setting\(' AND with_check !~* '\(\s*SELECT\s+current_setting\(')
+  )
+ORDER BY schemaname, tablename, policyname;
+
+OUTPUT:
+ schemaname | tablename | policyname | cmd | roles | qual | with_check 
+------------+-----------+------------+-----+-------+------+------------
+(0 rows)
+
+DICTAMEN FINAL:
+Total de advertencias auth_rls_initplan: 0 (CERO).
+Total de políticas no escalares residuales: 0 (CERO).

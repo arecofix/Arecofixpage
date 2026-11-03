@@ -63,6 +63,14 @@ export function buildMockTenant(overrides: Record<string, unknown> = {}) {
     // Must be 'localhost' so TenantService resolves correctly in Cypress
     custom_domain: 'localhost',
     is_active:     true,
+    features: {
+      hasProducts: true,
+      hasServices: true,
+      hasCourses: true,
+      hasRepairs: true,
+      hasBlog: true,
+    },
+    usd_rate: 1000,
     ...overrides,
   };
 }
@@ -71,6 +79,7 @@ export function buildMockBranch(overrides: Record<string, unknown> = {}) {
   return {
     id:        MOCK_BRANCH_ID,
     name:      'Sede Central',
+    slug:      null,
     tenant_id: MOCK_TENANT_ID,
     ...overrides,
   };
@@ -159,6 +168,7 @@ export function buildMockOrderItem(
       price:     product.price,
       currency:  product.currency,
       image_url: product.image_url,
+      stock:     (product as any).stock ?? 10,
     },
     ...overrides,
   };

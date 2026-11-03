@@ -16,20 +16,25 @@
                 <button type="button" routerLink="/admin/repairs" class="btn btn-sm bg-[#1F2937] hover:bg-gray-700 text-white border border-gray-600 rounded-lg">
                     <i class="fas fa-list"></i> Órdenes guardadas
                 </button>
-                <button type="button" class="btn btn-sm bg-[#1F2937] hover:bg-gray-700 text-white border border-gray-600 rounded-lg">
+                <button type="button" [routerLink]="['/admin/accounts']" [queryParams]="{ repair_id: id }" class="btn btn-sm bg-[#1F2937] hover:bg-gray-700 text-white border border-gray-600 rounded-lg" [disabled]="!id">
                     <i class="fas fa-chart-line"></i> Contabilidad
                 </button>
                 
                 <div class="divider divider-horizontal mx-0 before:bg-gray-200 before:dark:bg-gray-700 after:bg-gray-200 after:dark:bg-gray-700 hidden xl:flex"></div>
                 
                 @if (id) {
+                    <app-generate-invoice-button
+                        [repairId]="id"
+                        [trackingCode]="repairForm.get('tracking_code')?.value"
+                    ></app-generate-invoice-button>
                     <div class="dropdown dropdown-end">
                         <div tabindex="0" role="button" class="btn btn-sm bg-[#1F2937] hover:bg-gray-700 text-white border border-gray-600 rounded-lg">
                             <i class="fas fa-print"></i> Imprimir <i class="fas fa-chevron-down ml-1 text-xs"></i>
                         </div>
                         <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 mt-2">
-                            <li><a (click)="printOrder()"><i class="fas fa-receipt text-blue-500"></i> Ticket 80mm</a></li>
+                            <li><a (click)="printTicketNative()"><i class="fas fa-receipt text-blue-500"></i> Ticket 80mm</a></li>
                             <li><a (click)="printOrder()"><i class="fas fa-file-pdf text-red-500"></i> Factura A4 PDF</a></li>
+                            <li><a (click)="generateQuote()"><i class="fas fa-file-invoice-dollar text-green-500"></i> Presupuesto PDF</a></li>
                         </ul>
                     </div>
                     <button type="button" (click)="shareWhatsApp()" class="btn btn-sm bg-[#25D366] hover:bg-green-400 text-gray-900 dark:text-white border-none shadow-[0_0_15px_rgba(37,211,102,0.3)] rounded-lg font-bold animate-pulse-once" id="btn-notificar-cliente">
@@ -76,7 +81,7 @@
                                 
                                 @if(id) {
                                     <span class="bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 px-3 py-1 rounded-md text-xs font-mono text-gray-700 dark:text-gray-300 font-bold ml-2">
-                                        <i class="fas fa-hashtag text-gray-400 mr-1"></i>{{ repairForm.value.repair_number | number:'3.0-0' }}
+                                        <i class="fas fa-hashtag text-gray-400 mr-1"></i>{{ repairForm.value.repair_number ? (repairForm.value.repair_number | number:'3.0-0') : repairForm.value.tracking_code }}
                                     </span>
                                 }
                             </div>
@@ -220,6 +225,10 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="mt-4 border-t border-gray-200 dark:border-gray-700/40 pt-4" formGroupName="checklist">
+                                <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">Estado físico al ingresar:</label>
+                                <input type="text" formControlName="physical_condition" class="w-full bg-white dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-xl px-3 py-2.5 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder-gray-400 dark:placeholder-gray-500" placeholder="Detallar rayones, módulo astillado, faltante de botones...">
+                            </div>
                         </div>
 
                         <!-- Sección 3: Falla y Diagnóstico Técnico -->
@@ -359,15 +368,24 @@
                         <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2"><i class="fas fa-bolt text-yellow-400"></i> Servicio Rápido</h3>
                         <div class="flex flex-col gap-2">
                             <div class="flex gap-2">
-                                <input type="text" placeholder="Ej: Cambio glass" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none">
+                                <select 
+                                    [ngModel]="selectedShortcutId()"
+                                    (ngModelChange)="selectedShortcutId.set($event)"
+                                    [ngModelOptions]="{standalone: true}"
+                                    class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none">
+                                    <option value="">Seleccionar atajo...</option>
+                                    @for (s of shortcuts(); track s.id) {
+                                        <option [value]="s.id">{{ s.name }}</option>
+                                    }
+                                </select>
                             </div>
-                            <div class="flex gap-2 justify-between">
-                                <button type="button" class="btn btn-sm btn-circle bg-gray-200 dark:bg-gray-800 border-none text--400 hover:bg-gray-200"><i class="fas fa-plus"></i></button>
-                                <button type="button" class="btn btn-sm btn-circle bg-gray-200 dark:bg-gray-800 border-none text--400 hover:bg-gray-200"><i class="fas fa-pen"></i></button>
-                                <button type="button" class="btn btn-sm btn-circle bg-gray-200 dark:bg-gray-800 border-none text--400 hover:bg-gray-200"><i class="fas fa-trash"></i></button>
-                                <button type="button" class="btn btn-sm bg-[#34C759] hover:bg-emerald-500 text-gray-900 dark:text-white border-none rounded-lg flex-1 ml-2">Aplicar</button>
+                            <div class="flex gap-2 justify-between mt-1">
+                                <button type="button" (click)="addShortcut()" class="btn btn-sm btn-circle bg-gray-200 dark:bg-gray-800 border-none text-gray-500 hover:bg-gray-300 dark:hover:bg-gray-700" title="Guardar campos actuales como nuevo atajo"><i class="fas fa-plus"></i></button>
+                                <button type="button" (click)="editShortcut()" [disabled]="!selectedShortcutId()" class="btn btn-sm btn-circle bg-gray-200 dark:bg-gray-800 border-none text-blue-500 hover:bg-blue-100 disabled:opacity-50" title="Sobrescribir atajo con campos actuales"><i class="fas fa-pen"></i></button>
+                                <button type="button" (click)="deleteShortcut()" [disabled]="!selectedShortcutId()" class="btn btn-sm btn-circle bg-gray-200 dark:bg-gray-800 border-none text-red-500 hover:bg-red-100 disabled:opacity-50" title="Eliminar atajo seleccionado"><i class="fas fa-trash"></i></button>
+                                <button type="button" (click)="applyShortcut()" [disabled]="!selectedShortcutId()" class="btn btn-sm bg-[#34C759] hover:bg-emerald-500 text-white border-none rounded-lg flex-1 ml-2 disabled:opacity-50 disabled:bg-gray-400">Aplicar</button>
                             </div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-tight text-center">Usa atajos para llenar los campos de falla y trabajo automáticamente.</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-tight text-center">Selecciona un atajo y presiona Aplicar para llenar los campos de falla y trabajo. Usa (+) para crear uno nuevo.</p>
                         </div>
                     </div>
 
@@ -543,5 +561,89 @@
     </div>
 </div>
 }
+
+<div class="print-only">
+    <div class="ticket-container" *ngIf="repairForm">
+        <div class="ticket-title">{{ $any(company())?.name || 'Arecofix' }}</div>
+        <div class="text-center mb-2">
+            <div>{{ $any(company())?.address || 'Dirección de la sucursal' }}</div>
+            <div>Tel: {{ $any(company())?.phone || 'Sin Teléfono' }}</div>
+            <div>CUIT: {{ $any(company())?.cuit || 'N/A' }}</div>
+        </div>
+        
+        <div class="border-y mb-2 mt-2">
+            <div class="flex justify-between">
+                <span>Fecha: {{ date | date:'dd/MM/yyyy' }}</span>
+                <span>Hora: {{ date | date:'HH:mm' }}</span>
+            </div>
+            <div class="font-bold text-center mt-2 mb-2 text-sm">
+                ORDEN TÉCNICA # {{ repairForm.get('repair_number')?.value || 'S/N' }}
+            </div>
+            <div class="text-center text-xs">Cód. Seg: {{ repairForm.get('tracking_code')?.value || '---' }}</div>
+        </div>
+
+        <div class="mb-4">
+            <div class="font-bold">Cliente:</div>
+            <div>{{ repairForm.get('customer_name')?.value }}</div>
+            <div *ngIf="repairForm.get('customer_phone')?.value">Tel: {{ repairForm.get('customer_phone')?.value }}</div>
+        </div>
+
+        <div class="mb-4">
+            <div class="font-bold">Equipo:</div>
+            <div>{{ repairForm.get('device_model')?.value }}</div>
+            <div *ngIf="repairForm.get('imei')?.value">IMEI/Serie: {{ repairForm.get('imei')?.value }}</div>
+            <div *ngIf="repairForm.get('security_pin')?.value || repairForm.get('security_pattern')?.value">
+                Seguridad: {{ repairForm.get('security_pin')?.value ? 'PIN ' + repairForm.get('security_pin')?.value : '' }} {{ repairForm.get('security_pattern')?.value ? 'Patrón ' + repairForm.get('security_pattern')?.value : '' }}
+            </div>
+            <div *ngIf="repairForm.get('checklist.physical_condition')?.value">
+                Estado físico al ingresar: {{ repairForm.get('checklist.physical_condition')?.value }}
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <div class="font-bold">Falla Declarada:</div>
+            <div>{{ repairForm.get('issue_description')?.value || 'Sin detalles' }}</div>
+        </div>
+
+        <div class="border-y mb-2 mt-2" *ngIf="parts().length > 0 || (((repairForm.get('estimated_cost')?.value || repairForm.get('final_cost')?.value || 0) > partsTotal()) || repairForm.get('technical_labor_cost')?.value > 0)">
+            <div class="font-bold mb-1">Detalle de Costos:</div>
+            <div *ngFor="let p of parts()" class="flex justify-between text-xs">
+                <span>{{ p.quantity }}x {{ p.product_name }}</span>
+                <span>${{ (p.quantity * (p.unit_price_at_time || 0)) | number }}</span>
+            </div>
+            <div *ngIf="((repairForm.get('estimated_cost')?.value || repairForm.get('final_cost')?.value || 0) > partsTotal()) || repairForm.get('technical_labor_cost')?.value > 0" class="flex justify-between text-xs mt-1">
+                <span>1x Mano de Obra / Servicio Técnico</span>
+                <span>${{ repairForm.get('technical_labor_cost')?.value || ((repairForm.get('estimated_cost')?.value || repairForm.get('final_cost')?.value || 0) - partsTotal()) | number }}</span>
+            </div>
+        </div>
+
+        <div class="border-t pt-2 mt-2">
+            <div class="flex justify-between font-bold text-sm">
+                <span>TOTAL PRESUPUESTADO:</span>
+                <span>${{ repairForm.get('estimated_cost')?.value | number }}</span>
+            </div>
+            <div class="flex justify-between mt-1 text-xs">
+                <span>Seña pagada:</span>
+                <span>${{ repairForm.get('deposit_amount')?.value | number }}</span>
+            </div>
+            <div class="flex justify-between mt-1 font-bold text-sm">
+                <span>RESTA ABONAR:</span>
+                <span>${{ ((repairForm.get('final_cost')?.value || repairForm.get('estimated_cost')?.value || 0) - (repairForm.get('deposit_amount')?.value || 0)) | number }}</span>
+            </div>
+        </div>
+
+        <div class="mt-4 text-xs text-center border-t pt-2">
+            <p>Pasados los 30 días de notificada la reparación se cobrará resguardo diario. A los 90 días el equipo se considerará abandonado.</p>
+            <p class="mt-2 font-bold">Seguimiento web:</p>
+            <p>{{ getTrackingUrl() }}</p>
+            <p class="mt-2 text-center text-[10px]">¡Gracias por elegirnos!</p>
+        </div>
+        
+        <div class="mt-6 border-t border-black w-full text-center text-xs pt-1">
+            Firma del Cliente
+        </div>
+    </div>
+</div>
+
 
 

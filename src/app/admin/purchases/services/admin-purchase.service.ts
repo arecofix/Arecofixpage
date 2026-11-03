@@ -1,7 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
 import { TenantService } from '@app/core/services/tenant.service';
-import { FinanceService } from '@app/features/finance/application/services/finance.service';
+import { IEventBus } from '@app/domain/events/event-bus.interface';
+import { PurchaseRegisteredEvent } from '@app/domain/events/purchase-registered.event';
+import { PaymentMethod } from '@app/domain/events/types/payment-method';
 import { ProductRepository } from '@app/features/products/domain/repositories/product.repository';
 import { Purchase } from '@app/features/sales/domain/entities/purchase.entity';
 import { AuthService } from '@app/core/services/auth.service';
@@ -16,7 +18,7 @@ import { LoggerService } from '@app/core/services/logger.service';
 export class AdminPurchaseService {
   private supabase = inject(SUPABASE_CLIENT);
   private tenantService = inject(TenantService);
-  private financeService = inject(FinanceService);
+  private eventBus = inject(IEventBus);
   private productRepository = inject(ProductRepository);
   private authService = inject(AuthService);
   private branchContextService = inject(BranchContextService);
@@ -141,23 +143,51 @@ export class AdminPurchaseService {
       }
     }
 
-    // ── STEP 4: Record Cash Movement if applicable ─────────────────────────────
-    if (form.payment_method === 'efectivo') {
-      try {
-        await this.financeService.recordMovement({
-          amount: total,
-          type: 'expense',
-          category: 'purchase',
-          branch_id: branchId || null,
-          payment_method: 'cash',
-          reference_id: purchase.id,
-          notes: `Compra a proveedor #${purchase.id.substring(0, 8)}`
-        });
-      } catch (finErr) {
-        // Log but don't rollback — finance movement is non-critical
-        this.logger.warn('[AdminPurchaseService] STEP 4 - Finance movement failed (purchase was saved):', finErr);
-      }
+    // ── STEP 4: Publish Domain Event ──────────────────────────────────────────
+    const methodMap: Record<string, PaymentMethod> = {
+      efectivo: 'cash',
+      transferencia: 'transfer',
+      tarjeta: 'card',
+      qr: 'qr',
+      mercadopago: 'mercadopago',
+    };
+    const paymentMethod: PaymentMethod = methodMap[form.payment_method] || 'cash';
+    const paymentStatus: 'pending' | 'paid' =
+      form.payment_status === 'pending'
+        ? 'pending'
+        : (form.status === 'received' || form.payment_status === 'paid' ? 'paid' : 'paid');
+
+    let supplierName = 'Proveedor';
+    try {
+      const supplier = await this.supplierService.getById(form.supplier_id);
+      if (supplier?.name) supplierName = supplier.name;
+    } catch {
+      // ignore
     }
+
+    const subtotal = total / 1.21;
+    const taxAmount = total - subtotal;
+
+    this.eventBus.publish(
+      new PurchaseRegisteredEvent(
+        purchase.id,
+        form.supplier_id,
+        supplierName,
+        items.map((item) => ({
+          productId: item.product_id,
+          description: item.product_name || `Producto ${item.product_id}`,
+          quantity: Number(item.quantity),
+          unitCost: Number(item.unit_cost),
+          taxRate: 0.21,
+        })),
+        subtotal,
+        taxAmount,
+        total,
+        paymentMethod,
+        paymentStatus,
+        new Date(),
+      ),
+    );
   }
 }
 

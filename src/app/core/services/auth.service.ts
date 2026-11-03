@@ -9,12 +9,13 @@ import {
 } from '@supabase/supabase-js';
 import { environment } from '../../../environments/environment';
 import { SUPABASE_CLIENT } from '../di/supabase-token';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { BehaviorSubject, Observable, firstValueFrom } from 'rxjs';
+import { map, filter, take, timeout, finalize } from 'rxjs/operators';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { LoggerService } from './logger.service';
 import { ProfileService } from './profile.service';
 import { TenantService } from './tenant.service';
+import { PermissionService } from './permission.service';
 import { UserProfile } from '@app/shared/interfaces/user.interface';
 import { Branch } from '@app/shared/interfaces/branch.interface';
 import { App, URLOpenListenerEvent } from '@capacitor/app';
@@ -34,9 +35,13 @@ export class AuthService {
   private tenantService = inject(TenantService);
   private ngZone = inject(NgZone);
   private injector = inject(Injector);
+  private permissionService = inject(PermissionService);
   
   // Súper Administrador Global
   public isSuperAdmin = signal<boolean>(false);
+
+  // Monotonic epoch counter to invalidate stale async operations (such as refreshSession after logout)
+  private sessionEpoch = 0;
 
   private authState = new BehaviorSubject<{
     session: Session | null;
@@ -110,8 +115,19 @@ export class AuthService {
 
       if (error) {
         this.logger.error('Session retrieval error', error);
-        if (navigator.onLine) {
-           // Limpiar cualquier token zombi en localStorage (ej. de la nube anterior)
+        // Only clear storage if this is a definitive auth error (invalid/expired token),
+        // NOT on transient network errors or timeouts — those would wipe valid sessions.
+        const isDefinitiveAuthError =
+          error.status === 400 ||
+          error.status === 401 ||
+          (error.message && (
+            error.message.includes('Invalid Refresh Token') ||
+            error.message.includes('Refresh Token Not Found') ||
+            error.message.includes('JWT') ||
+            error.message.includes('token is expired')
+          ));
+        if (navigator.onLine && isDefinitiveAuthError) {
+           // Only clear tokens that are confirmed invalid (not on network errors)
            if (typeof localStorage !== 'undefined') {
              const keys = Object.keys(localStorage).filter(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
              keys.forEach(k => localStorage.removeItem(k));
@@ -138,14 +154,15 @@ export class AuthService {
           }
         }
 
-        if (profile) {
-           this.authState.next({ session, user: session.user, profile, isInitialized: true });
-        } else {
-           this.authState.next({ ...this.authState.value, session, user: session.user, isInitialized: true });
-        }
-
         if (profile && (TENANT_CONSTANTS.SUPER_ADMIN_EMAILS.includes(profile.email || '') || profile.role === 'super_admin')) {
           this.isSuperAdmin.set(true);
+        }
+
+        if (profile) {
+           this.authState.next({ session, user: session.user, profile, isInitialized: true });
+           await this.permissionService.loadPermissions();
+        } else {
+           this.authState.next({ ...this.authState.value, session, user: session.user, isInitialized: true });
         }
       } else {
         this.authState.next({ ...this.authState.value, isInitialized: true });
@@ -161,6 +178,8 @@ export class AuthService {
         // this.logger.info(`Auth Event: ${event}`);
         
         if (event === 'SIGNED_OUT') {
+           this.sessionEpoch++;
+           this.refreshInFlightPromise = null;
            if (typeof localStorage !== 'undefined') {
              const keys = Object.keys(localStorage).filter(k => k.startsWith('sb-') && k.endsWith('-auth-token'));
              keys.forEach(k => localStorage.removeItem(k));
@@ -168,10 +187,24 @@ export class AuthService {
            this.authState.next({ session: null, user: null, profile: null, isInitialized: true });
            this.isSuperAdmin.set(false);
            this.currentBranchSubject.next(null);
+           this.permissionService.clear();
            return;
         }
 
         if (session) {
+          const current = this.authState.value;
+          const isSameUser = current.user?.id === session.user.id;
+          const wasAlreadyInitialized = current.isInitialized && isSameUser && current.profile !== null;
+          const isOAuthRedirect = typeof window !== 'undefined' && window.location.hash.includes('access_token');
+
+          // If the user session is already initialized and this is a duplicate event or token refresh, skip redundant fetches
+          if (wasAlreadyInitialized && !isOAuthRedirect && (event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED' || event === 'SIGNED_IN')) {
+             if (current.session?.access_token !== session.access_token) {
+               this.authState.next({ ...current, session, user: session.user });
+             }
+             return;
+          }
+
           const profile = await this.ensureProfile(session);
           
           if (profile?.tenant_id) {
@@ -190,11 +223,9 @@ export class AuthService {
             }
           }
 
-          // Verificar si ya estábamos iniciados en sesión (background sync o refresh de tab)
-          const wasAlreadyInitialized = this.authState.value.isInitialized && this.authState.value.user !== null;
-
           if (profile) {
             this.authState.next({ session, user: session.user, profile, isInitialized: true });
+            await this.permissionService.loadPermissions();
           } else {
             // Keep existing profile if we failed to fetch
             this.authState.next({ ...this.authState.value, session, user: session.user, isInitialized: true });
@@ -227,23 +258,27 @@ export class AuthService {
               const currentPath = window.location.pathname;
               const isAuthPage = currentPath === '/login' || currentPath === '/register' || currentPath === '/' || currentPath.includes('/auth/');
               
+              let navigated = false;
+
               // Evitar redirección si el usuario ya estaba validado en la UI (tab recovery, background token refresh)
               if (!wasAlreadyInitialized || isOAuthRedirect) {
                 if (hasExplicitReturnUrl) {
                    if (currentPath !== returnUrl) {
-                       router.navigateByUrl(returnUrl);
+                       await router.navigateByUrl(returnUrl);
+                       navigated = true;
                    }
                 } else if (isAuthPage) {
                    if (currentPath !== returnUrl) {
-                       router.navigateByUrl(returnUrl);
+                       await router.navigateByUrl(returnUrl);
+                       navigated = true;
                    }
                 }
               }
               
-              if (isOAuthRedirect) {
+              if (isOAuthRedirect && !navigated) {
                  history.replaceState(null, '', window.location.pathname + window.location.search);
               }
-            }, 100);
+            }, 500);
           }
 
           if (profile && (TENANT_CONSTANTS.SUPER_ADMIN_EMAILS.includes(profile.email || '') || profile.role === 'super_admin')) {
@@ -302,36 +337,48 @@ export class AuthService {
     }
   }
 
+  private profileInFlightPromise: Promise<UserProfile | null> | null = null;
+
   /**
    * Ensures a profile row exists for the given session user.
    */
   private async ensureProfile(session: Session): Promise<UserProfile | null> {
-    try {
-      if (typeof navigator !== 'undefined' && !navigator.onLine) {
-        const cached = localStorage.getItem(`arecofix_profile_${session.user.id}`);
-        if (cached) return JSON.parse(cached);
-      }
+    const current = this.authState.value;
+    if (current.user?.id === session.user.id && current.profile) {
+      return current.profile;
+    }
 
-      const existingProfile = await this.profileService.getProfile(session.user.id);
-      const meta = session.user.user_metadata || {};
-      const metaAvatar = meta['avatar_url'] || meta['picture'] || null;
+    if (this.profileInFlightPromise) {
+      return this.profileInFlightPromise;
+    }
 
-      if (existingProfile) {
-         if (metaAvatar && existingProfile.avatar_url !== metaAvatar) {
-             const { data: updatedProfile, error } = await this.supabase
-                 .from('profiles')
-                 .update({ avatar_url: metaAvatar, updated_at: new Date().toISOString() })
-                 .eq('id', session.user.id)
-                 .select()
-                 .maybeSingle();
-             if (!error && updatedProfile) {
-                 localStorage.setItem(`arecofix_profile_${session.user.id}`, JSON.stringify(updatedProfile));
-                 return updatedProfile as UserProfile;
-             }
-         }
-         localStorage.setItem(`arecofix_profile_${session.user.id}`, JSON.stringify(existingProfile));
-         return existingProfile;
-      }
+    this.profileInFlightPromise = (async () => {
+      try {
+        if (typeof navigator !== 'undefined' && !navigator.onLine) {
+          const cached = localStorage.getItem(`arecofix_profile_${session.user.id}`);
+          if (cached) return JSON.parse(cached);
+        }
+
+        const existingProfile = await this.profileService.getProfile(session.user.id);
+        const meta = session.user.user_metadata || {};
+        const metaAvatar = meta['avatar_url'] || meta['picture'] || null;
+
+        if (existingProfile) {
+           if (metaAvatar && existingProfile.avatar_url !== metaAvatar) {
+               const { data: updatedProfile, error } = await this.supabase
+                   .from('profiles')
+                   .update({ avatar_url: metaAvatar, updated_at: new Date().toISOString() })
+                   .eq('id', session.user.id)
+                   .select()
+                   .maybeSingle();
+               if (!error && updatedProfile) {
+                   localStorage.setItem(`arecofix_profile_${session.user.id}`, JSON.stringify(updatedProfile));
+                   return updatedProfile as UserProfile;
+               }
+           }
+           localStorage.setItem(`arecofix_profile_${session.user.id}`, JSON.stringify(existingProfile));
+           return existingProfile;
+        }
 
       const currentTenantId = this.tenantService.getTenantId();
       const isFallback = currentTenantId === TENANT_CONSTANTS.FALLBACK_ID;
@@ -383,10 +430,18 @@ export class AuthService {
       const cached = localStorage.getItem(`arecofix_profile_${session.user.id}`);
       if (cached) return JSON.parse(cached);
       return null;
+    } finally {
+      this.profileInFlightPromise = null;
     }
-  }
+  })();
+
+  return this.profileInFlightPromise;
+}
 
   async signOut(): Promise<string | null> {
+    this.sessionEpoch++;
+    this.refreshInFlightPromise = null;
+
     const { isTauri } = await import('@tauri-apps/api/core');
     const runningInTauri = isTauri();
     
@@ -404,6 +459,58 @@ export class AuthService {
     return this.authState.value.user;
   }
 
+  async getSession(): Promise<Session | null> {
+    if (this.authState.value.session) {
+      return this.authState.value.session;
+    }
+    const state = await this.waitForAuth();
+    if (state.session) return state.session;
+    try {
+      const { data } = await this.supabase.auth.getSession();
+      return data?.session || null;
+    } catch {
+      return null;
+    }
+  }
+
+  waitForAuth(timeoutMs: number = 4000): Promise<{ session: Session | null; user: User | null; profile: UserProfile | null; isInitialized: boolean }> {
+    if (this.authState.value.isInitialized) {
+      return Promise.resolve(this.authState.value);
+    }
+
+    return new Promise((resolve) => {
+      let completed = false;
+      const timeoutId = setTimeout(() => {
+        if (!completed) {
+          completed = true;
+          this.logger.warn(`[AuthService] waitForAuth timed out after ${timeoutMs}ms, resolving with current state`);
+          resolve(this.authState.value);
+        }
+      }, timeoutMs);
+
+      this.authState$
+        .pipe(
+          filter((state) => state.isInitialized),
+          take(1),
+          finalize(() => clearTimeout(timeoutId))
+        )
+        .subscribe({
+          next: (state) => {
+            if (!completed) {
+              completed = true;
+              resolve(state);
+            }
+          },
+          error: () => {
+            if (!completed) {
+              completed = true;
+              resolve(this.authState.value);
+            }
+          }
+        });
+    });
+  }
+
   async getUser(): Promise<User | null> {
     const {
       data: { user },
@@ -415,9 +522,70 @@ export class AuthService {
     return this.authState.value.session;
   }
 
-  async getSession(): Promise<Session | null> {
-    const { data } = await this.supabase.auth.getSession();
-    return data.session;
+  /**
+   * Retrieves access token synchronously from current state or storage
+   */
+  getStoredAccessToken(): string | null {
+    if (this.authState.value.session?.access_token) {
+      return this.authState.value.session.access_token;
+    }
+
+    if (typeof window === 'undefined') return null;
+
+    try {
+      // Respect supabase-remember-me flag: if false, tokens are in sessionStorage.
+      // Search sessionStorage first when not in "remember me" mode.
+      const rememberMe = localStorage.getItem('supabase-remember-me') === 'true';
+      const storageSources: Storage[] = rememberMe
+        ? [localStorage, sessionStorage]
+        : [sessionStorage, localStorage];
+
+      for (const storage of storageSources) {
+        for (let i = 0; i < storage.length; i++) {
+          const key = storage.key(i);
+          if (key && ((key.startsWith('sb-') && key.endsWith('-auth-token')) || key === 'supabase-auth-token')) {
+            const raw = storage.getItem(key);
+            if (raw) {
+              try {
+                const parsed = JSON.parse(raw);
+                const token = parsed?.access_token || parsed?.session?.access_token;
+                if (token && typeof token === 'string') {
+                  return token;
+                }
+              } catch {
+                // Malformed entry — skip
+              }
+            }
+          }
+        }
+      }
+    } catch {
+      // Ignore storage access error
+    }
+
+    return null;
+  }
+
+  /**
+   * Resolves a guaranteed valid (non-expired) access token, refreshing if needed.
+   */
+  async getAccessToken(): Promise<string | null> {
+    let session = this.authState.value.session;
+    if (!session) {
+      session = await this.getSession();
+    }
+    if (!session) {
+      return null;
+    }
+
+    const nowSec = Math.floor(Date.now() / 1000);
+    if (session.expires_at && session.expires_at <= nowSec + 30) {
+      this.logger.info('[AuthService] Token expired or expiring soon. Refreshing session...');
+      const refreshed = await this.refreshSession();
+      return refreshed?.access_token || session.access_token || null;
+    }
+
+    return session.access_token || null;
   }
 
   async getUserProfile(userId: string): Promise<UserProfile | null> {
@@ -499,7 +667,7 @@ export class AuthService {
         
         let response;
         try {
-          response = await fetch('http://localhost:5000/api/login', {
+          response = await fetch(`${environment.flaskApiUrl}/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username: email, password: password }),
@@ -623,18 +791,59 @@ export class AuthService {
     return error ? error.message : null;
   }
 
+  private refreshInFlightPromise: Promise<Session | null> | null = null;
+
   /**
-   * Proactively refreshes the session to ensure a valid token for long operations.
+   * Refreshes the session ensuring a valid token. Single-flight mutex prevents concurrent duplications.
+   * Enforces a timeout (default 8s) to prevent hung network states.
+   * Compares sessionEpoch before committing state to avoid rehydration if user logged out during refresh.
    */
-  async refreshSession(): Promise<Session | null> {
-    const { data: { session }, error } = await this.supabase.auth.refreshSession();
-    if (error) {
-      this.logger.error('Error refreshing session', error);
-      return null;
+  async refreshSession(timeoutMs: number = 8000): Promise<Session | null> {
+    if (this.refreshInFlightPromise) {
+      return this.refreshInFlightPromise;
     }
-    if (session) {
-      this.authState.next({ ...this.authState.value, session, user: session.user });
-    }
-    return session;
+
+    const currentEpoch = this.sessionEpoch;
+
+    this.refreshInFlightPromise = (async () => {
+      let timeoutId: ReturnType<typeof setTimeout> | undefined;
+      try {
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          timeoutId = setTimeout(() => {
+            reject(new Error(`[AuthService] refreshSession timed out after ${timeoutMs}ms`));
+          }, timeoutMs);
+        });
+
+        const refreshPromise = this.supabase.auth.refreshSession();
+        const { data: { session }, error } = await Promise.race([refreshPromise, timeoutPromise]);
+        clearTimeout(timeoutId);
+
+        if (this.sessionEpoch !== currentEpoch) {
+          this.logger.warn('[AuthService] Stale session refresh discarded: sessionEpoch changed during refresh.');
+          return null;
+        }
+
+        if (error) {
+          this.logger.error('Error refreshing session', error);
+          return null;
+        }
+        if (session) {
+          this.authState.next({ ...this.authState.value, session, user: session.user });
+        }
+        return session;
+      } catch (err) {
+        clearTimeout(timeoutId);
+        this.logger.error('[AuthService] Exception or timeout in refreshSession', err);
+        return null;
+      } finally {
+        this.refreshInFlightPromise = null;
+      }
+    })();
+
+    return this.refreshInFlightPromise;
+  }
+
+  getSessionEpoch(): number {
+    return this.sessionEpoch;
   }
 }

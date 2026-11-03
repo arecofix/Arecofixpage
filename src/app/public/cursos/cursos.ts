@@ -3,7 +3,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { rxResource, toObservable, takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { switchMap, timeout, catchError, of, combineLatest } from 'rxjs';
+import { switchMap, timeout, catchError, of, combineLatest, take, filter } from 'rxjs';
 
 import { SeoService } from '@app/core/services/seo.service';
 import { CoursesService, Course } from '@app/core/services/courses.service';
@@ -132,17 +132,15 @@ export class CursosComponent implements OnInit {
     // Resource for Related Products (Tools/Kits)
     productsRs = rxResource({
         stream: () => {
+            const tenant = this.tenantService.currentTenant();
             const page = this.paginationService.currentPage() || 1;
             const sort = this.sort();
             const order = this.order();
 
-            return combineLatest([
-                this.tenant$,
-            ]).pipe(
-                switchMap(([tenant]) => {
-                    if (!tenant) return of({ data: [], meta: { total: 0 } });
-                    return this.categoryService.getDataBySlug('repuestos/tools');
-                }),
+            if (!tenant) return of({ data: [], meta: { total: 0 } });
+
+            return this.categoryService.getDataBySlug('repuestos/tools').pipe(
+                take(1),
                 switchMap(category => {
                     if (!category || !('data' in category) || !category.data?.[0]?.id) {
                         return of({ data: [], meta: { total: 0 } });
@@ -153,8 +151,9 @@ export class CursosComponent implements OnInit {
                         _page: page,
                         _sort: sort,
                         _order: order
-                    });
-                })
+                    }).pipe(take(1));
+                }),
+                catchError(() => of({ data: [], meta: { total: 0 } }))
             );
         }
     });
@@ -170,13 +169,22 @@ export class CursosComponent implements OnInit {
 
     ngOnInit() {
         this.setSEO();
-        this.tenant$
-            .pipe(takeUntilDestroyed(this.destroyRef))
-            .subscribe(tenant => {
-                if (tenant) {
+        const tenant = this.tenantService.currentTenant();
+        if (tenant) {
+            this.loadCourses();
+        } else {
+            this.tenant$
+                .pipe(
+                    filter((t): t is NonNullable<typeof t> => !!t),
+                    take(1),
+                    timeout(1500),
+                    catchError(() => of(null)),
+                    takeUntilDestroyed(this.destroyRef)
+                )
+                .subscribe(() => {
                     this.loadCourses();
-                }
-            });
+                });
+        }
 
         // Auto-play slider
         if (isPlatformBrowser(this.platformId)) {
@@ -224,7 +232,8 @@ export class CursosComponent implements OnInit {
     loadCourses() {
         this.isLoadingCourses.set(true);
         this.coursesService.getCourses().pipe(
-            timeout(15000),
+            take(1),
+            timeout(2000),
             catchError(err => {
                 console.error('API Error:', err);
                 return of({ data: null, error: err });
@@ -338,7 +347,7 @@ export class CursosComponent implements OnInit {
                 ...form
             });
 
-            if (response.error) throw new Error(response.error);
+            if (response.error) throw new Error(typeof response.error === 'string' ? response.error : (response.error as { message?: string })?.message || 'Error de registro');
             
             this.registrationSuccess.set(true);
         } catch (err) {

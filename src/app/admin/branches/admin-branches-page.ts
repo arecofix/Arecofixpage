@@ -6,7 +6,10 @@ import {
   computed,
   ChangeDetectorRef,
   ChangeDetectionStrategy,
+  DestroyRef,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter, take } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -15,6 +18,7 @@ import { TenantService } from '@app/core/services/tenant.service';
 import { SupabaseService } from '@app/core/services/supabase.service';
 import { AuthService } from '@app/core/services/auth.service';
 import { Pagination } from '@app/shared/components/pagination/pagination';
+import { sanitizeHexColor } from '@app/core/utils/color.utils';
 
 @Component({
   selector: 'app-admin-branches-page',
@@ -30,6 +34,7 @@ export class AdminBranchesPage implements OnInit {
   public auth = inject(AuthService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
 
   branches = signal<Branch[]>([]);
   loading = signal(true);
@@ -110,8 +115,16 @@ export class AdminBranchesPage implements OnInit {
     }
   }
 
-  async ngOnInit() {
-    await this.loadBranches();
+  ngOnInit() {
+    this.auth.authState$
+      .pipe(
+        filter((state) => state.isInitialized),
+        take(1),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(async () => {
+        await this.loadBranches();
+      });
   }
 
   async loadBranches() {
@@ -188,10 +201,11 @@ export class AdminBranchesPage implements OnInit {
       inventory: branch.plan_id === 'premium',
       customers: true,
     };
-    const branding = branch.branding_settings || {
-      logo_url: null,
-      favicon_url: null,
-      primary_color: '#0d9488',
+    const branding = {
+      logo_url: branch.branding_settings?.logo_url ?? null,
+      favicon_url: branch.branding_settings?.favicon_url ?? null,
+      primary_color: this.sanitizeColor(branch.branding_settings?.primary_color),
+      owner_name: branch.branding_settings?.owner_name ?? '',
     };
     const bank = branch.bank_info || {
       alias: '',
@@ -205,6 +219,28 @@ export class AdminBranchesPage implements OnInit {
       bank_info: { ...bank },
     });
     this.showForm.set(true);
+  }
+
+  sanitizeColor(color?: string | null): string {
+    return sanitizeHexColor(color, '#0d9488');
+  }
+
+  onPrimaryColorChange(newColor: string) {
+    const validColor = this.sanitizeColor(newColor);
+    const form = this.currentForm();
+    const currentBranding = form.branding_settings || {
+      logo_url: null,
+      favicon_url: null,
+      primary_color: '#0d9488',
+      owner_name: '',
+    };
+    this.currentForm.set({
+      ...form,
+      branding_settings: {
+        ...currentBranding,
+        primary_color: validColor,
+      },
+    });
   }
 
   onPlanChange(newPlan: string) {
@@ -302,28 +338,40 @@ export class AdminBranchesPage implements OnInit {
   }
 
   async deleteBranch(id: string) {
-    if (
-      !confirm(
-        '¿Seguro que deseas eliminar esta sucursal? Esta acción no se puede deshacer.',
-      )
-    )
-      return;
-
     try {
+      // 1. Check active users
+      const client = this.supabase.getClient();
+      const { count, error } = await client
+        .from('profiles')
+        .select('*', { count: 'exact', head: true })
+        .eq('branch_id', id);
+
+      if (error) {
+        this.error.set('Error verificando usuarios de la sucursal.');
+        return;
+      }
+
+      const activeUsers = count || 0;
+
+      // 2. Show native confirm dialog
+      if (
+        !confirm(
+          `Esta sucursal tiene ${activeUsers} usuarios registrados. Desactivarla impedirá el acceso a todo su personal. ¿Proceder?`
+        )
+      ) {
+        return;
+      }
+
+      this.loading.set(true);
       await this.branchService.deleteBranch(id);
-      this.success.set('Sucursal eliminada');
+      this.success.set('Sucursal desactivada con éxito (Soft Delete)');
       await this.loadBranches();
       setTimeout(() => this.success.set(null), 3000);
     } catch (e: any) {
       const errorMsg = e.message || '';
-      if (errorMsg.includes('23503') || errorMsg.includes('foreign key')) {
-        this.error.set(
-          'No se puede eliminar la sucursal porque tiene datos asociados (productos, reparaciones, etc.). Por favor, desactívela en su lugar.',
-        );
-      } else {
-        this.error.set('Error al eliminar: ' + errorMsg);
-      }
+      this.error.set('Error al desactivar la sucursal: ' + errorMsg);
     } finally {
+      this.loading.set(false);
       this.cdr.markForCheck();
     }
   }
