@@ -1,5 +1,26 @@
-import { Injectable, inject, PLATFORM_ID, signal, RendererFactory2, Renderer2 } from '@angular/core';
+import {
+  Injectable,
+  inject,
+  PLATFORM_ID,
+  signal,
+  RendererFactory2,
+  Renderer2,
+  DOCUMENT,
+  DestroyRef,
+} from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import type WAW from 'waw-widget';
+import {
+  WAW_DOM_IDS,
+  WAW_FEATURE_BUTTON_IDS,
+  WAW_CSS_CLASSES,
+  ALL_WAW_ROOT_CLASSES,
+  WAW_STORAGE_KEYS,
+  WAW_THEME_COLORS,
+  WAW_SPRITE_PATHS,
+  WawFeatureKey,
+  WAW_FEATURE_MAP,
+} from '@app/core/constants/waw.constants';
 
 /**
  * Representación tipada del objeto persistido por WAW en localStorage ('wawStates')
@@ -24,32 +45,65 @@ export interface WawStoredStates {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class WawAccessibilityService {
   private platformId = inject(PLATFORM_ID);
+  private document: Document = inject(DOCUMENT);
+  private destroyRef = inject(DestroyRef);
   private renderer: Renderer2 = inject(RendererFactory2).createRenderer(null, null);
-  private instance: any = null;
+
+  private instance: WAW | null = null;
   private isInitialized = false;
   private lastFocusedElement: HTMLElement | null = null;
   private initPromise: Promise<void> | null = null;
   private mutationObserver: MutationObserver | null = null;
+  private pendingSyncFrame: number | null = null;
+  private unlisteners: Array<() => void> = [];
 
   // ── Signals reactivos de estado (Angular 21) ──────────────────────────────────
-  public isWawOpen = signal(false);
-  public isDyslexiaActive = signal(false);
-  public isBigCursorActive = signal(false);
-  public isReadingLineActive = signal(false);
-  public isReadingMaskActive = signal(false);
-  public isScreenReaderActive = signal(false);
-  public isAnimationsStopped = signal(false);
-  public isLinksHighlighted = signal(false);
-  public isHeadersHighlighted = signal(false);
-  public isImagesHidden = signal(false);
-  public isMuted = signal(false);
+  public readonly isWawOpen = signal<boolean>(false);
+  public readonly isDyslexiaActive = signal<boolean>(false);
+  public readonly isBigCursorActive = signal<boolean>(false);
+  public readonly isReadingLineActive = signal<boolean>(false);
+  public readonly isReadingMaskActive = signal<boolean>(false);
+  public readonly isScreenReaderActive = signal<boolean>(false);
+  public readonly isAnimationsStopped = signal<boolean>(false);
+  public readonly isLinksHighlighted = signal<boolean>(false);
+  public readonly isHeadersHighlighted = signal<boolean>(false);
+  public readonly isImagesHidden = signal<boolean>(false);
+  public readonly isMuted = signal<boolean>(false);
+
+  constructor() {
+    this.destroyRef.onDestroy(() => this.destroy());
+  }
 
   /**
-   * Inicializa el widget WAW de forma lazy (solo en navegador).
+   * Limpieza de recursos, listeners y observadores para evitar fugas de memoria
+   */
+  public destroy(): void {
+    if (this.pendingSyncFrame !== null && typeof cancelAnimationFrame !== 'undefined') {
+      cancelAnimationFrame(this.pendingSyncFrame);
+      this.pendingSyncFrame = null;
+    }
+
+    if (this.mutationObserver) {
+      this.mutationObserver.disconnect();
+      this.mutationObserver = null;
+    }
+
+    this.unlisteners.forEach((unlisten) => {
+      try {
+        unlisten();
+      } catch {
+        // Ignorar errores al desuscribir
+      }
+    });
+    this.unlisteners = [];
+  }
+
+  /**
+   * Inicializa el widget WAW de forma diferida (solo en navegador).
    * Pre-inyecta sprites SVG con rutas absolutas para evitar fallos 404.
    */
   async init(): Promise<void> {
@@ -69,14 +123,14 @@ export class WawAccessibilityService {
       try {
         await this.preinjectSprites();
 
-        const { default: WAW } = await import('waw-widget');
+        const { default: WAWClass } = await import('waw-widget');
 
         if (!this.instance) {
-          this.instance = new WAW({
+          this.instance = new WAWClass({
             colors: {
-              mainColor: '#486EAB',
-              secondColor: '#1A1A40'
-            }
+              mainColor: WAW_THEME_COLORS.MAIN,
+              secondColor: WAW_THEME_COLORS.SECOND,
+            },
           });
         }
 
@@ -96,56 +150,50 @@ export class WawAccessibilityService {
   }
 
   /**
-   * FASE 2: Listener directo al botón nativo de cierre ('X') de WAW (#close-button)
-   * Garantiza la remoción inmediata de waw-panel-open y la restauración de inert sin clics extras
+   * Listener directo al botón nativo de cierre ('X') de WAW (#close-button)
+   * Garantiza la remoción inmediata de waw-panel-open y la restauración de inert sin clics extras.
    */
-  private setupCloseButtonListener(): void {
-    if (typeof document === 'undefined') return;
-
-    const closeBtn = document.getElementById('close-button');
-    const widget = document.getElementById('waw-widget');
+  public setupCloseButtonListener(): void {
+    const closeBtn = this.document.getElementById(WAW_DOM_IDS.CLOSE_BUTTON);
+    const widget = this.document.getElementById(WAW_DOM_IDS.WIDGET);
 
     if (closeBtn) {
-      this.renderer.listen(closeBtn, 'click', () => {
-        if (document.body) {
-          this.renderer.removeClass(document.body, 'waw-panel-open');
+      const unlisten = this.renderer.listen(closeBtn, 'click', () => {
+        if (this.document.body) {
+          this.renderer.removeClass(this.document.body, WAW_CSS_CLASSES.PANEL_OPEN);
         }
         if (widget) {
-          this.renderer.removeClass(widget, 'open');
+          this.renderer.removeClass(widget, WAW_CSS_CLASSES.OPEN);
           this.renderer.setAttribute(widget, 'inert', '');
         }
-        const overlay = document.getElementById('waw-backdrop-overlay');
+        const overlay = this.document.getElementById(WAW_DOM_IDS.BACKDROP_OVERLAY);
         if (overlay) {
-          this.renderer.removeClass(overlay, 'visible');
+          this.renderer.removeClass(overlay, WAW_CSS_CLASSES.OVERLAY_VISIBLE);
         }
         this.isWawOpen.set(false);
         this.syncStates();
       });
+      this.unlisteners.push(unlisten);
     }
   }
 
   /**
-   * Pre-inyecta los símbolos SVG de WAW usando rutas absolutas
+   * Pre-inyecta los símbolos SVG de WAW usando rutas absolutas para evitar 404 en subrutas
    */
   private async preinjectSprites(): Promise<void> {
-    if (typeof document === 'undefined' || document.getElementById('waw-svg-sprites-preinjected')) {
+    if (this.document.getElementById(WAW_DOM_IDS.SPRITES_CONTAINER)) {
       return;
     }
 
-    const spriteFiles = [
-      '/assets/icons/icons.svg',
-      '/assets/icons/options.svg'
-    ];
-
     const container = this.renderer.createElement('div') as HTMLElement;
-    this.renderer.setProperty(container, 'id', 'waw-svg-sprites-preinjected');
+    this.renderer.setProperty(container, 'id', WAW_DOM_IDS.SPRITES_CONTAINER);
     this.renderer.setStyle(container, 'position', 'absolute');
     this.renderer.setStyle(container, 'width', '0');
     this.renderer.setStyle(container, 'height', '0');
     this.renderer.setStyle(container, 'display', 'none');
     this.renderer.setStyle(container, 'overflow', 'hidden');
 
-    const fetches = spriteFiles.map(async file => {
+    const fetches = WAW_SPRITE_PATHS.map(async (file) => {
       try {
         const res = await fetch(file);
         if (!res.ok) return '';
@@ -157,39 +205,82 @@ export class WawAccessibilityService {
 
     const svgs = await Promise.all(fetches);
     this.renderer.setProperty(container, 'innerHTML', svgs.join('\n'));
-    if (document.body) {
-      this.renderer.insertBefore(document.body, container, document.body.firstChild);
+    if (this.document.body) {
+      this.renderer.insertBefore(this.document.body, container, this.document.body.firstChild);
     }
   }
 
   /**
-   * Configura MutationObserver seguro para SSR para escuchar cambios en documentElement y en el contenedor del widget.
+   * Configura MutationObserver con debouncing seguro para evitar layout thrashing
    */
   private setupStateObserver(): void {
-    if (typeof window === 'undefined' || typeof document === 'undefined' || typeof MutationObserver === 'undefined') {
+    if (typeof window === 'undefined' || typeof MutationObserver === 'undefined') {
       return;
     }
 
     if (this.mutationObserver) return;
 
     this.mutationObserver = new MutationObserver(() => {
-      this.syncStates();
+      this.scheduleSyncStates();
     });
 
     // Observar cambios de clases en el <html>
-    this.mutationObserver.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class', 'style']
-    });
+    if (this.document.documentElement) {
+      this.mutationObserver.observe(this.document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style'],
+      });
+    }
 
     // Observar contenedor principal del widget
-    const widget = document.getElementById('waw-widget');
+    const widget = this.document.getElementById(WAW_DOM_IDS.WIDGET);
     if (widget) {
       this.mutationObserver.observe(widget, {
         attributes: true,
         subtree: true,
-        attributeFilter: ['class', 'inert']
+        attributeFilter: ['class', 'inert'],
       });
+    }
+  }
+
+  /**
+   * Debounce reactivo para coalescer mutaciones DOM múltiples en un solo frame
+   */
+  public scheduleSyncStates(): void {
+    if (!isPlatformBrowser(this.platformId) || typeof window === 'undefined') return;
+
+    if (this.pendingSyncFrame !== null && typeof cancelAnimationFrame !== 'undefined') {
+      cancelAnimationFrame(this.pendingSyncFrame);
+    }
+
+    this.pendingSyncFrame = requestAnimationFrame(() => {
+      this.pendingSyncFrame = null;
+      this.syncStates();
+    });
+  }
+
+  /**
+   * Lectura segura y tipada de localStorage
+   */
+  private getStoredStates(): WawStoredStates | null {
+    if (!isPlatformBrowser(this.platformId) || typeof window === 'undefined') return null;
+    try {
+      const raw = window.localStorage.getItem(WAW_STORAGE_KEYS.STATES);
+      return raw ? (JSON.parse(raw) as WawStoredStates) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Borrado seguro de localStorage
+   */
+  private clearStoredStates(): void {
+    if (!isPlatformBrowser(this.platformId) || typeof window === 'undefined') return;
+    try {
+      window.localStorage.removeItem(WAW_STORAGE_KEYS.STATES);
+    } catch {
+      // Ignorar fallo de almacenamiento
     }
   }
 
@@ -198,111 +289,104 @@ export class WawAccessibilityService {
    * estado de botones internos (.active) y persistencia en localStorage ('wawStates').
    */
   public syncStates(): void {
-    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+    if (!isPlatformBrowser(this.platformId) || !this.document.documentElement) return;
 
-    const rootClasses = document.documentElement.classList;
-
-    let parsedStates: WawStoredStates | null = null;
-    try {
-      const raw = localStorage.getItem('wawStates');
-      if (raw) {
-        parsedStates = JSON.parse(raw) as WawStoredStates;
-      }
-    } catch {
-      // Ignorar fallo de parseo
-    }
+    const rootClasses = this.document.documentElement.classList;
+    const parsedStates = this.getStoredStates();
 
     const isBtnActive = (id: string): boolean => {
-      const el = document.getElementById(id);
-      return el ? el.classList.contains('active') : false;
+      const el = this.document.getElementById(id);
+      return el ? el.classList.contains(WAW_CSS_CLASSES.ACTIVE) : false;
     };
 
     // 1. Modo Dislexia
     const isDyslexia =
-      rootClasses.contains('WAWDyslexicFont') ||
-      isBtnActive('btn-apto-dislexia') ||
+      rootClasses.contains(WAW_CSS_CLASSES.ROOT_DYSLEXIA) ||
+      isBtnActive(WAW_FEATURE_BUTTON_IDS.DYSLEXIA) ||
       parsedStates?.dyslexia_font === true;
     this.isDyslexiaActive.set(isDyslexia);
 
     // 2. Cursor Grande
     const isBigCursor =
-      rootClasses.contains('WAWBigCursor') ||
-      isBtnActive('btn-big-cursor') ||
+      rootClasses.contains(WAW_CSS_CLASSES.ROOT_BIG_CURSOR) ||
+      isBtnActive(WAW_FEATURE_BUTTON_IDS.BIG_CURSOR) ||
       parsedStates?.big_cursor === true;
     this.isBigCursorActive.set(isBigCursor);
 
     // 3. Detener Animaciones (en WAW animations === false significa detenido)
     const isAnimStopped =
-      rootClasses.contains('WAWNoAnimations') ||
-      isBtnActive('btn-animations') ||
+      rootClasses.contains(WAW_CSS_CLASSES.ROOT_NO_ANIMATIONS) ||
+      isBtnActive(WAW_FEATURE_BUTTON_IDS.ANIMATIONS) ||
       (parsedStates && typeof parsedStates.animations === 'boolean' ? !parsedStates.animations : false);
     this.isAnimationsStopped.set(isAnimStopped);
 
     // 4. Ocultar Imágenes
     const isHideImg =
-      rootClasses.contains('WAWHideImages') ||
-      isBtnActive('btn-hide-img') ||
+      rootClasses.contains(WAW_CSS_CLASSES.ROOT_HIDE_IMAGES) ||
+      isBtnActive(WAW_FEATURE_BUTTON_IDS.HIDE_IMAGES) ||
       parsedStates?.hide_images === true;
     this.isImagesHidden.set(isHideImg);
 
     // 5. Resaltar Enlaces
     const isLinks =
-      rootClasses.contains('WAWHighlightLinks') ||
-      isBtnActive('btn-highlight-links') ||
+      rootClasses.contains(WAW_CSS_CLASSES.ROOT_HIGHLIGHT_LINKS) ||
+      isBtnActive(WAW_FEATURE_BUTTON_IDS.HIGHLIGHT_LINKS) ||
       parsedStates?.highlight_links === true;
     this.isLinksHighlighted.set(isLinks);
 
     // 6. Resaltar Encabezados
     const isHeaders =
-      rootClasses.contains('WAWHighlightHeaders') ||
-      isBtnActive('btn-highlight-headers') ||
+      rootClasses.contains(WAW_CSS_CLASSES.ROOT_HIGHLIGHT_HEADERS) ||
+      isBtnActive(WAW_FEATURE_BUTTON_IDS.HIGHLIGHT_HEADERS) ||
       parsedStates?.highlight_headers === true;
     this.isHeadersHighlighted.set(isHeaders);
 
     // 7. Guía de Lectura
-    const readingLine = document.getElementById('waw-reading-line');
+    const readingLine = this.document.getElementById(WAW_DOM_IDS.READING_LINE);
     const isLineActive =
-      (!!readingLine && !readingLine.classList.contains('hidden')) ||
-      isBtnActive('btn-reading-line') ||
+      (!!readingLine && !readingLine.classList.contains(WAW_CSS_CLASSES.HIDDEN)) ||
+      isBtnActive(WAW_FEATURE_BUTTON_IDS.READING_LINE) ||
       parsedStates?.reading_line === true;
     this.isReadingLineActive.set(isLineActive);
 
     // 8. Máscara de Lectura
-    const readingMask = document.getElementById('waw-reading-mask');
+    const readingMask = this.document.getElementById(WAW_DOM_IDS.READING_MASK);
     const isMaskActive =
-      (!!readingMask && !readingMask.classList.contains('hidden')) ||
-      isBtnActive('btn-reading-mask') ||
+      (!!readingMask && !readingMask.classList.contains(WAW_CSS_CLASSES.HIDDEN)) ||
+      isBtnActive(WAW_FEATURE_BUTTON_IDS.READING_MASK) ||
       parsedStates?.reading_mask === true;
     this.isReadingMaskActive.set(isMaskActive);
 
     // 9. Lector de Pantalla / Voz
     const isVoice =
-      isBtnActive('btn-voice-reading') ||
+      isBtnActive(WAW_FEATURE_BUTTON_IDS.SCREEN_READER) ||
       parsedStates?.voice_reading === true;
     this.isScreenReaderActive.set(isVoice);
 
     // 10. Sonido / Mute (en WAW sound === false significa silenciado)
-    const muteIndicator = document.getElementById('waw-mute-indicator');
+    const muteIndicator = this.document.getElementById(WAW_DOM_IDS.MUTE_INDICATOR);
     const isMutedState =
-      (!!muteIndicator && muteIndicator.classList.contains('active')) ||
-      isBtnActive('btn-mute-sound') ||
+      (!!muteIndicator && muteIndicator.classList.contains(WAW_CSS_CLASSES.ACTIVE)) ||
+      isBtnActive(WAW_FEATURE_BUTTON_IDS.MUTE) ||
       (parsedStates && typeof parsedStates.sound === 'boolean' ? !parsedStates.sound : false);
     this.isMuted.set(isMutedState);
 
     // Panel abierto/cerrado
-    const widget = document.getElementById('waw-widget');
-    const open = widget?.classList.contains('open') ?? (this.instance?.widget_open ?? false);
+    const widget = this.document.getElementById(WAW_DOM_IDS.WIDGET);
+    const open = widget?.classList.contains(WAW_CSS_CLASSES.OPEN) ?? (this.instance?.widget_open ?? false);
     this.isWawOpen.set(open);
-    if (document.body) {
+
+    if (this.document.body) {
       if (open) {
-        this.renderer.addClass(document.body, 'waw-panel-open');
+        this.renderer.addClass(this.document.body, WAW_CSS_CLASSES.PANEL_OPEN);
       } else {
-        this.renderer.removeClass(document.body, 'waw-panel-open');
+        this.renderer.removeClass(this.document.body, WAW_CSS_CLASSES.PANEL_OPEN);
       }
     }
-    const overlay = document.getElementById('waw-backdrop-overlay');
+
+    const overlay = this.document.getElementById(WAW_DOM_IDS.BACKDROP_OVERLAY);
     if (overlay && !open) {
-      this.renderer.removeClass(overlay, 'visible');
+      this.renderer.removeClass(overlay, WAW_CSS_CLASSES.OVERLAY_VISIBLE);
     }
     if (widget && !open && !widget.hasAttribute('inert')) {
       this.renderer.setAttribute(widget, 'inert', '');
@@ -313,35 +397,37 @@ export class WawAccessibilityService {
    * Manejo accesible por teclado: Esc para cerrar el panel y devolver el foco
    */
   private registerKeyboardListener(): void {
-    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+    if (!isPlatformBrowser(this.platformId) || typeof window === 'undefined') return;
 
-    document.addEventListener('keydown', (event: KeyboardEvent) => {
+    const unlisten = this.renderer.listen(this.document, 'keydown', (event: KeyboardEvent) => {
       if (event.key === 'Escape' && this.isOpen()) {
         event.preventDefault();
         this.close();
       }
     });
+    this.unlisteners.push(unlisten);
   }
 
   /**
    * Crea o asegura la existencia de un backdrop overlay seguro para WAW
    */
   private ensureOverlay(): HTMLElement | null {
-    if (typeof document === 'undefined') return null;
-
-    let overlay = document.getElementById('waw-backdrop-overlay');
+    let overlay = this.document.getElementById(WAW_DOM_IDS.BACKDROP_OVERLAY);
     if (!overlay) {
       overlay = this.renderer.createElement('div') as HTMLElement;
-      this.renderer.setProperty(overlay, 'id', 'waw-backdrop-overlay');
-      this.renderer.addClass(overlay, 'waw-custom-backdrop');
+      this.renderer.setProperty(overlay, 'id', WAW_DOM_IDS.BACKDROP_OVERLAY);
+      this.renderer.addClass(overlay, WAW_CSS_CLASSES.OVERLAY_CUSTOM);
       this.renderer.setAttribute(overlay, 'aria-hidden', 'true');
-      overlay.addEventListener('click', (e) => {
+
+      const unlisten = this.renderer.listen(overlay, 'click', (e: Event) => {
         e.preventDefault();
         e.stopPropagation();
         this.close();
       });
-      if (document.body) {
-        this.renderer.appendChild(document.body, overlay);
+      this.unlisteners.push(unlisten);
+
+      if (this.document.body) {
+        this.renderer.appendChild(this.document.body, overlay);
       }
     }
     return overlay;
@@ -351,88 +437,88 @@ export class WawAccessibilityService {
    * Abre el panel de WAW eliminando el atributo 'inert' y mostrando el overlay
    */
   async open(triggerElement?: HTMLElement): Promise<void> {
-    if (!isPlatformBrowser(this.platformId) || typeof window === 'undefined' || typeof document === 'undefined') return;
+    if (!isPlatformBrowser(this.platformId) || typeof window === 'undefined') return;
 
     if (triggerElement) {
       this.lastFocusedElement = triggerElement;
-    } else if (document.activeElement instanceof HTMLElement) {
-      this.lastFocusedElement = document.activeElement;
+    } else if (this.document.activeElement instanceof HTMLElement) {
+      this.lastFocusedElement = this.document.activeElement;
     }
 
     if (!this.isInitialized) {
       await this.init();
     }
 
-    const widget = document.getElementById('waw-widget');
+    const widget = this.document.getElementById(WAW_DOM_IDS.WIDGET);
     if (widget) {
       this.renderer.removeAttribute(widget, 'inert');
     }
 
     const overlay = this.ensureOverlay();
     if (overlay) {
-      this.renderer.addClass(overlay, 'visible');
+      this.renderer.addClass(overlay, WAW_CSS_CLASSES.OVERLAY_VISIBLE);
     }
 
     if (this.instance && typeof this.instance.open === 'function') {
       this.instance.open();
     } else {
-      const openBtn = document.getElementById('open-button');
+      const openBtn = this.document.getElementById(WAW_DOM_IDS.OPEN_BUTTON);
       if (openBtn) {
         openBtn.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
       }
     }
 
     if (widget) {
-      this.renderer.addClass(widget, 'open');
+      this.renderer.addClass(widget, WAW_CSS_CLASSES.OPEN);
       this.renderer.removeAttribute(widget, 'inert');
     }
-    if (document.body) {
-      this.renderer.addClass(document.body, 'waw-panel-open');
+    if (this.document.body) {
+      this.renderer.addClass(this.document.body, WAW_CSS_CLASSES.PANEL_OPEN);
     }
 
     this.syncStates();
   }
 
   /**
-   * Alias explícito para apertura de panel completo
+   * Apertura programada limpia de panel completo desacoplada de timeouts mágicos
    */
   async openFullWawPanel(triggerElement?: HTMLElement, event?: Event): Promise<void> {
     if (event) {
       event.preventDefault();
       event.stopPropagation();
     }
-    setTimeout(() => {
+    queueMicrotask(() => {
       this.open(triggerElement);
-    }, 10);
+    });
   }
 
   /**
    * Cierra el panel de WAW, restaura 'inert' y devuelve el foco
    */
   close(): void {
-    if (!isPlatformBrowser(this.platformId) || typeof window === 'undefined' || typeof document === 'undefined') return;
+    if (!isPlatformBrowser(this.platformId) || typeof window === 'undefined') return;
 
-    const overlay = document.getElementById('waw-backdrop-overlay');
+    const overlay = this.document.getElementById(WAW_DOM_IDS.BACKDROP_OVERLAY);
     if (overlay) {
-      this.renderer.removeClass(overlay, 'visible');
+      this.renderer.removeClass(overlay, WAW_CSS_CLASSES.OVERLAY_VISIBLE);
     }
 
     if (this.instance && typeof this.instance.close === 'function') {
       this.instance.close();
     } else {
-      const closeBtn = document.getElementById('close-button');
+      const closeBtn = this.document.getElementById(WAW_DOM_IDS.CLOSE_BUTTON);
       if (closeBtn) {
         closeBtn.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
       }
     }
 
-    const widget = document.getElementById('waw-widget');
+    const widget = this.document.getElementById(WAW_DOM_IDS.WIDGET);
     if (widget) {
-      this.renderer.removeClass(widget, 'open');
+      this.renderer.removeClass(widget, WAW_CSS_CLASSES.OPEN);
       this.renderer.setAttribute(widget, 'inert', '');
     }
-    if (document.body) {
-      this.renderer.removeClass(document.body, 'waw-panel-open');
+    if (this.document.body) {
+      this.renderer.removeClass(this.document.body, WAW_CSS_CLASSES.PANEL_OPEN);
     }
 
     if (this.lastFocusedElement && typeof this.lastFocusedElement.focus === 'function') {
@@ -458,56 +544,44 @@ export class WawAccessibilityService {
    * Verifica si el panel WAW está visible actualmente
    */
   isOpen(): boolean {
-    if (!isPlatformBrowser(this.platformId) || typeof document === 'undefined') return false;
-    const widget = document.getElementById('waw-widget');
-    return widget?.classList.contains('open') ?? (this.instance?.widget_open ?? false);
+    if (!isPlatformBrowser(this.platformId)) return false;
+    const widget = this.document.getElementById(WAW_DOM_IDS.WIDGET);
+    return widget?.classList.contains(WAW_CSS_CLASSES.OPEN) ?? (this.instance?.widget_open ?? false);
   }
 
   /**
-   * Restablece todas las funciones del widget WAW y limpia clases globales
+   * Restablece todas las funciones del widget WAW y limpia clases globales con Renderer2
    */
   reset(): void {
-    if (!isPlatformBrowser(this.platformId) || typeof document === 'undefined') return;
+    if (!isPlatformBrowser(this.platformId)) return;
 
     if (this.instance && typeof this.instance.resetFunctions === 'function') {
       this.instance.resetFunctions();
     } else {
-      const resetBtn = document.querySelector('[data-waw-function="reset"]') as HTMLElement | null;
+      const resetBtn = this.document.querySelector('[data-waw-function="reset"]') as HTMLElement | null;
       if (resetBtn) {
         resetBtn.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
       }
     }
 
-    document.documentElement.classList.remove(
-      'WAWDyslexicFont',
-      'WAWBigCursor',
-      'WAWNoAnimations',
-      'WAWHideImages',
-      'WAWHighlightLinks',
-      'WAWHighlightHeaders',
-      'WAWGreyscale',
-      'WAWInvertedColor'
-    );
+    ALL_WAW_ROOT_CLASSES.forEach((cls) => {
+      this.renderer.removeClass(this.document.documentElement, cls);
+    });
 
-    const activeButtons = document.querySelectorAll('.waw .opcion.active, #waw-mute-indicator.active');
-    activeButtons.forEach(btn => this.renderer.removeClass(btn, 'active'));
+    const activeButtons = this.document.querySelectorAll('.waw .opcion.active, #waw-mute-indicator.active');
+    activeButtons.forEach((btn) => this.renderer.removeClass(btn, WAW_CSS_CLASSES.ACTIVE));
 
-    const readingMask = document.getElementById('waw-reading-mask');
+    const readingMask = this.document.getElementById(WAW_DOM_IDS.READING_MASK);
     if (readingMask) {
-      this.renderer.addClass(readingMask, 'hidden');
+      this.renderer.addClass(readingMask, WAW_CSS_CLASSES.HIDDEN);
     }
 
-    const readingLine = document.getElementById('waw-reading-line');
+    const readingLine = this.document.getElementById(WAW_DOM_IDS.READING_LINE);
     if (readingLine) {
-      this.renderer.addClass(readingLine, 'hidden');
+      this.renderer.addClass(readingLine, WAW_CSS_CLASSES.HIDDEN);
     }
 
-    try {
-      localStorage.removeItem('wawStates');
-    } catch {
-      // ignore
-    }
-
+    this.clearStoredStates();
     this.syncStates();
   }
 
@@ -516,13 +590,13 @@ export class WawAccessibilityService {
    * Utiliza UN SOLO evento sintético 'click' con bubbles: true para evitar el efecto de doble rebote.
    */
   async clickFeatureButton(btnId: string): Promise<void> {
-    if (!isPlatformBrowser(this.platformId) || typeof document === 'undefined') return;
+    if (!isPlatformBrowser(this.platformId)) return;
 
     if (!this.isInitialized) {
       await this.init();
     }
 
-    const widget = document.getElementById('waw-widget');
+    const widget = this.document.getElementById(WAW_DOM_IDS.WIDGET);
     const wasInert = widget ? widget.hasAttribute('inert') : false;
 
     // 1. Remover atributo 'inert' ANTES de ejecutar el clic para permitir despacho del evento
@@ -530,9 +604,8 @@ export class WawAccessibilityService {
       this.renderer.removeAttribute(widget, 'inert');
     }
 
-    const btn = document.getElementById(btnId);
+    const btn = this.document.getElementById(btnId);
     if (btn) {
-      // Despacho único y limpio mediante dispatchEvent con bubbles: true
       btn.dispatchEvent(
         new MouseEvent('click', {
           bubbles: true,
@@ -554,26 +627,17 @@ export class WawAccessibilityService {
   /**
    * Toggle genérico para accesos rápidos con bypass de 'inert'
    */
-  async toggleQuickOption(optionKey: string, event?: Event): Promise<void> {
+  async toggleQuickOption(optionKey: WawFeatureKey | string, event?: Event): Promise<void> {
     if (event) {
       event.preventDefault();
       event.stopPropagation();
     }
 
-    const buttonMap: Record<string, string> = {
-      dyslexia: 'btn-apto-dislexia',
-      'reading-line': 'btn-reading-line',
-      'reading-mask': 'btn-reading-mask',
-      'big-cursor': 'btn-big-cursor',
-      'screen-reader': 'btn-voice-reading',
-      animations: 'btn-animations',
-      links: 'btn-highlight-links',
-      headers: 'btn-highlight-headers',
-      'hide-img': 'btn-hide-img',
-      mute: 'btn-mute-sound',
-    };
+    const targetBtnId =
+      optionKey in WAW_FEATURE_MAP
+        ? WAW_FEATURE_MAP[optionKey as WawFeatureKey]
+        : optionKey;
 
-    const targetBtnId = buttonMap[optionKey] || optionKey;
     await this.clickFeatureButton(targetBtnId);
   }
 

@@ -1,7 +1,9 @@
-import { Component, ChangeDetectionStrategy, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { PreferencesService } from '../../services/preferences.service';
 import { WawAccessibilityService } from '@app/core/services/waw-accessibility.service';
+import { WawFeatureKey } from '@app/core/constants/waw.constants';
 
 @Component({
   selector: 'app-accessibility-sidebar',
@@ -13,7 +15,12 @@ import { WawAccessibilityService } from '@app/core/services/waw-accessibility.se
 export class AccessibilitySidebarComponent {
   public preferencesService = inject(PreferencesService);
   public wawService = inject(WawAccessibilityService);
-  private cdr = inject(ChangeDetectorRef);
+
+  // Señales reactivas derivadas de PreferencesService (Angular 21)
+  public sidebarOpen = toSignal(this.preferencesService.sidebarOpen$, { initialValue: false });
+  public language = toSignal(this.preferencesService.language$, { initialValue: 'es' });
+  public theme = toSignal(this.preferencesService.theme$, { initialValue: 'gradient-5' });
+  public fontSize = toSignal(this.preferencesService.fontSize$, { initialValue: 16 });
 
   get backgroundOptions() {
     return this.preferencesService.backgroundOptions;
@@ -26,51 +33,42 @@ export class AccessibilitySidebarComponent {
     }
     this.preferencesService.closeSidebar();
     await this.wawService.openFullWawPanel(undefined, event);
-    this.cdr.markForCheck();
   }
 
   async openWawWidget(event?: Event): Promise<void> {
     await this.openFullWawPanel(event);
   }
 
-  async toggleQuickOption(optionKey: string, event?: Event): Promise<void> {
+  async toggleQuickOption(optionKey: WawFeatureKey | string, event?: Event): Promise<void> {
     await this.wawService.toggleQuickOption(optionKey, event);
-    this.cdr.markForCheck();
   }
 
   async toggleDyslexia(event?: Event): Promise<void> {
     await this.wawService.toggleDyslexia(event);
-    this.cdr.markForCheck();
   }
 
   async toggleReadingLine(event?: Event): Promise<void> {
     await this.wawService.toggleReadingLine(event);
-    this.cdr.markForCheck();
   }
 
   async toggleReadingMask(event?: Event): Promise<void> {
     await this.wawService.toggleReadingMask(event);
-    this.cdr.markForCheck();
   }
 
   async toggleBigCursor(event?: Event): Promise<void> {
     await this.wawService.toggleBigCursor(event);
-    this.cdr.markForCheck();
   }
 
   async toggleScreenReader(event?: Event): Promise<void> {
     await this.wawService.toggleScreenReader(event);
-    this.cdr.markForCheck();
   }
 
   async toggleStopAnimations(event?: Event): Promise<void> {
     await this.wawService.toggleStopAnimations(event);
-    this.cdr.markForCheck();
   }
 
   resetAll(): void {
     this.preferencesService.resetPreferences();
     this.wawService.reset();
-    this.cdr.markForCheck();
   }
 }

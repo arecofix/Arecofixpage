@@ -208,7 +208,7 @@ describe('WawAccessibilityService', () => {
       document.body.classList.add('waw-panel-open');
       service.isWawOpen.set(true);
 
-      (service as any).setupCloseButtonListener();
+      service.setupCloseButtonListener();
 
       closeBtn.click();
 
@@ -236,6 +236,21 @@ describe('WawAccessibilityService', () => {
       expect(document.documentElement.classList.contains('WAWBigCursor')).toBe(false);
       expect(service.isDyslexiaActive()).toBe(false);
       expect(service.isBigCursorActive()).toBe(false);
+    });
+
+    it('scheduleSyncStates() debe ejecutar syncStates en el siguiente frame', (done) => {
+      const syncSpy = jest.spyOn(service, 'syncStates');
+      service.scheduleSyncStates();
+
+      requestAnimationFrame(() => {
+        expect(syncSpy).toHaveBeenCalled();
+        done();
+      });
+    });
+
+    it('destroy() debe limpiar observadores, unlisteners y timers sin arrojar errores', async () => {
+      await service.init();
+      expect(() => service.destroy()).not.toThrow();
     });
   });
 
