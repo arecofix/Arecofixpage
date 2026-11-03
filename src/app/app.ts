@@ -13,6 +13,7 @@ import { filter } from 'rxjs/operators';
 import { isPlatformBrowser } from '@angular/common';
 import { ToastComponent } from './shared/components/toast/toast.component';
 import { RibbonMenuComponent } from './shared/components/ribbon-menu/ribbon-menu.component';
+import { WawWidgetComponent } from './shared/components/waw-widget/waw-widget.component';
 import { AnalyticsService } from './core/services/analytics.service';
 import { LoggerService } from './core/services/logger.service';
 import { SeoService } from './core/services/seo.service';
@@ -35,6 +36,7 @@ import { IEventBus } from './domain/events/event-bus.interface';
     RouterOutlet,
     ToastComponent,
     RibbonMenuComponent,
+    WawWidgetComponent,
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   changeDetection: ChangeDetectionStrategy.Default,

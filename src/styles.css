@@ -744,5 +744,42 @@ cdk-virtual-scroll-viewport,
   pointer-events: none;
 }
 
+/* ==========================================================================
+   WAW ACCESSIBILITY WIDGET & OVERLAP PREVENTION (GLOBAL STYLES)
+   ========================================================================== */
+#waw-widget,
+.waw-panel,
+.waw {
+  z-index: 2147483647 !important;
+}
+
+#waw-widget[inert] {
+  opacity: 1 !important;
+}
+
+body.waw-panel-open app-accessibility-sidebar > button,
+body.accessibility-sidebar-open app-accessibility-sidebar > button {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+body.waw-panel-open app-ai-chatbot,
+body.accessibility-sidebar-open app-ai-chatbot {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+#waw-reading-mask.hidden,
+.waw-reading-mask.hidden,
+#waw-reading-line.hidden,
+.waw-reading-line.hidden {
+  display: none !important;
+}
+
+
 
 

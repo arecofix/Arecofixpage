@@ -85,9 +85,9 @@ export class PreferencesService {
   private toggleBodyScroll(lock: boolean): void {
     if (!isPlatformBrowser(this.platformId)) return;
     if (lock) {
-      document.body.classList.add('overflow-hidden', 'touch-none');
+      document.body.classList.add('overflow-hidden', 'touch-none', 'accessibility-sidebar-open');
     } else {
-      document.body.classList.remove('overflow-hidden', 'touch-none');
+      document.body.classList.remove('overflow-hidden', 'touch-none', 'accessibility-sidebar-open');
     }
   }
 
@@ -146,6 +146,20 @@ export class PreferencesService {
 
   getCurrentTheme(): string {
     return this.themeSubject.value;
+  }
+
+  resetPreferences(): void {
+    this.fontSizeSubject.next(16);
+    this.savePreference('portfolio-font-size', '16');
+    this.applyFontSize(16);
+
+    if (this.highContrastSubject.value) {
+      this.highContrastSubject.next(false);
+      this.savePreference('portfolio-high-contrast', 'false');
+      this.applyHighContrast(false);
+    }
+
+    this.setTheme('system');
   }
 
   private savePreference(key: string, value: string): void {
