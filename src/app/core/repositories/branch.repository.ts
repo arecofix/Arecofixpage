@@ -47,7 +47,7 @@ export class BranchRepository extends BaseRepository<Branch> {
           .select(options?.select || '*')
           .eq(column, value);
         if (error || !data) return [];
-        return data as Branch[];
+        return data as unknown as Branch[];
       })()
     );
   }
@@ -63,7 +63,7 @@ export class BranchRepository extends BaseRepository<Branch> {
           .eq('id', id)
           .maybeSingle();
         if (error || !data) return null;
-        return data as Branch;
+        return data as unknown as Branch;
       })()
     );
   }
