@@ -26,7 +26,6 @@ export class BranchService {
   private supabaseService = inject(SupabaseService);
   private logger = inject(LoggerService);
   private branchContextService = inject(BranchContextService);
-  
   private publicResolver = inject(PublicBranchIdentityResolver);
   private _currentBranch = signal<Branch | null>(null);
   public currentBranch = this._currentBranch.asReadonly();
