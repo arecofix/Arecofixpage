@@ -103,10 +103,35 @@ export class BranchService {
 
     if (this._currentBranch()?.id === validId) return;
 
-    // Try to find in cache or repo
+    // 1. Intentar resolver de forma pública segura vía RPC anti-enumeración (sin tax_id ni bank_info)
+    const publicIdentity = await this.publicResolver.resolveById(validId);
+    if (publicIdentity) {
+      const branch: Branch = {
+        id: publicIdentity.id,
+        name: publicIdentity.name,
+        official_name: publicIdentity.officialName || undefined,
+        slug: publicIdentity.slug,
+        address: publicIdentity.address || '',
+        is_active: true,
+        global_markup_percentage: 0,
+        contact_phone: publicIdentity.contactPhone || undefined,
+        whatsapp_number: publicIdentity.whatsappNumber || undefined,
+        contact_email: publicIdentity.contactEmail || undefined,
+        branding_settings: publicIdentity.brandingSettings as Branch['branding_settings'],
+        tenant_id: publicIdentity.tenantId,
+        updated_at: publicIdentity.updatedAt,
+      };
+      if (branch.slug) this.branchCache.set(branch.slug, branch);
+      this.setCurrentBranch(branch);
+      return;
+    }
+
+    // 2. Si no es pública o es ruta autenticada, delegar al repositorio bajo RLS
     const branches = await firstValueFrom(this.branchRepo.getWhere('id', validId));
     if (branches && branches.length > 0) {
-      this.setCurrentBranch(branches[0] as Branch);
+      const branch = branches[0] as Branch;
+      if (branch.slug) this.branchCache.set(branch.slug, branch);
+      this.setCurrentBranch(branch);
     } else {
       console.warn('[BranchService] Branch not found by ID:', validId);
       this.setCurrentBranch(null);

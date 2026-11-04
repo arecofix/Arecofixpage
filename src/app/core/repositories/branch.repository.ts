@@ -29,7 +29,7 @@ export class BranchRepository extends BaseRepository<Branch> {
 
   /**
    * Safe getter: Tries authenticated 'branches' table first; if empty or unauthenticated (e.g. public storefront),
-   * falls back to the safe 'public_branch_profile' view which strips sensitive banking/tax columns.
+   * falls back to the safe anti-enumeration RPCs which strip sensitive banking/tax columns.
    */
   override getWhere(
     column: string,
@@ -42,12 +42,24 @@ export class BranchRepository extends BaseRepository<Branch> {
         if (primary && primary.length > 0) {
           return primary;
         }
-        const { data, error } = await this.supabase
-          .from('public_branch_profile')
-          .select(options?.select || '*')
-          .eq(column, value);
-        if (error || !data) return [];
-        return data as unknown as Branch[];
+
+        if (column === 'slug') {
+          const { data, error } = await this.supabase
+            .rpc('get_public_branch', { p_slug: String(value) })
+            .maybeSingle();
+          if (error || !data) return [];
+          return [data as unknown as Branch];
+        }
+
+        if (column === 'id') {
+          const { data, error } = await this.supabase
+            .rpc('get_public_branch_by_id', { p_id: String(value) })
+            .maybeSingle();
+          if (error || !data) return [];
+          return [data as unknown as Branch];
+        }
+
+        return [];
       })()
     );
   }
@@ -57,11 +69,11 @@ export class BranchRepository extends BaseRepository<Branch> {
       (async () => {
         const primary = await firstValueFrom(super.getById(id, options));
         if (primary) return primary;
+
         const { data, error } = await this.supabase
-          .from('public_branch_profile')
-          .select(options?.select || '*')
-          .eq('id', id)
+          .rpc('get_public_branch_by_id', { p_id: id })
           .maybeSingle();
+
         if (error || !data) return null;
         return data as unknown as Branch;
       })()

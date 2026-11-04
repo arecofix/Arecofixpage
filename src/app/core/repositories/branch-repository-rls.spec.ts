@@ -12,6 +12,7 @@ describe('BranchRepository - Public Fallback Security', () => {
   beforeEach(() => {
     mockSupabase = {
       from: jest.fn(),
+      rpc: jest.fn(),
       auth: {
         onAuthStateChange: jest.fn().mockReturnValue({ data: { subscription: { unsubscribe: jest.fn() } } }),
         getSession: jest.fn().mockResolvedValue({ data: { session: null } }),
@@ -41,7 +42,7 @@ describe('BranchRepository - Public Fallback Security', () => {
     repository = TestBed.inject(BranchRepository);
   });
 
-  it('should fall back to public_branch_profile when branches table returns empty for getWhere', async () => {
+  it('should fall back to get_public_branch RPC when branches table returns empty for slug query', async () => {
     const publicBranch = {
       id: 'branch-1',
       name: 'Central',
@@ -63,23 +64,25 @@ describe('BranchRepository - Public Fallback Security', () => {
           })
         };
       }
-      if (tableName === 'public_branch_profile') {
+      return {};
+    });
+
+    mockSupabase.rpc.mockImplementation((fnName: string) => {
+      if (fnName === 'get_public_branch') {
         return {
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockResolvedValue({ data: [publicBranch], error: null })
-          })
+          maybeSingle: jest.fn().mockResolvedValue({ data: publicBranch, error: null })
         };
       }
-      return {};
+      return { maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }) };
     });
 
     const result = await firstValueFrom(repository.getWhere('slug', 'central'));
     expect(result).toEqual([publicBranch]);
     expect(mockSupabase.from).toHaveBeenCalledWith('branches');
-    expect(mockSupabase.from).toHaveBeenCalledWith('public_branch_profile');
+    expect(mockSupabase.rpc).toHaveBeenCalledWith('get_public_branch', { p_slug: 'central' });
   });
 
-  it('should fall back to public_branch_profile when branches table returns null for getById', async () => {
+  it('should fall back to get_public_branch_by_id RPC when branches table returns null for getById', async () => {
     const publicBranch = {
       id: 'branch-2',
       name: 'Sucursal 2',
@@ -96,21 +99,21 @@ describe('BranchRepository - Public Fallback Security', () => {
           })
         };
       }
-      if (tableName === 'public_branch_profile') {
+      return {};
+    });
+
+    mockSupabase.rpc.mockImplementation((fnName: string) => {
+      if (fnName === 'get_public_branch_by_id') {
         return {
-          select: jest.fn().mockReturnValue({
-            eq: jest.fn().mockReturnValue({
-              maybeSingle: jest.fn().mockResolvedValue({ data: publicBranch, error: null })
-            })
-          })
+          maybeSingle: jest.fn().mockResolvedValue({ data: publicBranch, error: null })
         };
       }
-      return {};
+      return { maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }) };
     });
 
     const result = await firstValueFrom(repository.getById('branch-2'));
     expect(result).toEqual(publicBranch);
     expect(mockSupabase.from).toHaveBeenCalledWith('branches');
-    expect(mockSupabase.from).toHaveBeenCalledWith('public_branch_profile');
+    expect(mockSupabase.rpc).toHaveBeenCalledWith('get_public_branch_by_id', { p_id: 'branch-2' });
   });
 });

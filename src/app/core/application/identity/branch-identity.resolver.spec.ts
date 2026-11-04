@@ -66,6 +66,37 @@ describe('Branch Identity Resolvers (Public vs Authenticated)', () => {
       expect((result as any).bank_info).toBeUndefined();
     });
 
+    it('resolveById calls get_public_branch_by_id RPC and returns sanitized public identity without taxId or bankInfo', async () => {
+      const rpcData = {
+        id: 'branch-100',
+        name: 'Sucursal Centro',
+        official_name: 'Sucursal Centro SRL',
+        slug: 'centro',
+        address: 'Calle Falsa 123',
+        contact_phone: '1122334455',
+        whatsapp_number: '5491122334455',
+        contact_email: 'centro@empresa.com',
+        branding_settings: { primary_color: '#3b82f6' },
+        tenant_id: 'tenant-1',
+        updated_at: '2026-11-04T12:00:00Z',
+      };
+
+      mockSupabase.rpc.mockReturnValue({
+        maybeSingle: jest.fn().mockResolvedValue({ data: rpcData, error: null }),
+      });
+
+      const result = await publicResolver.resolveById('branch-100');
+
+      expect(mockSupabase.rpc).toHaveBeenCalledWith('get_public_branch_by_id', { p_id: 'branch-100' });
+      expect(result).toBeDefined();
+      expect(result?.id).toBe('branch-100');
+      expect(result?.slug).toBe('centro');
+      expect((result as any).taxId).toBeUndefined();
+      expect((result as any).tax_id).toBeUndefined();
+      expect((result as any).bankInfo).toBeUndefined();
+      expect((result as any).bank_info).toBeUndefined();
+    });
+
     it('returns null if slug does not exist or RPC returns null', async () => {
       mockSupabase.rpc.mockReturnValue({
         maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
