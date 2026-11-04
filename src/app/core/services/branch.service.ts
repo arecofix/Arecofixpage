@@ -11,6 +11,7 @@ import { Branch } from '@app/shared/interfaces/branch.interface';
 export type { Branch };
 
 import { BranchContextService } from './branch-context.service';
+import { PublicBranchIdentityResolver } from '../application/identity/public-branch-identity.resolver';
 import { SupabaseService } from './supabase.service';
 import { assertUuid } from '../utils/uuid.utils';
 
@@ -26,6 +27,7 @@ export class BranchService {
   private logger = inject(LoggerService);
   private branchContextService = inject(BranchContextService);
   
+  private publicResolver = inject(PublicBranchIdentityResolver);
   private _currentBranch = signal<Branch | null>(null);
   public currentBranch = this._currentBranch.asReadonly();
   public currentBranchId = computed(() => this._currentBranch()?.id || null);
@@ -170,13 +172,33 @@ export class BranchService {
       return null;
     }
 
-    // Delega al repositorio buscar de forma aislada
+    // 1. Intentar resolver de forma pública segura vía RPC anti-enumeración (sin tax_id ni bank_info)
+    const publicIdentity = await this.publicResolver.resolveBySlug(slug);
+    if (publicIdentity) {
+      const branch: Branch = {
+        id: publicIdentity.id,
+        name: publicIdentity.name,
+        official_name: publicIdentity.officialName || undefined,
+        slug: publicIdentity.slug,
+        address: publicIdentity.address || '',
+        is_active: true,
+        global_markup_percentage: 0,
+        contact_phone: publicIdentity.contactPhone || undefined,
+        whatsapp_number: publicIdentity.whatsappNumber || undefined,
+        contact_email: publicIdentity.contactEmail || undefined,
+        branding_settings: publicIdentity.brandingSettings as Branch['branding_settings'],
+        tenant_id: publicIdentity.tenantId,
+        updated_at: publicIdentity.updatedAt,
+      };
+      this.branchCache.set(slug, branch);
+      return branch;
+    }
+
+    // 2. Si es una ruta autenticada y el RPC no encontró datos, delegar al repositorio bajo RLS
     const branches = await firstValueFrom(this.branchRepo.getWhere('slug', slug));
-    
     if (!branches || branches.length === 0 || !branches[0].is_active) {
       return null;
     }
-
     const branch = branches[0] as Branch;
     this.branchCache.set(slug, branch);
     return branch;
