@@ -43,6 +43,31 @@ export interface InvoiceFormItemRow {
   taxRate: ArcaVatRate;
 }
 
+function createDefaultEmitter(): ArcaEmitterData {
+  return {
+    businessName: '',
+    cuit: '',
+    commercialAddress: '',
+    vatCondition: 'IVA Responsable Inscripto',
+    iibb: '',
+    activityStartDate: '01/03/2021',
+    pointOfSale: '00004',
+    phone: '',
+    email: '',
+    logoUrl: '',
+  };
+}
+
+function createDefaultCustomer(): ArcaCustomerData {
+  return {
+    name: 'Consumidor Final',
+    docType: 'DNI',
+    docNumber: '',
+    vatCondition: 'Consumidor Final',
+    address: '',
+    email: '',
+  };
+}
 let rowIdSequence = 0;
 function createDefaultRow(): InvoiceFormItemRow {
   return {
@@ -73,18 +98,7 @@ export class InvoiceFormModalComponent implements OnInit {
   invoiceCreated = output<CreateInvoiceDto>();
 
   // ── Emisor (Empresa) ────────────────────────────────────────────────────────
-  emitter = signal<ArcaEmitterData>({
-    businessName: '',
-    cuit: '',
-    commercialAddress: '',
-    vatCondition: 'IVA Responsable Inscripto',
-    iibb: '',
-    activityStartDate: '01/03/2021',
-    pointOfSale: '00004',
-    phone: '',
-    email: '',
-    logoUrl: '',
-  });
+  emitter = signal<ArcaEmitterData>(createDefaultEmitter());
 
   // ── Form State ──────────────────────────────────────────────────────────────
   invoiceType = signal<ArcaInvoiceType>('B');
@@ -96,14 +110,7 @@ export class InvoiceFormModalComponent implements OnInit {
   discount = signal<number>(0);
 
   // ── Customer State ──────────────────────────────────────────────────────────
-  customer = signal<ArcaCustomerData>({
-    name: 'Consumidor Final',
-    docType: 'DNI',
-    docNumber: '',
-    vatCondition: 'Consumidor Final',
-    address: '',
-    email: '',
-  });
+  customer = signal<ArcaCustomerData>(createDefaultCustomer());
 
   // ── Items State ─────────────────────────────────────────────────────────────
   items = signal<InvoiceFormItemRow[]>([createDefaultRow()]);
