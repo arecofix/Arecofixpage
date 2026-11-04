@@ -379,6 +379,7 @@ export class AdminInvoiceDetailPage implements OnInit {
       paymentMethod: (inv.payment_method as any) || 'cash',
       grandTotal: inv.total_amount,
       emitterVatCondition: emitter.vatCondition,
+      emitterTaxId: emitter.cuit,
     });
 
     if (!validation.isValid) {
@@ -432,14 +433,14 @@ export class AdminInvoiceDetailPage implements OnInit {
     const c = this.company();
     return {
       businessName: c?.name || 'Arecofix',
-      cuit: c?.tax_id || '20438529161',
-      commercialAddress: c?.address || c?.location || 'Jorge Newbery 69, Buenos Aires',
+      cuit: c?.tax_id || '',
+      commercialAddress: c?.address || c?.location || '',
       vatCondition: (c?.vat_condition as ArcaVatCondition) || 'IVA Responsable Inscripto',
-      iibb: c?.iibb || c?.tax_id || '20438529161',
+      iibb: c?.iibb || c?.tax_id || '',
       activityStartDate: c?.activity_start_date || '01/03/2021',
       pointOfSale: c?.point_of_sale ? String(c.point_of_sale) : '00004',
-      phone: c?.phone || '1125960900',
-      email: c?.email || 'ezequielneryo15@gmail.com',
+      phone: c?.phone || '',
+      email: c?.email || '',
       logoUrl: c?.logo_url || '',
     };
   }

@@ -197,6 +197,7 @@ describe('CalculateArcaTotalsUseCase & Fiscal Rules (RG 5614/2024 / Ley 27.743)'
       items: [{ description: 'Servicio técnico', quantity: 1, unit_price: 1000, tax_rate: 0.21 }],
       paymentMethod: 'cash' as const,
       grandTotal: 1000,
+      emitterTaxId: '30716492819',
     };
 
     it('Si el emisor es Monotributista y se intenta emitir Factura A → error', () => {

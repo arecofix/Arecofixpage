@@ -154,10 +154,14 @@ export class InvoicePdfExportService {
     doc.text(`Fecha de Emisión: ${issueDate}`, rightX, currY);
 
     currY += 4;
-    doc.text(`CUIT: ${emitter.cuit || '30-71649281-9'}`, rightX, currY);
+    if (emitter.cuit) {
+      doc.text(`CUIT: ${emitter.cuit}`, rightX, currY);
+    }
 
     currY += 4;
-    doc.text(`Ingresos Brutos: ${emitter.iibb || emitter.cuit || '30-71649281-9'}`, rightX, currY);
+    if (emitter.iibb || emitter.cuit) {
+      doc.text(`Ingresos Brutos: ${emitter.iibb || emitter.cuit}`, rightX, currY);
+    }
 
     currY += 4;
     doc.text(`Fecha de Inicio de Actividades: ${emitter.activityStartDate || '01/03/2021'}`, rightX, currY);

@@ -25,9 +25,11 @@ export class QrGeneratorService {
       ? new Date(invoice.issued_at).toISOString().substring(0, 10)
       : new Date().toISOString().substring(0, 10);
 
-    const cleanEmitterCuit = Number(
-      (emitter.cuit || '30716492819').replace(/\D/g, '')
-    ) || 30716492819;
+    const rawEmitterCuit = (emitter.cuit || '').replace(/\D/g, '');
+    if (!rawEmitterCuit || rawEmitterCuit.length !== 11) {
+      throw new Error('No se puede generar QR ARCA: CUIT de emisor inexistente o inválido (debe tener 11 dígitos).');
+    }
+    const cleanEmitterCuit = Number(rawEmitterCuit);
 
     const ptoVta = Number(
       (emitter.pointOfSale || '00004').toString().replace(/\D/g, '')

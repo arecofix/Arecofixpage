@@ -81,6 +81,7 @@
     <app-invoice-draft-banner
       [invoice]="invoice()"
       [emitterVatCondition]="emitterVatCondition()"
+      [emitterTaxId]="company()?.tax_id"
       [confirming]="confirming()"
       (confirmRequested)="handleConfirmDraft()"
     ></app-invoice-draft-banner>
@@ -168,11 +169,11 @@
               </div>
               <div class="data-row flex flex-wrap gap-1 items-baseline">
                 <span class="font-bold text-gray-900 dark:text-white shrink-0">CUIT:</span>
-                <span class="font-mono text-gray-700 dark:text-gray-300">{{ company()?.tax_id || '20438529161' }}</span>
+                <span class="font-mono text-gray-700 dark:text-gray-300">{{ company()?.tax_id || 'Sin CUIT registrado' }}</span>
               </div>
               <div class="data-row flex flex-wrap gap-1 items-baseline">
                 <span class="font-bold text-gray-900 dark:text-white shrink-0">Ingresos Brutos:</span>
-                <span class="font-mono text-gray-700 dark:text-gray-300">{{ company()?.iibb || company()?.tax_id || '20438529161' }}</span>
+                <span class="font-mono text-gray-700 dark:text-gray-300">{{ company()?.iibb || company()?.tax_id || 'Sin IIBB registrado' }}</span>
               </div>
               <div class="last-data-row flex flex-wrap gap-1 items-baseline">
                 <span class="font-bold text-gray-900 dark:text-white shrink-0">Fecha de Inicio de Actividades:</span>
@@ -508,7 +509,9 @@
         {{ company()?.name || 'ARECOFIX' }}
       </p>
       <p style="font-size: 9px; margin: 2px 0;">{{ company()?.address || 'Buenos Aires' }}</p>
-      <p style="font-size: 9px; margin: 1px 0;">CUIT: {{ company()?.tax_id || '30-71649281-9' }}</p>
+      @if (company()?.tax_id) {
+        <p style="font-size: 9px; margin: 1px 0;">CUIT: {{ company()?.tax_id }}</p>
+      }
       <p style="font-size: 9px; margin: 1px 0;">P.Vta: {{ formatPtoVta($any(company())?.point_of_sale || 4) }}</p>
     </div>
 

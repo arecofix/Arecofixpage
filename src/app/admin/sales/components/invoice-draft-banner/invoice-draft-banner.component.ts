@@ -20,6 +20,7 @@ import { Invoice } from '@app/features/sales/domain/entities/invoice.entity';
 export class InvoiceDraftBannerComponent {
   @Input() invoice: Invoice | null = null;
   @Input() emitterVatCondition?: string;
+  @Input() emitterTaxId?: string;
   @Input() confirming: boolean = false;
   @Output() confirmRequested = new EventEmitter<void>();
 
@@ -72,9 +73,15 @@ export class InvoiceDraftBannerComponent {
     return vat.includes('monotributo') || vat.includes('monotributista');
   });
 
+  hasValidEmitterTaxId = computed(() => {
+    const clean = (this.emitterTaxId || '').replace(/\D/g, '');
+    return clean.length === 11;
+  });
+
   canConfirm = computed(() => {
     const s = this.invoice?.status;
-    return s === 'draft' || s === 'pending_review' || s === 'stale';
+    const isStatusOk = s === 'draft' || s === 'pending_review' || s === 'stale';
+    return isStatusOk && this.hasValidEmitterTaxId();
   });
 
   onConfirm(): void {

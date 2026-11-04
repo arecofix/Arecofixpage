@@ -74,11 +74,11 @@ export class InvoiceFormModalComponent implements OnInit {
 
   // ── Emisor (Empresa) ────────────────────────────────────────────────────────
   emitter = signal<ArcaEmitterData>({
-    businessName: 'ARECOFIX SERVICIOS INTEGRALES',
-    cuit: '30-71649281-9',
-    commercialAddress: 'Av. San Martín 450, San Antonio de Areco',
+    businessName: '',
+    cuit: '',
+    commercialAddress: '',
     vatCondition: 'IVA Responsable Inscripto',
-    iibb: '30-71649281-9 (Conv. Multilateral)',
+    iibb: '',
     activityStartDate: '01/03/2021',
     pointOfSale: '00004',
     phone: '',
@@ -176,6 +176,7 @@ export class InvoiceFormModalComponent implements OnInit {
       paymentMethod: this.paymentMethod(),
       grandTotal: totals.grandTotal,
       emitterVatCondition: this.emitter().vatCondition,
+      emitterTaxId: this.emitter().cuit,
     });
   });
 

@@ -238,11 +238,11 @@ export class AdminInvoicesPage implements OnInit, OnDestroy {
   private async getEmitterData(): Promise<ArcaEmitterData> {
     const c = await this.companyService.getSettings();
     return {
-      businessName: c?.name || 'ARECOFIX SERVICIOS INTEGRALES',
-      cuit: c?.tax_id || '30-71649281-9',
-      commercialAddress: c?.address || c?.location || 'Buenos Aires, Argentina',
+      businessName: c?.name || '',
+      cuit: c?.tax_id || '',
+      commercialAddress: c?.address || c?.location || '',
       vatCondition: (c as any)?.vat_condition || 'IVA Responsable Inscripto',
-      iibb: (c as any)?.iibb || c?.tax_id || '30-71649281-9',
+      iibb: (c as any)?.iibb || c?.tax_id || '',
       activityStartDate: (c as any)?.activity_start_date || '01/03/2021',
       pointOfSale: (c as any)?.point_of_sale || '00004',
       phone: c?.phone || '',

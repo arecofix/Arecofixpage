@@ -2,6 +2,55 @@ import { ValidateArcaInvoiceUseCase } from './validate-arca-invoice.usecase';
 import { ARCA_CONSTANTS } from '../entities/arca.entity';
 
 describe('ValidateArcaInvoiceUseCase', () => {
+  const validEmitterTaxId = '30716492819';
+
+  describe('Compliance Fiscal de CUIT de Emisor (Bloque 1.5)', () => {
+    const baseParams = {
+      type: 'B' as const,
+      customer: {
+        name: 'Consumidor Final',
+        docType: 'DNI' as const,
+        docNumber: '',
+        vatCondition: 'Consumidor Final' as const,
+      },
+      items: [
+        { description: 'Reparación de módulo', quantity: 1, unit_price: 10000, tax_rate: 0.21 },
+      ],
+      paymentMethod: 'cash' as const,
+      grandTotal: 12100,
+    };
+
+    it('Sin emitterTaxId (undefined o vacío) → bloquea emisión y retorna error de compliance', () => {
+      const result = ValidateArcaInvoiceUseCase.execute({
+        ...baseParams,
+        emitterTaxId: undefined,
+      });
+
+      expect(result.isValid).toBe(false);
+      expect(result.errors.some((e) => e.includes('Bloqueo fiscal') && e.includes('CUIT'))).toBe(true);
+    });
+
+    it('emitterTaxId con menos de 11 dígitos → bloquea emisión', () => {
+      const result = ValidateArcaInvoiceUseCase.execute({
+        ...baseParams,
+        emitterTaxId: '12345678',
+      });
+
+      expect(result.isValid).toBe(false);
+      expect(result.errors.some((e) => e.includes('Bloqueo fiscal'))).toBe(true);
+    });
+
+    it('emitterTaxId con 11 dígitos formateados con guiones → válido', () => {
+      const result = ValidateArcaInvoiceUseCase.execute({
+        ...baseParams,
+        emitterTaxId: '30-71649281-9',
+      });
+
+      expect(result.isValid).toBe(true);
+      expect(result.errors.length).toBe(0);
+    });
+  });
+
   describe('Identificación obligatoria por Umbrales RG 5614/2024 / Ley 27.743', () => {
     it('Monto < $208.644 sin identificación (efectivo) → válido como Consumidor Final anónimo', () => {
       const result = ValidateArcaInvoiceUseCase.execute({
@@ -17,6 +66,7 @@ describe('ValidateArcaInvoiceUseCase', () => {
         ],
         paymentMethod: 'cash',
         grandTotal: 60500,
+        emitterTaxId: validEmitterTaxId,
       });
 
       expect(result.isValid).toBe(true);
@@ -38,6 +88,7 @@ describe('ValidateArcaInvoiceUseCase', () => {
         ],
         paymentMethod: 'cash', // Efectivo
         grandTotal: 302500, // >= $208.644
+        emitterTaxId: validEmitterTaxId,
       });
 
       expect(result.isValid).toBe(false);
@@ -60,6 +111,7 @@ describe('ValidateArcaInvoiceUseCase', () => {
         ],
         paymentMethod: 'transfer', // Medios electrónicos
         grandTotal: 302500, // < $417.288
+        emitterTaxId: validEmitterTaxId,
       });
 
       expect(result.isValid).toBe(true);
@@ -80,6 +132,7 @@ describe('ValidateArcaInvoiceUseCase', () => {
         ],
         paymentMethod: 'transfer', // Electrónico
         grandTotal: 484000, // >= $417.288
+        emitterTaxId: validEmitterTaxId,
       });
 
       expect(result.isValid).toBe(false);
@@ -102,6 +155,7 @@ describe('ValidateArcaInvoiceUseCase', () => {
         ],
         paymentMethod: 'cash',
         grandTotal: 484000,
+        emitterTaxId: validEmitterTaxId,
       });
 
       expect(result.isValid).toBe(true);
@@ -122,6 +176,7 @@ describe('ValidateArcaInvoiceUseCase', () => {
         items: [{ description: 'Servicio técnico', quantity: 1, unit_price: 10000, tax_rate: 0.21 }],
         paymentMethod: 'transfer',
         grandTotal: 12100,
+        emitterTaxId: validEmitterTaxId,
       });
 
       expect(result.isValid).toBe(false);
@@ -140,6 +195,7 @@ describe('ValidateArcaInvoiceUseCase', () => {
         items: [{ description: 'Servicio técnico', quantity: 1, unit_price: 10000, tax_rate: 0.21 }],
         paymentMethod: 'transfer',
         grandTotal: 12100,
+        emitterTaxId: validEmitterTaxId,
       });
 
       expect(result.isValid).toBe(false);
@@ -158,6 +214,7 @@ describe('ValidateArcaInvoiceUseCase', () => {
         items: [{ description: 'Servicio técnico', quantity: 1, unit_price: 10000, tax_rate: 0.21 }],
         paymentMethod: 'transfer',
         grandTotal: 12100,
+        emitterTaxId: validEmitterTaxId,
       });
 
       expect(result.isValid).toBe(false);
@@ -177,6 +234,7 @@ describe('ValidateArcaInvoiceUseCase', () => {
         paymentMethod: 'transfer',
         grandTotal: 12100,
         emitterVatCondition: 'Responsable Monotributo', // Emisor Monotributista
+        emitterTaxId: validEmitterTaxId,
       });
 
       expect(result.isValid).toBe(false);
@@ -196,6 +254,7 @@ describe('ValidateArcaInvoiceUseCase', () => {
         paymentMethod: 'cash',
         grandTotal: 10000,
         emitterVatCondition: 'Monotributo',
+        emitterTaxId: validEmitterTaxId,
       });
 
       expect(result.isValid).toBe(false);
@@ -215,6 +274,7 @@ describe('ValidateArcaInvoiceUseCase', () => {
         paymentMethod: 'cash',
         grandTotal: 10000,
         emitterVatCondition: 'Responsable Monotributo',
+        emitterTaxId: validEmitterTaxId,
       });
 
       expect(result.isValid).toBe(true);

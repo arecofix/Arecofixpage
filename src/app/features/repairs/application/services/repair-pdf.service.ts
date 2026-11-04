@@ -61,7 +61,10 @@ export class RepairPdfService {
     const contactY = logoBase64 ? 18 : 16;
     doc.text(company?.address || company?.location || 'Dirección de la Sucursal', 10, contactY);
     doc.text(`Tel: ${company?.phone || company?.contact_phone || 'Sin Teléfono'}`, 80, contactY);
-    doc.text(`CUIT: ${company?.cuit || 'N/A'}`, 10, contactY + 4);
+    const rawOrderCuit = (company?.cuit || company?.tax_id || '').replace(/\D/g, '');
+    if (rawOrderCuit.length === 11) {
+      doc.text(`CUIT: ${company?.cuit || company?.tax_id}`, 10, contactY + 4);
+    }
 
     // Ticket Info (Right side)
     doc.setFontSize(12);
@@ -245,8 +248,9 @@ export class RepairPdfService {
     doc.text(`Teléfono: ${company?.phone || company?.contact_phone || 'No registrado'}`, 15, 62);
     const emailStr = company?.email || company?.contact_email || 'No registrado';
     doc.text(`Mail: ${emailStr}`, 15, 68);
-    if (company?.cuit || company?.tax_id) {
-       doc.text(`CUIT: ${company.cuit || company.tax_id}`, 15, 74);
+    const rawQuoteCuit = (company?.cuit || company?.tax_id || '').replace(/\D/g, '');
+    if (rawQuoteCuit.length === 11) {
+      doc.text(`CUIT: ${company?.cuit || company?.tax_id}`, 15, 74);
     }
     
     // Client Info Box

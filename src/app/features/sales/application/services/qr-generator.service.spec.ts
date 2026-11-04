@@ -97,6 +97,16 @@ describe('QrGeneratorService (RG 4892/2020)', () => {
     expect(decodedJson.codAut).toBe(74128956321458);
   });
 
+  it('buildQrPayload debe lanzar error si el CUIT del emisor no existe o no tiene 11 dígitos', () => {
+    expect(() => {
+      service.buildQrPayload(mockInvoiceWithCae, { ...mockEmitter, cuit: '' });
+    }).toThrow('No se puede generar QR ARCA: CUIT de emisor inexistente o inválido');
+
+    expect(() => {
+      service.buildQrPayload(mockInvoiceWithCae, { ...mockEmitter, cuit: '12345' });
+    }).toThrow('No se puede generar QR ARCA: CUIT de emisor inexistente o inválido');
+  });
+
   it('generateQrDataUrl debe retornar un data URL de imagen PNG en base64 con qrcode', async () => {
     const payload = service.buildQrPayload(mockInvoiceWithCae, mockEmitter);
     const dataUrl = await service.generateQrDataUrl(payload);

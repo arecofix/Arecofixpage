@@ -46,19 +46,33 @@
               {{ emitter().businessName }}
             </h3>
             <p class="text-xs text-gray-600 dark:text-gray-400 flex flex-wrap gap-x-4 gap-y-1">
-              <span><strong>CUIT:</strong> {{ emitter().cuit }}</span>
+              <span><strong>CUIT:</strong> {{ emitter().cuit || 'Sin CUIT configurado' }}</span>
               <span><strong>Condición IVA:</strong> {{ emitter().vatCondition }}</span>
-              <span><strong>IIBB:</strong> {{ emitter().iibb }}</span>
+              <span><strong>IIBB:</strong> {{ emitter().iibb || 'Sin IIBB' }}</span>
               <span><strong>Inicio Act.:</strong> {{ emitter().activityStartDate }}</span>
             </p>
           </div>
           <div class="text-right shrink-0">
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 text-[10px] font-bold">
-              <i class="fas fa-check-circle text-xs"></i> Perfil fiscal activo
-            </span>
+            @if (emitter().cuit && emitter().cuit.length >= 11) {
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 text-[10px] font-bold">
+                <i class="fas fa-check-circle text-xs"></i> Perfil fiscal activo
+              </span>
+            } @else {
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 border border-rose-200 text-[10px] font-bold">
+                <i class="fas fa-triangle-exclamation text-xs"></i> CUIT requerido
+              </span>
+            }
           </div>
         </div>
       </section>
+
+      <!-- Alerta Bloqueo Fiscal si falta CUIT (Bloque 1.5) -->
+      @if (!emitter().cuit || emitter().cuit.length < 11) {
+        <div class="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2.5">
+          <i class="fas fa-ban text-base shrink-0"></i>
+          <span><strong>Bloqueo Fiscal:</strong> La sucursal o empresa emisora no posee un CUIT válido (11 dígitos). Configure el CUIT en la sucursal antes de emitir comprobantes fiscales.</span>
+        </div>
+      }
 
       <!-- 2. TIPO DE COMPROBANTE & CONDICIONES GENERALES -->
       <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 bg-gray-50/70 dark:bg-slate-800/30 p-4 rounded-2xl border border-gray-100 dark:border-slate-800">

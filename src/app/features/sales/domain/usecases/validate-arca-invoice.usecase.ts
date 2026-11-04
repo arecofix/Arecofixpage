@@ -22,6 +22,7 @@ export interface ValidateArcaInvoiceParams {
   paymentMethod: ArcaPaymentMethod;
   grandTotal: number;
   emitterVatCondition?: ArcaVatCondition | string;
+  emitterTaxId?: string;
 }
 
 /**
@@ -33,7 +34,15 @@ export class ValidateArcaInvoiceUseCase {
     const errors: string[] = [];
     const warnings: string[] = [];
 
-    // 0. Validar Condición del Emisor (Monotributista vs Responsable Inscripto)
+    // 0. Compliance Fiscal Obligatorio (Bloque 1.5): Validación de CUIT del Emisor
+    const cleanEmitterTaxId = (params.emitterTaxId || '').replace(/\D/g, '');
+    if (!cleanEmitterTaxId || cleanEmitterTaxId.length !== 11) {
+      errors.push(
+        'Bloqueo fiscal: La sucursal o empresa emisora no posee un CUIT válido (11 dígitos). Configure el CUIT antes de emitir comprobantes.'
+      );
+    }
+
+    // 0.1 Validar Condición del Emisor (Monotributista vs Responsable Inscripto)
     if (params.emitterVatCondition) {
       const emitterCond = params.emitterVatCondition.toString().toLowerCase().trim();
       const isMonotributista =

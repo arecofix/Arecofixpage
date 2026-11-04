@@ -359,6 +359,7 @@ describe('CreateInvoiceDraftFromRepairOrderUseCase & ARCA Integration', () => {
       ],
       paymentMethod: 'cash',
       grandTotal: 250000,
+      emitterTaxId: '30716492819',
     });
 
     expect(validationResult.isValid).toBe(false);
