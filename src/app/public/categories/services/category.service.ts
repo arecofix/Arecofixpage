@@ -49,10 +49,9 @@ export class CategoryService {
 
     return from(
       this.supabase
-        .from('categories')
+        .from('public_category_profile')
         .select('*', { count: 'exact' })
         .eq('tenant_id', this.tenantService.getTenantId())
-        .eq('is_active', true)
         .range(start, end)
     ).pipe(
       map(({ data, count, error }) => {
@@ -80,10 +79,9 @@ export class CategoryService {
 
     return from(
       this.supabase
-        .from('categories')
+        .from('public_category_profile')
         .select('*', { count: 'exact' })
         .eq('tenant_id', this.tenantService.getTenantId())
-        .eq('is_active', true)
         .order('name')
         .limit(_per_page)
     ).pipe(
@@ -119,7 +117,7 @@ export class CategoryService {
 
     // Step 1: exact match (fastest, most reliable)
     let exactQuery = this.supabase
-        .from('categories')
+        .from('public_category_profile')
         .select('*')
         .eq('tenant_id', tenantId);
         
@@ -144,7 +142,7 @@ export class CategoryService {
         }
         // Step 2: case-insensitive partial fallback (handles slugs with suffixes)
         let fallbackQuery = this.supabase
-            .from('categories')
+            .from('public_category_profile')
             .select('*')
             .eq('tenant_id', tenantId)
             .order('slug')

@@ -59,16 +59,20 @@ export class SupabaseServiceRepository implements ServiceRepository {
   }
 
   async getPublicList(): Promise<Service[]> {
+    const slug = this.tenantService.currentTenant()?.slug || 'arecofix';
     const { data, error } = await this.supabase
-      .from('services')
-      .select('*')
-      .eq('is_published', true)
-      .is('deleted_at', null)
-      .order('created_at', { ascending: false });
+      .rpc('get_public_services', { p_tenant_slug: slug });
 
     if (error) {
-      console.error('Error fetching public services:', error);
-      throw error;
+      console.warn('RPC get_public_services failed, falling back to direct query:', error);
+      const { data: directData, error: directError } = await this.supabase
+        .from('services')
+        .select('*')
+        .eq('is_published', true)
+        .is('deleted_at', null)
+        .order('created_at', { ascending: false });
+      if (directError) throw directError;
+      return (directData || []).map((row: any) => ServiceMapper.toEntity(row));
     }
 
     return (data || []).map((row: any) => ServiceMapper.toEntity(row));

@@ -18,7 +18,14 @@ export class SupabaseCourseRepository extends CourseRepository {
       .eq('is_active', true)
       .order('created_at', { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      const { data: rpcData, error: rpcError } = await this.scoped.client
+        .rpc('get_public_courses', { p_tenant_slug: 'arecofix' });
+      if (!rpcError && rpcData) {
+        return rpcData as Course[];
+      }
+      throw error;
+    }
     return (data || []) as Course[];
   }
 

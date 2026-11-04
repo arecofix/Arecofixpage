@@ -157,7 +157,7 @@
           *ngIf="branch()?.whatsapp_number"
           [href]="
             'https://wa.me/' +
-            $safeNavigationMigration(branch()?.whatsapp_number)
+            branch()?.whatsapp_number
           "
           target="_blank"
           rel="noopener"
@@ -167,14 +167,14 @@
         </a>
         <a
           *ngIf="branch()?.contact_email"
-          [href]="'mailto:' + $safeNavigationMigration(branch()?.contact_email)"
+          [href]="'mailto:' + branch()?.contact_email"
           class="bh-contact__email"
         >
           ✉️ Enviarnos un Email
         </a>
         <a
           *ngIf="branch()?.contact_phone"
-          [href]="'tel:' + $safeNavigationMigration(branch()?.contact_phone)"
+          [href]="'tel:' + branch()?.contact_phone"
           class="bh-contact__phone"
         >
           📞 {{ branch()?.contact_phone }}
