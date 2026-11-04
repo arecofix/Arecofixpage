@@ -3,7 +3,7 @@ import { BranchRepository } from './branch.repository';
 import { SUPABASE_CLIENT } from '../di/supabase-token';
 import { LoggerService } from '../services/logger.service';
 import { SupabaseStorageService } from '../services/supabase-storage.service';
-import { firstValueFrom, of } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 describe('BranchRepository - Public Fallback Security', () => {
   let repository: BranchRepository;
@@ -11,7 +11,12 @@ describe('BranchRepository - Public Fallback Security', () => {
 
   beforeEach(() => {
     mockSupabase = {
-      from: jest.fn()
+      from: jest.fn(),
+      auth: {
+        onAuthStateChange: jest.fn().mockReturnValue({ data: { subscription: { unsubscribe: jest.fn() } } }),
+        getSession: jest.fn().mockResolvedValue({ data: { session: null } }),
+        getUser: jest.fn().mockResolvedValue({ data: { user: null } })
+      }
     };
 
     const mockLogger = {
