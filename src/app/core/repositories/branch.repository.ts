@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { BaseRepository } from './base.repository';
 import { LoggerService } from '../services/logger.service';
-import { Observable, from, map } from 'rxjs';
+import { Observable, from, firstValueFrom, map } from 'rxjs';
 import { Branch } from '@app/shared/interfaces/branch.interface';
 import { SUPABASE_CLIENT } from '../di/supabase-token';
 
@@ -25,6 +25,47 @@ export class BranchRepository extends BaseRepository<Branch> {
 
   async uploadLogo(file: File): Promise<string> {
     return this.storageService.uploadFile(file, 'branches', 'public-assets');
+  }
+
+  /**
+   * Safe getter: Tries authenticated 'branches' table first; if empty or unauthenticated (e.g. public storefront),
+   * falls back to the safe 'public_branch_profile' view which strips sensitive banking/tax columns.
+   */
+  override getWhere(
+    column: string,
+    value: string | number | boolean | null,
+    options?: { column?: string; ascending?: boolean; select?: string }
+  ): Observable<Branch[]> {
+    return from(
+      (async () => {
+        const primary = await firstValueFrom(super.getWhere(column, value, options));
+        if (primary && primary.length > 0) {
+          return primary;
+        }
+        const { data, error } = await this.supabase
+          .from('public_branch_profile')
+          .select(options?.select || '*')
+          .eq(column, value);
+        if (error || !data) return [];
+        return data as Branch[];
+      })()
+    );
+  }
+
+  override getById(id: string, options?: { select?: string }): Observable<Branch | null> {
+    return from(
+      (async () => {
+        const primary = await firstValueFrom(super.getById(id, options));
+        if (primary) return primary;
+        const { data, error } = await this.supabase
+          .from('public_branch_profile')
+          .select(options?.select || '*')
+          .eq('id', id)
+          .maybeSingle();
+        if (error || !data) return null;
+        return data as Branch;
+      })()
+    );
   }
 
   /**

@@ -49,35 +49,39 @@ BEGIN
   RAISE NOTICE 'PASÓ: public_branch_profile no contiene columnas bancarias ni fiscales.';
 END $$;
 
--- 4. Test como usuario autenticado de Tenant A (Librería ZAONA: 550e8400-e29b-41d4-a716-446655440000)
--- Profile ID: 3d027aa6-d59a-4b04-aa38-38c8d263c877
+-- 4. Test como usuario autenticado de Tenant Binarycell (Tenant: b7030a00-7b43-4afd-a6f9-cc5ec882266b)
+-- Profile ID: c245900f-ae24-4523-bf89-5306c7a9796b
 SET LOCAL ROLE authenticated;
-SET LOCAL request.jwt.claims = '{"sub": "3d027aa6-d59a-4b04-aa38-38c8d263c877", "role": "authenticated"}';
+SET LOCAL request.jwt.claims = '{"sub": "c245900f-ae24-4523-bf89-5306c7a9796b", "role": "authenticated"}';
 
 DO $$
 DECLARE
   v_branch_count INT;
+  v_branch_name TEXT;
   v_other_branch_count INT;
 BEGIN
   -- Leer solo sus sucursales
-  SELECT count(*) INTO v_branch_count 
-  FROM public.branches
-  WHERE tenant_id = '550e8400-e29b-41d4-a716-446655440000'::uuid;
+  SELECT count(*), max(name) INTO v_branch_count, v_branch_name 
+  FROM public.branches;
 
-  IF v_branch_count = 0 THEN
-    RAISE EXCEPTION 'TEST FALLÓ: Usuario de Tenant A no pudo leer sus propias sucursales.';
+  IF v_branch_count <> 1 THEN
+    RAISE EXCEPTION 'TEST FALLÓ: Usuario de Binarycell vio % sucursales (se esperaba 1).', v_branch_count;
   END IF;
 
-  -- Verificar aislamiento cross-tenant
+  IF v_branch_name <> 'Binarycell' THEN
+    RAISE EXCEPTION 'TEST FALLÓ: Usuario de Binarycell vio una sucursal equivocada: %', v_branch_name;
+  END IF;
+
+  -- Verificar que no ve sucursales ajenas (como Arecofix, Safefix, Maxilubreze)
   SELECT count(*) INTO v_other_branch_count 
   FROM public.branches 
-  WHERE tenant_id <> '550e8400-e29b-41d4-a716-446655440000'::uuid;
+  WHERE tenant_id <> 'b7030a00-7b43-4afd-a6f9-cc5ec882266b'::uuid;
 
   IF v_other_branch_count > 0 THEN
-    RAISE EXCEPTION 'TEST FALLÓ: Usuario de Tenant A vio % sucursales ajenas con datos bancarios!', v_other_branch_count;
+    RAISE EXCEPTION 'TEST FALLÓ: Usuario de Binarycell vio % sucursales ajenas con datos bancarios!', v_other_branch_count;
   END IF;
 
-  RAISE NOTICE 'PASÓ: Usuario de Tenant A sólo ve sus propias sucursales (% sucursales propias, 0 ajenas).', v_branch_count;
+  RAISE NOTICE 'PASÓ: Usuario de Binarycell sólo ve su propia sucursal (% - 0 sucursales ajenas).', v_branch_name;
 END $$;
 
 ROLLBACK;

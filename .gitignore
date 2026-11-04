@@ -14,6 +14,7 @@
 .env.production
 .env.development
 !.env.example
+ docker-compose.yml
 src/environments/environment.generated.ts
 
 # Claves privadas SSH, certificados SSL y tokens
