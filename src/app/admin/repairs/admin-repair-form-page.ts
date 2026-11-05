@@ -170,6 +170,12 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
 
   repairForm!: FormGroup;
 
+  constructor() {
+    if (!this.repairForm) {
+      this.setupForm();
+    }
+  }
+
   // Shortcuts
   shortcuts = signal<QuickShortcut[]>([]);
   selectedShortcutId = signal<string>('');
@@ -500,7 +506,9 @@ export class AdminRepairFormPage implements OnInit, OnDestroy {
     }
 
     this.id = this.route.snapshot.paramMap.get('id');
-    this.setupForm();
+    if (!this.repairForm) {
+      this.setupForm();
+    }
     this.setupSearchStreams();
     this.loadShortcuts();
 

@@ -291,13 +291,13 @@
                                                     <div class="flex items-center gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
                                                         <div class="flex items-center gap-1">
                                                             <span class="text-[10px] text-gray-400 font-semibold uppercase">Cant:</span>
-                                                            <input type="number" min="1" [ngModel]="part.quantity" (ngModelChange)="updatePartQuantity(idx, $event)" class="w-14 bg-gray-50 dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-lg px-2 py-1 text-center font-bold text-gray-900 dark:text-white text-xs focus:ring-1 focus:ring-emerald-500 focus:outline-none" />
+                                                            <input type="number" min="1" [value]="part.quantity" (input)="updatePartQuantity(idx, $any($event.target).value)" class="w-14 bg-gray-50 dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-lg px-2 py-1 text-center font-bold text-gray-900 dark:text-white text-xs focus:ring-1 focus:ring-emerald-500 focus:outline-none" />
                                                         </div>
                                                         <div class="flex items-center gap-1">
                                                             <span class="text-[10px] text-gray-400 font-semibold uppercase">Precio:</span>
                                                             <div class="relative">
                                                                 <span class="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">$</span>
-                                                                <input type="number" min="0" step="100" [ngModel]="part.unit_price_at_time" (ngModelChange)="updatePartPrice(idx, $event)" class="w-24 pl-5 pr-2 py-1 bg-gray-50 dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-lg font-bold text-emerald-600 dark:text-emerald-400 text-xs focus:ring-1 focus:ring-emerald-500 focus:outline-none text-right" placeholder="0" />
+                                                                <input type="number" min="0" step="100" [value]="part.unit_price_at_time" (input)="updatePartPrice(idx, $any($event.target).value)" class="w-24 pl-5 pr-2 py-1 bg-gray-50 dark:bg-[#101828] border border-gray-300 dark:border-gray-700 rounded-lg font-bold text-emerald-600 dark:text-emerald-400 text-xs focus:ring-1 focus:ring-emerald-500 focus:outline-none text-right" placeholder="0" />
                                                             </div>
                                                         </div>
                                                         <span class="font-bold text-gray-900 dark:text-white min-w-16 text-right">
@@ -408,10 +408,9 @@
                         <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-3 flex items-center gap-2"><i class="fas fa-bolt text-yellow-400"></i> Servicio Rápido</h3>
                         <div class="flex flex-col gap-2">
                             <div class="flex gap-2">
-                                <select 
-                                    [ngModel]="selectedShortcutId()"
-                                    (ngModelChange)="selectedShortcutId.set($event)"
-                                    [ngModelOptions]="{standalone: true}"
+                                <select
+                                    [value]="selectedShortcutId()"
+                                    (change)="selectedShortcutId.set($any($event.target).value)"
                                     class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-2 text-gray-900 dark:text-white text-sm focus:outline-none">
                                     <option value="">Seleccionar atajo...</option>
                                     @for (s of shortcuts(); track s.id) {
@@ -534,7 +533,7 @@
             <div class="form-control mb-4">
                 <div class="relative">
                     <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400"></i>
-                    <input type="text" [ngModel]="searchQuery()" (ngModelChange)="onSearchChange($event)" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-xl pl-11 pr-4 py-3 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB]/30 focus:shadow-[0_0_10px_rgba(52,152,219,0.2)] transition-all placeholder-gray-500 dark:placeholder-gray-400" placeholder="Buscar pantalla, pin de carga, batería..." />
+                    <input type="text" [value]="searchQuery()" (input)="onSearchChange($any($event.target).value)" class="w-full bg-white dark:bg-[#101828] border border-gray-200 dark:border-gray-700 rounded-xl pl-11 pr-4 py-3 text-gray-900 dark:text-white text-sm focus:outline-none focus:border-[#3498DB] focus:ring-1 focus:ring-[#3498DB]/30 focus:shadow-[0_0_10px_rgba(52,152,219,0.2)] transition-all placeholder-gray-500 dark:placeholder-gray-400" placeholder="Buscar pantalla, pin de carga, batería..." />
                     @if (searchingProducts()) {
                         <div class="absolute right-4 top-1/2 -translate-y-1/2">
                             <span class="loading loading-spinner loading-xs text-[#34C759]"></span>
@@ -596,19 +595,19 @@
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full max-w-lg mb-4 text-left">
                             <div class="sm:col-span-3">
                                 <label class="block text-[11px] font-semibold text-gray-700 dark:text-gray-300 mb-1">Nombre del repuesto</label>
-                                <input type="text" [ngModel]="manualPartName() || searchQuery()" (ngModelChange)="manualPartName.set($event)" class="w-full bg-white dark:bg-[#1a253a] border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#34C759]" placeholder="Nombre del repuesto" />
+                                <input type="text" [value]="manualPartName() || searchQuery()" (input)="manualPartName.set($any($event.target).value)" class="w-full bg-white dark:bg-[#1a253a] border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#34C759]" placeholder="Nombre del repuesto" />
                             </div>
                             <div>
                                 <label class="block text-[11px] font-semibold text-gray-700 dark:text-gray-300 mb-1">Precio al cliente ($)</label>
-                                <input type="number" min="0" step="100" [ngModel]="manualPartPrice()" (ngModelChange)="manualPartPrice.set($event)" class="w-full bg-white dark:bg-[#1a253a] border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#34C759]" placeholder="0" />
+                                <input type="number" min="0" step="100" [value]="manualPartPrice()" (input)="manualPartPrice.set(+$any($event.target).value)" class="w-full bg-white dark:bg-[#1a253a] border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#34C759]" placeholder="0" />
                             </div>
                             <div>
                                 <label class="block text-[11px] font-semibold text-gray-700 dark:text-gray-300 mb-1">Costo insumo ($)</label>
-                                <input type="number" min="0" step="100" [ngModel]="manualPartCost()" (ngModelChange)="manualPartCost.set($event)" class="w-full bg-white dark:bg-[#1a253a] border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#34C759]" placeholder="0" />
+                                <input type="number" min="0" step="100" [value]="manualPartCost()" (input)="manualPartCost.set(+$any($event.target).value)" class="w-full bg-white dark:bg-[#1a253a] border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#34C759]" placeholder="0" />
                             </div>
                             <div>
                                 <label class="block text-[11px] font-semibold text-gray-700 dark:text-gray-300 mb-1">Stock inicial</label>
-                                <input type="number" min="1" [ngModel]="manualPartStock()" (ngModelChange)="manualPartStock.set($event)" class="w-full bg-white dark:bg-[#1a253a] border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#34C759]" placeholder="1" />
+                                <input type="number" min="1" [value]="manualPartStock()" (input)="manualPartStock.set(+$any($event.target).value)" class="w-full bg-white dark:bg-[#1a253a] border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-1.5 text-xs text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#34C759]" placeholder="1" />
                             </div>
                         </div>
 
