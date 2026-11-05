@@ -18,7 +18,7 @@ import { HomeIndustriesComponent } from './components/home-industries.component'
 import { HomePillarsComponent } from './components/home-pillars.component';
 import { HomeMetricsComponent } from './components/home-metrics.component';
 import { HomeRemoteWorkComponent } from './components/home-remote-work.component';
-import { ShareButtonsComponent } from '@app/shared/components/share-buttons/share-buttons.component';
+
 
 @Component({
   selector: 'app-public-home-page',
@@ -35,7 +35,7 @@ import { ShareButtonsComponent } from '@app/shared/components/share-buttons/shar
     HomePillarsComponent,
     HomeMetricsComponent,
     HomeRemoteWorkComponent,
-    ShareButtonsComponent
+
   ],
   templateUrl: './public-home-page.html',
   styles: `

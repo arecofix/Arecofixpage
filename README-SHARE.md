@@ -8,10 +8,11 @@ Componente standalone reutilizable y accesible para compartir contenido en redes
 
 - **Multiplataforma**: Integración directa con **WhatsApp**, **Facebook**, **X (Twitter)**, **LinkedIn**, **Telegram**, **Email** y **Copiar Enlace**.
 - **Web Share API Nativo**: En dispositivos móviles (iOS / Android) utiliza `navigator.share()` cuando está disponible, brindando la experiencia nativa del sistema operativo. En desktop o navegadores no compatibles, despliega las opciones web o copia al portapapeles.
-- **3 Variantes de Visualización**:
-  1. `inline`: Botones en fila/grilla, ideales para fichas de producto, artículos de blog o cursos.
-  2. `menu`: Botón compacto tipo dropdown/popover, ideal para barras de herramientas o tarjetas de producto con espacio reducido.
-  3. `floating`: Botón de acción flotante (FAB) con animación Speed Dial, ideal para la página de inicio o landings.
+- **Variantes de Visualización**:
+  1. `discreet`: Botón/enlace sutil con ícono y texto "Compartir" (sin fondos llamativos ni fixed/sticky), diseñado para ubicarse junto al título, valoración y SKU en la ficha de producto. Despliega un menú de redes hacia abajo con `position: absolute`.
+  2. `inline`: Botones en fila/grilla, ideales para artículos de blog o cursos.
+  3. `menu`: Botón compacto tipo dropdown/popover, ideal para barras de herramientas.
+  4. `floating` / `static`: Botón de acción estático con despliegue Speed Dial hacia arriba.
 - **Accesibilidad Total (WCAG 2.1 AA)**:
   - Navegación completa por teclado (`Tab`, `Shift+Tab`, `Enter`, `Space`).
   - Cierre con tecla `Esc` y restauración automática del foco en el botón disparador.
@@ -45,7 +46,20 @@ export class MiPaginaComponent {}
 
 ## 🎨 Ejemplos por Variante
 
-### 1. Variante `inline` (Detalle de Producto / Blog)
+### 1. Variante `discreet` (Ficha de Producto - Estilo MercadoLibre)
+
+Muestra un botón discreto con ícono y texto sutil al lado de valoraciones y SKU. Al hacer clic, abre un menú desplegable hacia abajo con las redes:
+
+```html
+<app-share-buttons 
+  variant="discreet"
+  [title]="producto.name"
+  [text]="'Mirá este repuesto en Arecofix: ' + producto.name"
+  ariaLabel="Compartir este producto">
+</app-share-buttons>
+```
+
+### 2. Variante `inline` (Blog / Cursos)
 
 Muestra los botones alineados con o sin etiquetas de texto.
 
@@ -72,13 +86,13 @@ Muestra un botón compacto "Compartir" que abre un menú desplegable accesible.
 </app-share-buttons>
 ```
 
-### 3. Variante `floating` (Botón Flotante Speed Dial)
+### 3. Variante `static` (Botón discreto antes del Footer)
 
-Flota en la esquina inferior de la pantalla sobre el toggle de accesibilidad, abriendo un menú vertical interactivo.
+Posicionado de forma estática y minimalista justo antes de `<app-footer>`, desplegando hacia arriba un menú popover de redes (`position: absolute`) sin afectar el flujo del documento ni tapar la lectura.
 
 ```html
 <app-share-buttons 
-  variant="floating"
+  variant="static"
   title="Arecofix - Servicio Técnico y Repuestos Especializados"
   text="Soluciones profesionales en tecnología y microelectrónica.">
 </app-share-buttons>
@@ -94,7 +108,7 @@ Flota en la esquina inferior de la pantalla sobre el toggle de accesibilidad, ab
 | `[text]` | `string` | `''` | Descripción o mensaje acompañante. |
 | `[url]` | `string` | `''` | URL absoluta (si se omite, usa `window.location.href`). |
 | `[networks]` | `ShareNetwork[]` | `['whatsapp', 'facebook', 'x', 'linkedin', 'telegram', 'email', 'copy']` | Lista y orden de redes a mostrar. |
-| `[variant]` | `'inline' \| 'menu' \| 'floating'` | `'inline'` | Modo de visualización visual del componente. |
+| `[variant]` | `'inline' \| 'menu' \| 'floating' \| 'static'` | `'inline'` | Modo de visualización visual del componente. |
 | `[showLabels]`| `boolean` | `false` | Indica si los botones inline muestran texto además del icono. |
 | `[customClass]`| `string` | `''` | Clases CSS adicionales para el contenedor principal. |
 | `(shared)` | `EventEmitter<ShareEvent>` | — | Emite evento `{ network: string, url: string }` tras compartir. |

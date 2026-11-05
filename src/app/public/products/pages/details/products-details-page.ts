@@ -23,7 +23,7 @@ import {
   IsLoadingComponent,
 } from '@app/shared/components/resource-status';
 import { BreadcrumbsComponent, BreadcrumbItem } from '@app/shared/components/breadcrumbs/breadcrumbs.component';
-import { ShareButtonsComponent } from '@app/shared/components/share-buttons/share-buttons.component';
+import { ShareButtonsComponent } from '@app/shared/components/share-buttons';
 /*  */
 import { CategoryService } from '@app/public/categories/services';
 import { ProductService } from '@app/public/products/services';

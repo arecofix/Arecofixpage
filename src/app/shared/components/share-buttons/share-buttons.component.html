@@ -2,9 +2,60 @@
   class="share-buttons-container relative"
   [ngClass]="[variant, customClass]"
   role="group"
-  aria-label="Compartir esta página"
+  [attr.aria-label]="ariaLabel || 'Compartir esta página'"
 >
-  <!-- 1. VARIANTE INLINE -->
+  <!-- 1. VARIANTE DISCREET (ENLACE/BOTÓN SUTIL CON ÍCONO Y TEXTO, IDEAL PARA DETALLE DE PRODUCTO) -->
+  @if (variant === 'discreet') {
+    <div class="relative inline-block text-left">
+      <button
+        #triggerBtn
+        type="button"
+        (click)="triggerNativeOrMenu()"
+        [attr.aria-expanded]="isMenuOpen()"
+        aria-haspopup="true"
+        [attr.aria-label]="ariaLabel || 'Compartir este producto'"
+        [title]="ariaLabel || 'Compartir este producto'"
+        class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs sm:text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-brand-blue dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-850 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-blue"
+      >
+        <i class="fa-solid fa-share-nodes text-xs sm:text-sm" aria-hidden="true"></i>
+        <span>Compartir</span>
+      </button>
+
+      @if (isMenuOpen()) {
+        <div
+          class="absolute top-full mt-2 left-0 sm:left-auto sm:right-0 w-56 rounded-xl bg-white dark:bg-gray-900 shadow-2xl border border-gray-200 dark:border-gray-800 py-2 z-50 animate-fadeIn"
+          role="menu"
+          aria-orientation="vertical"
+        >
+          <div class="px-3 py-1.5 border-b border-gray-100 dark:border-gray-800 text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
+            Compartir producto
+          </div>
+
+          <div class="p-1 space-y-0.5">
+            @for (net of activeNetworks; track net.id) {
+              <button
+                type="button"
+                (click)="onShareNetwork(net.id)"
+                role="menuitem"
+                [attr.aria-label]="net.ariaLabel"
+                class="w-full flex items-center justify-between px-3 py-2 text-xs rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer text-left focus:outline-none focus:bg-gray-100 dark:focus:bg-gray-800"
+              >
+                <div class="flex items-center gap-2.5">
+                  <i [class]="net.iconClass" class="w-4 text-center text-sm" aria-hidden="true"></i>
+                  <span class="font-medium">{{ net.name }}</span>
+                </div>
+                @if (net.id === 'copy' && copied()) {
+                  <span class="text-emerald-500 font-bold text-[10px] uppercase">¡Copiado!</span>
+                }
+              </button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- 2. VARIANTE INLINE -->
   @if (variant === 'inline') {
     <div class="flex flex-wrap items-center gap-2">
       @for (net of activeNetworks; track net.id) {
@@ -85,12 +136,12 @@
     </div>
   }
 
-  <!-- 3. VARIANTE FLOATING (BOTÓN FLOTANTE EN ESQUINA) -->
-  @if (variant === 'floating') {
-    <div class="fixed bottom-24 left-6 z-1000 flex flex-col items-center gap-2">
+  <!-- 3. VARIANTE ESTÁTICA / SPEED DIAL (SIN POSICIÓN FIXED NI STICKY) -->
+  @if (variant === 'static' || variant === 'floating') {
+    <div class="relative inline-flex flex-col items-center">
       @if (isMenuOpen()) {
         <div
-          class="flex flex-col items-center gap-2 mb-2 p-2 rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-2xl border border-gray-200 dark:border-gray-800 animate-fadeIn"
+          class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 w-max max-w-[calc(100vw-2rem)] flex flex-wrap items-center justify-center gap-2 p-2 rounded-2xl bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-2xl border border-gray-200 dark:border-gray-800 z-30 animate-fadeIn"
           role="menu"
           aria-label="Redes para compartir"
         >
@@ -118,9 +169,9 @@
         type="button"
         (click)="triggerNativeOrMenu()"
         [attr.aria-expanded]="isMenuOpen()"
-        aria-label="Abrir opciones para compartir"
-        title="Compartir"
-        class="w-12 h-12 rounded-full bg-brand-blue hover:bg-brand-dark text-white flex items-center justify-center shadow-lg transition-transform duration-200 hover:scale-105 active:scale-95 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-blue"
+        aria-label="Compartir esta página"
+        title="Compartir esta página"
+        class="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-brand-blue hover:bg-brand-dark text-white flex items-center justify-center shadow-md hover:shadow-lg transition-transform duration-200 hover:scale-105 active:scale-95 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-blue"
       >
         <i
           class="fa-solid text-lg transition-transform duration-200"

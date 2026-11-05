@@ -12,25 +12,26 @@ import { Environment } from './environment.model';
 export const environment: Environment = {
   production: false,
   appName: 'Arecofix',
-  apiUrl: 'https://arecofix.com.ar',
-  baseUrl: 'https://arecofix.com.ar',
+
+  // APUNTAR A LOCAL/STAGING EN DESARROLLO, NO A PRODUCCIÓN
+  apiUrl: 'http://localhost:5000/api',
+  baseUrl: 'http://localhost:4200',
 
   // Supabase Configuration
-  // Auth y datos apuntan al entorno local en la VPS.
   supabaseUrl: 'https://db.arecofix.com.ar',
   supabaseDataUrl: 'https://db.arecofix.com.ar',
   supabaseKey: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzkyODk0OTg3LCJleHAiOjIxMDgyNTQ5ODd9.bv4ev9v3YD47JrDN0qDyN5MlWYNxTxiqtNhocDcp99g',
   authRedirectUrl: 'http://localhost:4200',
   enableProfileUpsert: false,
   enableRealtime: true,
-  flaskApiUrl: 'http://localhost:5000/api',
 
   // RAG Chatbot Worker (Fase 3 - backend proxy)
   chatbotWorkerUrl: 'https://arecofix-rag-chatbot.ezequielenrico15.workers.dev',
   embeddingWorkerUrl: 'https://arecofix-embedding-ingestion.ezequielenrico15.workers.dev',
   posthogKey: 'phc_qFqQScDE30GuuNh1UmGOcg8zQZIiHSpPXZ2761l50q4',
   posthogHost: 'https://us.i.posthog.com',
-  // WhatsApp Configuration
+
+  // WhatsApp Configuration (NUNCA poner el Access Token acá)
   whatsappPhoneNumberId: '322928504245092',
   whatsappBusinessAccountId: '368379263021902',
   whatsappAppId: '1209190100450173',
@@ -76,10 +77,13 @@ export const environment: Environment = {
       cv: '/curriculum-ezequiel-enrico.pdf'
     }
   },
+
   downloads: {
     desktopSetupUrl: 'https://github.com/arecofix/Arecofixpage/releases/latest/download/Arecofix-setup.exe'
   },
+
   turnstileSiteKey: '1x00000000000000000000AA',
+
   allowedApiHosts: [
     'arecofix.com.ar',
     'www.arecofix.com.ar',
@@ -87,6 +91,7 @@ export const environment: Environment = {
     'localhost',
     '127.0.0.1'
   ],
+
   features: {
     trialEnabled: true
   }

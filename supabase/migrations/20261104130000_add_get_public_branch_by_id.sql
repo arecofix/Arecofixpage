@@ -51,3 +51,4 @@ GRANT EXECUTE ON FUNCTION public.get_public_branch_by_id(uuid) TO anon, authenti
 NOTIFY pgrst, 'reload schema';
 
 COMMIT;
+

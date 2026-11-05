@@ -41,9 +41,13 @@ describe('Verificación Crítica: Flujo de Compra de Producto post-Login', () =>
 
     cy.intercept('GET', '**/rest/v1/products*', (req) => {
       const isSingle = String(req.headers['accept'])?.includes('application/vnd.pgrst.object');
-      req.reply({ statusCode: 200, body: isSingle ? mockProduct : [mockProduct] });
+      req.reply({
+        statusCode: 200,
+        headers: { 'Content-Range': '0-0/1' },
+        body: isSingle ? mockProduct : [mockProduct]
+      });
     }).as('getProduct');
-    
+
     // Limpiar estado
     cy.clearCookies();
     cy.clearLocalStorage();
@@ -66,7 +70,7 @@ describe('Verificación Crítica: Flujo de Compra de Producto post-Login', () =>
 
     // 3. Volvemos al producto
     cy.visit(PRODUCT_URL);
-    
+
     // El usuario está logueado, por lo que debería ver directamente el producto y botón de comprar
     cy.contains('Módulo Ejemplo 123', { timeout: 10000 }).should('be.visible');
     cy.contains(/agregar al carrito|comprar/i, { timeout: 10000 }).should('be.visible');

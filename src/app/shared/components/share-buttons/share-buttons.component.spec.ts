@@ -105,5 +105,116 @@ describe('ShareButtonsComponent', () => {
 
     expect(component.isMenuOpen()).toBe(false);
   });
+
+  it('en variante static o floating no debe tener clases fixed o sticky', () => {
+    fixture.componentRef.setInput('variant', 'static');
+    fixture.detectChanges();
+
+    const element = fixture.nativeElement as HTMLElement;
+    const fixedOrStickyElements = element.querySelectorAll('.fixed, .sticky');
+    expect(fixedOrStickyElements.length).toBe(0);
+  });
+
+  it('el botón disparador en variante static debe tener aria-label y title "Compartir esta página"', () => {
+    fixture.componentRef.setInput('variant', 'static');
+    fixture.detectChanges();
+
+    const triggerBtn = fixture.nativeElement.querySelector('button[aria-label="Compartir esta página"]');
+    expect(triggerBtn).toBeTruthy();
+    expect(triggerBtn.getAttribute('title')).toBe('Compartir esta página');
+    expect(triggerBtn.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('en variante static despliega el menú absoluto hacia arriba y responde a Escape', async () => {
+    fixture.componentRef.setInput('variant', 'static');
+    fixture.detectChanges();
+
+    expect(component.isMenuOpen()).toBe(false);
+
+    await component.triggerNativeOrMenu();
+    fixture.detectChanges();
+    expect(component.isMenuOpen()).toBe(true);
+
+    const menu = fixture.nativeElement.querySelector('div[role="menu"]');
+    expect(menu).toBeTruthy();
+    expect(menu.classList.contains('absolute')).toBe(true);
+    expect(menu.classList.contains('fixed')).toBe(false);
+
+    const netButtons = fixture.nativeElement.querySelectorAll('div[role="menu"] button');
+    expect(netButtons.length).toBe(component.networks.length);
+
+    // Escape cierra el menú
+    const escapeEvent = new KeyboardEvent('keydown', { key: 'Escape' });
+    component.onEscapeKey(escapeEvent);
+    fixture.detectChanges();
+    expect(component.isMenuOpen()).toBe(false);
+  });
+
+  describe('variante discreet (para páginas de detalle de producto)', () => {
+    beforeEach(() => {
+      fixture.componentRef.setInput('variant', 'discreet');
+      fixture.detectChanges();
+    });
+
+    it('no debe tener clases fixed ni sticky', () => {
+      const element = fixture.nativeElement as HTMLElement;
+      const fixedOrStickyElements = element.querySelectorAll('.fixed, .sticky');
+      expect(fixedOrStickyElements.length).toBe(0);
+    });
+
+    it('debe renderizar un botón discreto con ícono y texto Compartir', () => {
+      const triggerBtn = fixture.nativeElement.querySelector('button');
+      expect(triggerBtn).toBeTruthy();
+      expect(triggerBtn.textContent).toContain('Compartir');
+      expect(triggerBtn.getAttribute('aria-label')).toBe('Compartir este producto');
+      expect(triggerBtn.getAttribute('title')).toBe('Compartir este producto');
+    });
+
+    it('al hacer clic despliega el menú absoluto hacia abajo y lista las redes', async () => {
+      expect(component.isMenuOpen()).toBe(false);
+
+      await component.triggerNativeOrMenu();
+      fixture.detectChanges();
+      expect(component.isMenuOpen()).toBe(true);
+
+      const menu = fixture.nativeElement.querySelector('div[role="menu"]');
+      expect(menu).toBeTruthy();
+      expect(menu.classList.contains('absolute')).toBe(true);
+      expect(menu.classList.contains('top-full')).toBe(true);
+      expect(menu.classList.contains('fixed')).toBe(false);
+
+      const netButtons = fixture.nativeElement.querySelectorAll('div[role="menu"] button');
+      expect(netButtons.length).toBe(component.networks.length);
+    });
+
+    it('al seleccionar una red en discreet emite shared y cierra el menú', async () => {
+      const sharedSpy = jest.spyOn(component.shared, 'emit');
+      component.url = 'https://arecofix.com.ar/productos/1';
+      component.title = 'Módulo iPhone';
+
+      await component.triggerNativeOrMenu();
+      fixture.detectChanges();
+      expect(component.isMenuOpen()).toBe(true);
+
+      await component.onShareNetwork('whatsapp');
+      fixture.detectChanges();
+
+      expect(mockShareService.shareToWhatsApp).toHaveBeenCalled();
+      expect(sharedSpy).toHaveBeenCalled();
+      expect(component.isMenuOpen()).toBe(false);
+    });
+
+    it('cierra el menú con la tecla Escape', async () => {
+      await component.triggerNativeOrMenu();
+      fixture.detectChanges();
+      expect(component.isMenuOpen()).toBe(true);
+
+      const escapeEvent = new KeyboardEvent('keydown', { key: 'Escape' });
+      component.onEscapeKey(escapeEvent);
+      fixture.detectChanges();
+      expect(component.isMenuOpen()).toBe(false);
+    });
+  });
 });
+
 

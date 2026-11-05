@@ -1,21 +1,18 @@
 @if (!isPortfolioRoute()) {
-  <public-layout-header></public-layout-header>
+<public-layout-header></public-layout-header>
 }
-<div
-  [ngClass]="[
-    preferencesService.getBackgroundClass((preferencesService.theme$ | async)!),
-    (preferencesService.highContrast$ | async) ? 'high-contrast' : '',
-  ]"
-  class="min-h-[100dvh] flex flex-col transition-all duration-300 relative text-gray-900 dark:text-gray-100 font-sans pt-16 bg-gray-50 dark:bg-[#080808]"
->
+
+<div [ngClass]="[themeClass(), isHighContrast() ? 'high-contrast' : '']"
+  class="min-h-[100dvh] flex flex-col transition-all duration-300 relative text-gray-900 dark:text-gray-100 font-sans"
+  [class.pt-16]="!isPortfolioRoute()">
   <main class="flex-grow flex flex-col relative w-full">
     <router-outlet></router-outlet>
   </main>
-  
-  <div class="mt-auto w-full">
-    <app-footer></app-footer>
-  </div>
-</div>
 
-<app-accessibility-sidebar></app-accessibility-sidebar>
-<app-ai-chatbot></app-ai-chatbot>
+  <!-- El footer va directo acá, el flex-grow de main lo empuja al fondo -->
+  <app-footer></app-footer>
+
+  <!-- Widgets dentro del contenedor principal para heredar temas y alto contraste -->
+  <app-accessibility-sidebar></app-accessibility-sidebar>
+  <app-ai-chatbot></app-ai-chatbot>
+</div>

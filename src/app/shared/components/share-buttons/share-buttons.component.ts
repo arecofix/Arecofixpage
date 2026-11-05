@@ -29,7 +29,7 @@ export interface NetworkConfig {
   imports: [CommonModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './share-buttons.component.html',
-  styleUrls: ['./share-buttons.component.scss']
+  styleUrl: './share-buttons.component.scss'
 })
 export class ShareButtonsComponent {
   private platformId = inject(PLATFORM_ID);
@@ -43,7 +43,16 @@ export class ShareButtonsComponent {
   @Input() text: string = '';
   @Input() url: string = '';
   @Input() networks: ShareNetwork[] = ['whatsapp', 'facebook', 'x', 'linkedin', 'telegram', 'email', 'copy'];
-  @Input() variant: 'inline' | 'floating' | 'menu' = 'inline';
+  /**
+   * Modo de visualización:
+   * - 'discreet': Botón/enlace sutil con ícono y texto (ideal para fichas de producto al lado de título/estrellas).
+   * - 'inline': Fila de botones para fichas de producto o artículos.
+   * - 'menu': Dropdown compacto para barras de herramientas.
+   * - 'static': Botón minimalista icon-only (abre menú hacia arriba, sin fixed/sticky).
+   * - 'floating': Alias por compatibilidad de 'static'.
+   */
+  @Input() variant: 'discreet' | 'inline' | 'menu' | 'static' | 'floating' = 'inline';
+  @Input() ariaLabel: string = 'Compartir este producto';
   @Input() showLabels: boolean = false;
   @Input() customClass: string = '';
 
@@ -196,7 +205,7 @@ export class ShareButtonsComponent {
 
     this.shared.emit({ network, url: shareUrl });
 
-    if (this.variant === 'menu' || this.variant === 'floating') {
+    if (this.variant === 'menu' || this.variant === 'floating' || this.variant === 'static' || this.variant === 'discreet') {
       this.closeMenu();
     }
   }

@@ -16,6 +16,8 @@ import { generatedEnv } from './environment.generated';
 export const environment: Environment = {
   production: true,
   appName: 'Arecofix',
+
+  // URLs de Producción
   apiUrl: 'https://arecofix.com.ar',
   baseUrl: 'https://arecofix.com.ar',
 
@@ -27,12 +29,17 @@ export const environment: Environment = {
   authRedirectUrl: 'https://arecofix.com.ar',
   enableProfileUpsert: false,
   enableRealtime: true,
-  flaskApiUrl: 'http://localhost:5000/api',
+
+  // CORREGIDO: Eliminado el localhost. Si usás la misma API, apuntá a apiUrl o a tu subdominio de API.
+  // flaskApiUrl: 'http://localhost:5000/api', // <-- ELIMINADO O CORREGIDO
 
   // RAG Chatbot Worker (Fase 3 - backend proxy)
   chatbotWorkerUrl: 'https://arecofix-rag-chatbot.ezequielenrico15.workers.dev',
+  embeddingWorkerUrl: 'https://arecofix-embedding-ingestion.ezequielenrico15.workers.dev',
+
   posthogKey: 'phc_qFqQScDE30GuuNh1UmGOcg8zQZIiHSpPXZ2761l50q4',
   posthogHost: 'https://us.i.posthog.com',
+
   // WhatsApp Configuration
   whatsappPhoneNumberId: '322928504245092',
   whatsappBusinessAccountId: '368379263021902',
@@ -79,17 +86,21 @@ export const environment: Environment = {
       cv: 'assets/img/portfolio/Ezequiel_Enrico_CV.pdf'
     }
   },
+
   downloads: {
     desktopSetupUrl: 'https://github.com/arecofix/Arecofixpage/releases/latest/download/Arecofix-setup.exe'
   },
+
   turnstileSiteKey: generatedEnv.turnstileSiteKey,
+
   allowedApiHosts: [
     'arecofix.com.ar',
     'www.arecofix.com.ar',
-    'staging.arecofix.com.ar',
-    'localhost',
-    '127.0.0.1'
+    'staging.arecofix.com.ar'
+    // 'localhost', // <-- Quitado para producción
+    // '127.0.0.1' // <-- Quitado para producción
   ],
+
   features: {
     trialEnabled: generatedEnv.trialEnabled
   }

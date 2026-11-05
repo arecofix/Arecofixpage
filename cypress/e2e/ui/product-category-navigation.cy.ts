@@ -39,19 +39,19 @@ describe('Product Category Navigation & Reactivity Flow', () => {
       cy.stub(win.console, 'warn').callsFake(() => {});
     });
 
-    cy.intercept('GET', '**/rest/v1/categories?select=*&slug=eq.modulos*', {
+    cy.intercept('GET', '**/rest/v1/*categor*slug=eq.modulos*', {
       statusCode: 200,
       headers: { 'Content-Range': '0-0/1' },
       body: [catModulos],
     }).as('getModulosCat');
 
-    cy.intercept('GET', '**/rest/v1/categories?select=*&slug=eq.herramientas*', {
+    cy.intercept('GET', '**/rest/v1/*categor*slug=eq.herramientas*', {
       statusCode: 200,
       headers: { 'Content-Range': '0-0/1' },
       body: [catHerramientas],
     }).as('getHerramientasCat');
 
-    cy.intercept('GET', '**/rest/v1/categories?select=*&is_active=eq.true*', {
+    cy.intercept('GET', '**/rest/v1/*categor*is_active=eq.true*', {
       statusCode: 200,
       body: [catModulos, catHerramientas],
     }).as('getAllCategories');
