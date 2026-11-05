@@ -58,14 +58,26 @@ serve(async (req: Request) => {
     }
 
     if (!tenantData.whatsapp_enabled) {
-        throw new Error("WhatsApp integration is not enabled for this tenant.");
+        return new Response(
+            JSON.stringify({ success: false, message: "WhatsApp integration is not enabled for this tenant." }),
+            { 
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                status: 200,
+            }
+        );
     }
 
     const WHATSAPP_TOKEN = tenantData.whatsapp_access_token;
     const WHATSAPP_PHONE_ID = tenantData.whatsapp_phone_id;
     
     if (!WHATSAPP_TOKEN || !WHATSAPP_PHONE_ID) {
-        throw new Error("Missing WhatsApp API Configuration for this tenant.");
+        return new Response(
+            JSON.stringify({ success: false, message: "Missing WhatsApp API configuration for this tenant." }),
+            { 
+                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                status: 200,
+            }
+        );
     }
 
     const apiUrl = `https://graph.facebook.com/v19.0/${WHATSAPP_PHONE_ID}/messages`;

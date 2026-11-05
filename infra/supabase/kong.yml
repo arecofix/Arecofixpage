@@ -262,6 +262,52 @@ services:
       - X-Guest-Session
       credentials: true
       max_age: 86400
+- name: functions-send-whatsapp
+  url: http://whatsapp-function:8000
+  routes:
+  - name: functions-send-whatsapp-route
+    paths:
+    - /functions/v1/send-whatsapp
+    strip_path: true
+  plugins:
+  - name: cors
+    config:
+      origins:
+      - https://arecofix.com.ar
+      - https://www.arecofix.com.ar
+      - https://staging.arecofix.com.ar
+      - http://localhost:4200
+      - http://127.0.0.1:4200
+      - http://localhost:4201
+      - http://127.0.0.1:4201
+      - http://localhost:4202
+      - http://127.0.0.1:4202
+      - http://localhost:3000
+      - http://127.0.0.1:3000
+      - tauri://localhost
+      - http://tauri.localhost
+      - https://tauri.localhost
+      - capacitor://localhost
+      methods:
+      - GET
+      - POST
+      - OPTIONS
+      headers:
+      - Accept
+      - Content-Type
+      - Authorization
+      - apikey
+      - Prefer
+      - prefer
+      - x-client-info
+      - X-Client-Info
+      - cf-connecting-ip
+      - x-forwarded-for
+      - x-test-secret
+      - x-guest-session
+      - X-Guest-Session
+      credentials: true
+      max_age: 86400
 upstreams:
 - name: postgrest-upstream
   targets:

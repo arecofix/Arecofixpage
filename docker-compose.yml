@@ -111,5 +111,39 @@ services:
       GOTRUE_MAILER_AUTOCONFIRM: "true"
       GOTRUE_DB_MIGRATIONS_PATH: /usr/local/etc/auth/migrations
 
+  trial-function:
+    image: denoland/deno:alpine
+    container_name: supabase-trial-function
+    restart: always
+    depends_on:
+      - kong
+      - db
+    volumes:
+      - ./supabase/functions/create-trial-tenant:/app
+    working_dir: /app
+    environment:
+      SUPABASE_URL: http://kong:8000
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      RATE_LIMIT_PER_HOUR: ${RATE_LIMIT_PER_HOUR:-5}
+      TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY}
+      NODE_ENV: production
+    command: run -A index.ts
+
+  whatsapp-function:
+    image: denoland/deno:alpine
+    container_name: supabase-whatsapp-function
+    restart: always
+    depends_on:
+      - kong
+      - db
+    volumes:
+      - ./supabase/functions/send-whatsapp:/app
+    working_dir: /app
+    environment:
+      SUPABASE_URL: http://kong:8000
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      NODE_ENV: production
+    command: run -A index.ts
+
 volumes:
   pgdata:

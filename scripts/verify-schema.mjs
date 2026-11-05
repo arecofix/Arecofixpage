@@ -46,6 +46,11 @@ const CRITICAL_SCHEMA_CHECKS = [
     table: 'service_leads',
     query: 'select=id,service_id,name,phone&limit=0',
     description: 'Tabla de prospectos y leads'
+  },
+  {
+    table: 'repair_parts_used',
+    query: 'select=id,repair_id,product_id,quantity,unit_price_at_time,cost_at_time,tenant_id,is_outsourced,supplier_id&limit=0',
+    description: 'Tabla repair_parts_used con repuestos tercerizados y costos'
   }
 ];
 

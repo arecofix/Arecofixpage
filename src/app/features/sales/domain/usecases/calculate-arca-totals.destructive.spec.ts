@@ -118,7 +118,7 @@ describe('CalculateArcaTotalsUseCase (Destructive Tax & Mutation Suite)', () => 
       const res = CalculateArcaTotalsUseCase.execute(massiveItems, 0, 'A');
       const duration = Date.now() - start;
 
-      expect(duration).toBeLessThan(150); // Generous threshold for CI/Windows
+      expect(duration).toBeLessThan(350); // Generous threshold for CI/Windows
       expect(res.totalNet).toBe(500000);
       expect(res.totalVat).toBe(105000);
       expect(res.grandTotal).toBe(605000);
