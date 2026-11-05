@@ -300,6 +300,13 @@ Cypress.Commands.add('loginAsAdmin', (url = '/', options = {}) => {
     });
   }).as('getTenants');
 
+  cy.intercept('**/rest/v1/public_tenant_profile*', (req) => {
+    req.reply({
+      statusCode: 200,
+      body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? mockTenant : [mockTenant]
+    });
+  }).as('getPublicTenantProfile');
+
   const mockBranch = { id: 'branch-1', name: 'Sede Central', slug: null, is_active: true };
 
   cy.intercept('GET', '**/rest/v1/branches*', (req) => {
@@ -453,7 +460,9 @@ Cypress.Commands.add('loginAsUser', (url: string, session: Record<string, unknow
     req.reply({ statusCode: 200, body: wantsObject ? profile : [profile] });
   }).as('getProfile');
 
-  cy.intercept('**/rest/v1/tenants*', (req) => { const mock = { id: 'bba26ccd-59ce-471c-aac0-4c1f5513de3b', name: 'Arecofix', slug: 'arecofix', is_active: true, usd_rate: 1000 }; req.reply({ statusCode: 200, body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? mock : [mock] }); }).as('getTenants');
+  cy.intercept('**/rest/v1/tenants*', (req) => { const mock = { id: (profile as any)?.tenant_id || 'bba26ccd-59ce-471c-aac0-4c1f5513de3b', name: 'Arecofix', slug: 'arecofix', is_active: true, usd_rate: 1000 }; req.reply({ statusCode: 200, body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? mock : [mock] }); }).as('getTenants');
+
+  cy.intercept('**/rest/v1/public_tenant_profile*', (req) => { const mock = { id: (profile as any)?.tenant_id || 'bba26ccd-59ce-471c-aac0-4c1f5513de3b', name: 'Arecofix', slug: 'arecofix', is_active: true, usd_rate: 1000, currency: 'ARS', tax_percentage: 21, branding_settings: { primary_color: '#3b82f6' } }; req.reply({ statusCode: 200, body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? mock : [mock] }); }).as('getPublicTenantProfile');
 
   cy.intercept('**/rest/v1/branches*', (req) => { const mock = { id: 'branch-1', name: 'Sede Central', slug: null, is_active: true }; req.reply({ statusCode: 200, body: String(req.headers['accept'])?.includes('application/vnd.pgrst.object') ? mock : [mock] }); }).as('getBranches');
 
