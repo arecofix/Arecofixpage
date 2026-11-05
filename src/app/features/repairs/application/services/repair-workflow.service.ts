@@ -89,17 +89,44 @@ export class RepairWorkflowService {
     // 1. Persistencia Principal
     await firstValueFrom(this.repairRepo.update(id, dto));
 
+    const newStatus = Number(dto.current_status_id);
+    const oldStatus = Number(original.current_status_id);
+
     // 2. Reconciliación de Stock
-    if (dto.parts) {
+    if (newStatus === 7 && oldStatus !== 7) {
+      // Si la orden se cancela, restauramos al stock de la sucursal cualquier repuesto que hubiera sido asignado
+      const partsToRestore = original.parts || [];
+      for (const part of partsToRestore) {
+        if (part.product_id) {
+          await this.stockService.deductStock(part.product_id, branchId, -(Number(part.quantity) || 1));
+        }
+      }
+    } else if (dto.parts) {
       await this.reconcilePartsStock(original.parts || [], dto.parts, branchId);
     }
 
-    // 3. Reconciliación Financiera (Pago final al entregar)
-    // Usamos Number() para asegurar comparación correcta
-    const newStatus = Number(dto.current_status_id);
-    const oldStatus = Number(original.current_status_id);
-    
-    if (newStatus === 6 && oldStatus !== 6) { // 6 = DELIVERED
+    // 3. Reconciliación Financiera
+    // 3a. Cancelación (newStatus === 7): Se devuelve la seña al cliente si existía
+    if (newStatus === 7 && oldStatus !== 7) {
+      const deposit = Number(original.deposit_amount || dto.deposit_amount || 0);
+      const finalCost = Number(original.final_cost || 0);
+      // Si ya estaba entregada (6), se devuelve el total cobrado; si no, la seña inicial
+      const refundAmount = oldStatus === 6 ? (finalCost > 0 ? finalCost : deposit) : deposit;
+
+      if (refundAmount > 0) {
+        const alreadyRefunded = await this.financeService.hasMovement(id, 'expense');
+        if (!alreadyRefunded) {
+          await this.registerRefundMovement(
+            id,
+            branchId,
+            refundAmount,
+            `Devolución de seña por reparación cancelada #${original.tracking_code || id.substring(0, 8)}`
+          );
+        }
+      }
+    }
+    // 3b. Entrega (newStatus === 6): Pago final al entregar equipo
+    else if (newStatus === 6 && oldStatus !== 6) { // 6 = DELIVERED
         const finalCost = Number(dto.final_cost || original.final_cost || 0);
         const deposit = Number(original.deposit_amount || 0);
         const balance = finalCost - deposit;
@@ -188,6 +215,19 @@ export class RepairWorkflowService {
          branch_id: branchId,
          amount: amount,
          type: 'income',
+         category: 'repair',
+         payment_method: 'efectivo',
+         reference_id: repairId,
+         notes: notes,
+     });
+  }
+
+  private async registerRefundMovement(repairId: string, branchId: string, amount: number, notes: string): Promise<void> {
+     await this.financeService.recordMovement({
+         tenant_id: this.tenantService.getTenantId(),
+         branch_id: branchId,
+         amount: amount,
+         type: 'expense',
          category: 'repair',
          payment_method: 'efectivo',
          reference_id: repairId,

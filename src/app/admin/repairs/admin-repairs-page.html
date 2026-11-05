@@ -192,9 +192,15 @@
                         <div class="text-right flex flex-col items-end pr-4">
                              <div class="font-black text-gray-900 dark:text-white text-base tracking-tight">{{ (repair.final_cost || repair.estimated_cost) | currency:'ARS':'symbol':'1.0-0' }}</div>
                              @if((repair.deposit_amount || 0) > 0) {
-                                 <div class="px-1.5 py-0.5 rounded bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase mt-1">
-                                     Seña: {{ repair.deposit_amount | currency:'ARS':'symbol':'1.0-0' }}
-                                 </div>
+                                 @if(repair.current_status_id === 7) {
+                                     <div class="px-1.5 py-0.5 rounded bg-rose-50 dark:bg-rose-500/10 border border-rose-200 dark:border-rose-500/20 text-[9px] font-bold text-rose-600 dark:text-rose-400 uppercase mt-1" title="Seña devuelta al cliente por cancelación">
+                                         Seña devuelta: {{ repair.deposit_amount | currency:'ARS':'symbol':'1.0-0' }}
+                                     </div>
+                                 } @else {
+                                     <div class="px-1.5 py-0.5 rounded bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase mt-1">
+                                         Seña: {{ repair.deposit_amount | currency:'ARS':'symbol':'1.0-0' }}
+                                     </div>
+                                 }
                              }
                         </div>
 

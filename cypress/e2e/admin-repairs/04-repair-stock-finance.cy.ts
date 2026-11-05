@@ -38,4 +38,21 @@ describe('Admin Repairs — Finanzas, Repuestos y Eventos de Facturación', () =
     // Botón de generar factura
     cy.get('app-generate-invoice-button', { timeout: 5000 }).should('exist');
   });
+
+  it('3. Al cancelar la reparación (7) debe registrar la reversión y devolución de la seña en caja', () => {
+    cy.intercept('POST', '**/rest/v1/cash_movements*').as('postRefundMovement');
+
+    // Cambiar estado a CANCELADO (7)
+    cy.get('#timeline-status-7').scrollIntoView().click({ force: true });
+    cy.wait(300);
+
+    // Guardar cambios
+    cy.contains('button', 'GUARDAR ORDEN').scrollIntoView().click({ force: true });
+
+    cy.wait('@patchRepair').then((interception) => {
+      expect(interception.request.body.current_status_id).to.eq(7);
+    });
+
+    cy.url({ timeout: 10000 }).should('include', '/admin/repairs');
+  });
 });

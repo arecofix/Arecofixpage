@@ -18,6 +18,15 @@ export class FlaskFinanceRepository implements FinanceRepository {
         return firstValueFrom(this.http.post<CashMovement>(this.apiUrl, movement));
     }
 
+    async hasMovement(referenceId: string, type: 'income' | 'expense'): Promise<boolean> {
+        try {
+            const movements = await firstValueFrom(this.getMovements(500));
+            return movements.some(m => m.reference_id === referenceId && m.type === type);
+        } catch {
+            return false;
+        }
+    }
+
     async getBalance(paymentMethod?: string): Promise<number> {
         const movements = await firstValueFrom(this.getMovements(1000));
         let filtered = movements;

@@ -14,6 +14,10 @@ export class FinanceService {
     return this.repository.recordMovement(movement);
   }
 
+  async hasMovement(referenceId: string, type: 'income' | 'expense'): Promise<boolean> {
+    return this.repository.hasMovement(referenceId, type);
+  }
+
   async getCashBalance(): Promise<number> {
     return this.repository.getBalance('cash');
   }

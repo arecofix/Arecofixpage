@@ -26,6 +26,23 @@ export class SupabaseFinanceRepository extends BaseRepository<CashMovement> impl
     return result;
   }
 
+  async hasMovement(referenceId: string, type: 'income' | 'expense'): Promise<boolean> {
+    try {
+      let query = this.supabase
+        .from(this.tableName)
+        .select('id')
+        .eq('reference_id', referenceId)
+        .eq('type', type)
+        .limit(1);
+
+      query = this.applyTenantFilter(query);
+      const { data, error } = await (query as any);
+      return !error && !!data && data.length > 0;
+    } catch {
+      return false;
+    }
+  }
+
   async getBalance(paymentMethod: string = 'cash'): Promise<number> {
     let query = this.supabase
       .from(this.tableName)
