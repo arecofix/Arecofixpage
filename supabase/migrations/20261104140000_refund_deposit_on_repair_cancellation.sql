@@ -15,6 +15,7 @@ AS $function$
 DECLARE
     v_refund_amount numeric := 0;
     v_branch_id uuid;
+    v_payment_method text;
     v_notes text;
 BEGIN
     -- Se dispara cuando el estado cambia a 7 (CANCELLED) y antes no era 7
@@ -41,6 +42,15 @@ BEGIN
                     (SELECT id FROM public.branches WHERE tenant_id = NEW.tenant_id ORDER BY is_active DESC LIMIT 1)
                 );
 
+                -- Buscar el método de pago original de la seña si existió
+                SELECT payment_method INTO v_payment_method
+                FROM public.cash_movements
+                WHERE reference_id = NEW.id AND type = 'income'
+                ORDER BY created_at ASC
+                LIMIT 1;
+
+                v_payment_method := COALESCE(v_payment_method, 'efectivo');
+
                 v_notes := format(
                     'Devolución de seña por reparación cancelada #%s', 
                     COALESCE(NEW.tracking_code, OLD.tracking_code, NEW.id::text)
@@ -61,7 +71,7 @@ BEGIN
                     v_refund_amount,
                     'expense',
                     'repair',
-                    COALESCE(NEW.payment_method, OLD.payment_method, 'cash'),
+                    v_payment_method,
                     NEW.id,
                     v_notes
                 );
@@ -99,7 +109,10 @@ SELECT
     r.deposit_amount,
     'expense',
     'repair',
-    COALESCE(r.payment_method, 'cash'),
+    COALESCE(
+        (SELECT cm.payment_method FROM public.cash_movements cm WHERE cm.reference_id = r.id AND cm.type = 'income' LIMIT 1),
+        'efectivo'
+    ),
     r.id,
     format('Devolución de seña por reparación cancelada #%s (Ajuste retroactivo)', COALESCE(r.tracking_code, r.id::text)),
     COALESCE(r.updated_at, r.created_at)
