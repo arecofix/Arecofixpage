@@ -468,6 +468,8 @@ Cypress.Commands.add('loginAsUser', (url: string, session: Record<string, unknow
       win.localStorage.setItem(`arecofix_profile_${userId}`, JSON.stringify(profile));
       win.localStorage.setItem('supabase-remember-me', 'true');
       win.localStorage.setItem('arecofix_current_branch_id', 'branch-1');
+      const currentTenantId = (profile as any)?.tenant_id || 'bba26ccd-59ce-471c-aac0-4c1f5513de3b';
+      win.localStorage.setItem('arecofix_tenant_id', currentTenantId);
       win.localStorage.setItem('cypress-test', 'true');
         win.localStorage.removeItem('cart_session_id');
         win.localStorage.setItem('cart_session_id', '00000000-0000-0000-0000-000000000000');
