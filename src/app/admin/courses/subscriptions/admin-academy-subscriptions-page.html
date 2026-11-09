@@ -1,0 +1,792 @@
+<div class="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 p-4 sm:p-6 lg:p-8">
+  <!-- Top Navigation & Header -->
+  <div class="max-w-7xl mx-auto space-y-6">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
+      <div>
+        <nav class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 mb-1">
+          <a routerLink="/admin/dashboard" class="hover:text-primary transition-colors">Dashboard</a>
+          <span>/</span>
+          <a routerLink="/admin/courses" class="hover:text-primary transition-colors">Academia</a>
+          <span>/</span>
+          <span class="text-slate-700 dark:text-slate-200 font-medium">Alumnos y Cobros</span>
+        </nav>
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
+          <span>🎓</span> Gestión de Alumnos y Cobros
+        </h1>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">
+          Control financiero de matrículas, emisión de recibos oficiales, estado de cuotas y seguimiento de cursada.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          (click)="exportCsv()"
+          class="btn btn-sm btn-outline border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          Exportar CSV
+        </button>
+
+        <button
+          type="button"
+          (click)="openEnrollModal()"
+          class="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white font-medium border-none shadow-sm gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Matricular Alumno
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+      <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700/60 shadow-xs">
+        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Total Matriculados</span>
+        <span class="text-2xl font-bold text-slate-900 dark:text-white mt-1 block">{{ stats().total }}</span>
+        <span class="text-[11px] text-slate-500 mt-1 block">Alumnos no cancelados</span>
+      </div>
+
+      <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-emerald-200 dark:border-emerald-900/50 shadow-xs">
+        <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">Al Día</span>
+        <span class="text-2xl font-bold text-emerald-700 dark:text-emerald-300 mt-1 block">{{ stats().active }}</span>
+        <span class="text-[11px] text-emerald-600/80 dark:text-emerald-400/80 mt-1 block">Cuotas regularizadas</span>
+      </div>
+
+      <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-amber-200 dark:border-amber-900/50 shadow-xs">
+        <span class="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">Pendientes / Gracia</span>
+        <span class="text-2xl font-bold text-amber-700 dark:text-amber-300 mt-1 block">{{ stats().pending }}</span>
+        <span class="text-[11px] text-amber-600/80 dark:text-amber-400/80 mt-1 block">Esperando primer o prox. pago</span>
+      </div>
+
+      <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-cyan-200 dark:border-cyan-900/50 shadow-xs">
+        <span class="text-xs font-semibold text-cyan-600 dark:text-cyan-400 uppercase tracking-wider block">Becados</span>
+        <span class="text-2xl font-bold text-cyan-700 dark:text-cyan-300 mt-1 block">{{ stats().scholarship }}</span>
+        <span class="text-[11px] text-cyan-600/80 dark:text-cyan-400/80 mt-1 block">Costo bonificado 100%</span>
+      </div>
+
+      <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-rose-200 dark:border-rose-900/50 shadow-xs">
+        <span class="text-xs font-semibold text-rose-600 dark:text-rose-400 uppercase tracking-wider block">Suspendidos</span>
+        <span class="text-2xl font-bold text-rose-700 dark:text-rose-300 mt-1 block">{{ stats().suspended }}</span>
+        <span class="text-[11px] text-rose-600/80 dark:text-rose-400/80 mt-1 block">Mora &gt; 7 días</span>
+      </div>
+    </div>
+
+    <!-- Filters & Search Toolbar -->
+    <div class="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700/60 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <!-- Search Input -->
+      <div class="relative flex-1 max-w-md">
+        <svg class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        <input
+          type="text"
+          placeholder="Buscar por alumno, email, DNI o curso..."
+          [ngModel]="searchQuery()"
+          (ngModelChange)="searchQuery.set($event)"
+          class="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
+        />
+      </div>
+
+      <!-- State Filter Pills -->
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0 text-xs font-medium">
+        <button
+          type="button"
+          (click)="selectedFilter.set('all')"
+          class="px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+          [ngClass]="selectedFilter() === 'all' ? 'bg-blue-600 text-white shadow-xs' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'">
+          Todos ({{ enrollments().length }})
+        </button>
+        <button
+          type="button"
+          (click)="selectedFilter.set('pending_payment')"
+          class="px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+          [ngClass]="selectedFilter() === 'pending_payment' ? 'bg-slate-800 dark:bg-slate-200 text-white dark:text-slate-900' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200'">
+          Pendientes
+        </button>
+        <button
+          type="button"
+          (click)="selectedFilter.set('active')"
+          class="px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+          [ngClass]="selectedFilter() === 'active' ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200'">
+          Al día
+        </button>
+        <button
+          type="button"
+          (click)="selectedFilter.set('grace_period')"
+          class="px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+          [ngClass]="selectedFilter() === 'grace_period' ? 'bg-amber-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200'">
+          En gracia
+        </button>
+        <button
+          type="button"
+          (click)="selectedFilter.set('suspended')"
+          class="px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+          [ngClass]="selectedFilter() === 'suspended' ? 'bg-rose-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200'">
+          Suspendidos
+        </button>
+        <button
+          type="button"
+          (click)="selectedFilter.set('scholarship')"
+          class="px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+          [ngClass]="selectedFilter() === 'scholarship' ? 'bg-cyan-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200'">
+          Becados
+        </button>
+        <button
+          type="button"
+          (click)="selectedFilter.set('cancelled')"
+          class="px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+          [ngClass]="selectedFilter() === 'cancelled' ? 'bg-slate-600 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200'">
+          Cancelados
+        </button>
+      </div>
+    </div>
+
+    <!-- Table Section (4.1) -->
+    <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700/60 shadow-xs overflow-hidden">
+      <!-- Loading State -->
+      @if (loading()) {
+        <div class="py-16 flex flex-col items-center justify-center gap-3 text-slate-500">
+          <span class="loading loading-spinner loading-md text-blue-600"></span>
+          <span class="text-sm">Cargando matrículas y estado de cuotas...</span>
+        </div>
+      } @else if (filteredEnrollments().length === 0) {
+        <div class="py-16 text-center text-slate-500">
+          <svg class="w-12 h-12 mx-auto text-slate-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+          </svg>
+          <p class="font-medium text-slate-700 dark:text-slate-300">No se encontraron alumnos con los criterios seleccionados</p>
+          <p class="text-xs text-slate-500 mt-1">Modificá el término de búsqueda o el filtro de estado.</p>
+        </div>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 dark:bg-slate-900/60 text-xs uppercase font-semibold text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
+              <tr>
+                <th class="py-3 px-4">Alumno</th>
+                <th class="py-3 px-4">Curso</th>
+                <th class="py-3 px-4 text-center">Cuotas</th>
+                <th class="py-3 px-4 text-right">Plan / Importe</th>
+                <th class="py-3 px-4 text-center">Estado</th>
+                <th class="py-3 px-4 text-center">Próx. Vencimiento</th>
+                <th class="py-3 px-4 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 dark:divide-slate-700/60">
+              @for (row of filteredEnrollments(); track row.id) {
+                <tr
+                  class="hover:bg-slate-50/70 dark:hover:bg-slate-700/30 transition-colors"
+                  [ngClass]="row.payment_plan_status === 'cancelled' ? 'opacity-60 bg-slate-50/40 dark:bg-slate-800/40' : ''">
+                  <!-- Alumno -->
+                  <td class="py-3.5 px-4">
+                    <div class="font-semibold text-slate-900 dark:text-white">{{ row.full_name }}</div>
+                    <div class="text-xs text-slate-500 flex items-center gap-2 mt-0.5">
+                      <span>{{ row.email }}</span>
+                      @if (row.phone) {
+                        <span>•</span>
+                        <span>{{ row.phone }}</span>
+                      }
+                      @if (row.dni) {
+                        <span>•</span>
+                        <span class="font-mono text-[11px]">DNI: {{ row.dni }}</span>
+                      }
+                    </div>
+                    @if (row.notes) {
+                      <div class="text-[11px] text-amber-600 dark:text-amber-400 mt-0.5 truncate max-w-xs" [title]="row.notes">
+                        Nota: {{ row.notes }}
+                      </div>
+                    }
+                  </td>
+
+                  <!-- Curso -->
+                  <td class="py-3.5 px-4 font-medium text-slate-800 dark:text-slate-200">
+                    {{ row.course_title }}
+                  </td>
+
+                  <!-- Cuotas -->
+                  <td class="py-3.5 px-4 text-center">
+                    @if (row.effective_status === 'scholarship') {
+                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-cyan-100 dark:bg-cyan-900/40 text-cyan-800 dark:text-cyan-300">
+                        Becado
+                      </span>
+                    } @else {
+                      <div class="inline-flex flex-col items-center">
+                        <span class="font-bold text-slate-800 dark:text-slate-100">
+                          {{ row.installments_paid }} / {{ row.installments_count }}
+                        </span>
+                        <div class="w-16 bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 mt-1 overflow-hidden">
+                          <div
+                            class="bg-blue-600 h-1.5 rounded-full"
+                            [style.width.%]="(row.installments_paid / (row.installments_count || 1)) * 100">
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </td>
+
+                  <!-- Plan / Importe -->
+                  <td class="py-3.5 px-4 text-right">
+                    @if (row.effective_status === 'scholarship') {
+                      <span class="text-xs font-mono font-semibold text-emerald-600 dark:text-emerald-400">$0</span>
+                    } @else {
+                      <div class="font-mono font-semibold text-slate-900 dark:text-white">
+                        ${{ (row.installment_amount || (row.agreed_price / (row.installments_count || 1))) | number:'1.0-0' }}
+                        <span class="text-xs font-normal text-slate-500">/mes</span>
+                      </div>
+                      <div class="text-xs font-mono text-slate-500">
+                        Total: ${{ row.agreed_price | number:'1.0-0' }}
+                      </div>
+                    }
+                  </td>
+
+                  <!-- Estado -->
+                  <td class="py-3.5 px-4 text-center">
+                    <span
+                      class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border"
+                      [ngClass]="getStatusBadgeClass(row.effective_status)">
+                      {{ getStatusLabel(row.effective_status, row.next_due_date) }}
+                    </span>
+                  </td>
+
+                  <!-- Próx. Vencimiento -->
+                  <td class="py-3.5 px-4 text-center text-xs font-mono">
+                    @if (row.payment_plan_status === 'cancelled') {
+                      <span class="text-slate-400">Cancelado</span>
+                    } @else if (row.effective_status === 'scholarship') {
+                      <span class="text-slate-400">Sin vto.</span>
+                    } @else if (row.effective_status === 'completed') {
+                      <span class="text-emerald-600 font-semibold">Al día (finalizado)</span>
+                    } @else if (row.next_due_date) {
+                      <span [ngClass]="row.effective_status === 'suspended' ? 'text-rose-600 font-bold' : (row.effective_status === 'grace_period' ? 'text-amber-600 font-bold' : 'text-slate-600 dark:text-slate-300')">
+                        {{ row.next_due_date | date:'dd/MM/yyyy' }}
+                      </span>
+                    } @else {
+                      <span class="text-slate-400">—</span>
+                    }
+                  </td>
+
+                  <!-- Acciones -->
+                  <td class="py-3.5 px-4 text-right">
+                    <div class="inline-flex items-center gap-1.5">
+                      <!-- Botón Cobrar -->
+                      @if (row.payment_plan_status !== 'cancelled' && row.effective_status !== 'scholarship' && row.effective_status !== 'completed') {
+                        <button
+                          type="button"
+                          (click)="openPaymentModal(row)"
+                          class="btn btn-xs bg-emerald-600 hover:bg-emerald-700 text-white font-medium border-none shadow-xs gap-1">
+                          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                          </svg>
+                          Cobrar
+                        </button>
+                      }
+
+                      <!-- Botón Historial -->
+                      <button
+                        type="button"
+                        (click)="openHistoryModal(row)"
+                        class="btn btn-xs btn-outline border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 gap-1"
+                        title="Ver historial de cobros y anulación">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Historial
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- MODAL 4.2: REGISTRAR PAGO -->
+  @if (showPaymentModal() && selectedEnrollmentForPayment(); as sel) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 dark:border-slate-700 animate-in fade-in zoom-in-95 duration-150">
+        <!-- Modal Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-5 flex items-center justify-between">
+          <div>
+            <span class="text-xs font-semibold uppercase tracking-wider text-blue-100">Cobro de Cuota</span>
+            <h3 class="text-lg font-bold">Registrar Cobro Oficial</h3>
+          </div>
+          <button
+            type="button"
+            (click)="closePaymentModal()"
+            class="text-white/80 hover:text-white rounded-lg p-1 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Modal Body -->
+        <form (ngSubmit)="submitPayment()" class="p-6 space-y-4">
+          <!-- Student & Course Details (Read-only) -->
+          <div class="bg-slate-50 dark:bg-slate-900/70 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700/60 text-xs space-y-1.5">
+            <div class="flex justify-between">
+              <span class="text-slate-500 font-medium">Alumno:</span>
+              <span class="font-semibold text-slate-800 dark:text-slate-100">{{ sel.full_name }} ({{ sel.email }})</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500 font-medium">Curso:</span>
+              <span class="font-semibold text-slate-800 dark:text-slate-100">{{ sel.course_title }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500 font-medium">Cuota a Cobrar:</span>
+              <span class="font-bold text-blue-600 dark:text-blue-400">
+                Cuota N° {{ sel.installments_paid + 1 }} de {{ sel.installments_count }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Monto a cobrar -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              Monto a Cobrar ($ ARS) *
+            </label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-semibold">$</span>
+              <input
+                type="number"
+                min="1"
+                step="1"
+                [ngModel]="paymentAmount()"
+                (ngModelChange)="paymentAmount.set($event)"
+                name="paymentAmount"
+                required
+                class="w-full pl-8 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
+              />
+            </div>
+            <span class="text-[11px] text-slate-500 mt-1 block">
+              Monto acordado por cuota: ${{ sel.installment_amount | number:'1.0-0' }}
+            </span>
+          </div>
+
+          <!-- Medio de Pago -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              Medio de Pago *
+            </label>
+            <select
+              [ngModel]="paymentMethod()"
+              (ngModelChange)="paymentMethod.set($event)"
+              name="paymentMethod"
+              class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-hidden">
+              <option value="cash">Efectivo en caja</option>
+              <option value="transfer">Transferencia bancaria (CBU/Alias)</option>
+              <option value="mercadopago">Mercado Pago</option>
+              <option value="other">Otro</option>
+            </select>
+          </div>
+
+          <!-- Fecha de Pago -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              Fecha de Cobro *
+            </label>
+            <input
+              type="date"
+              [ngModel]="paymentDate()"
+              (ngModelChange)="paymentDate.set($event)"
+              name="paymentDate"
+              required
+              class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
+            />
+          </div>
+
+          <!-- Observaciones -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              Observaciones / Referencia
+            </label>
+            <input
+              type="text"
+              placeholder="Ej: Transferencia Banco Provincia N° 84920"
+              [ngModel]="paymentNotes()"
+              (ngModelChange)="paymentNotes.set($event)"
+              name="paymentNotes"
+              class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
+            />
+          </div>
+
+          <!-- Checkbox PDF -->
+          <div class="flex items-center gap-2 pt-1">
+            <input
+              type="checkbox"
+              id="genPdf"
+              [ngModel]="generatePdfCheckbox()"
+              (ngModelChange)="generatePdfCheckbox.set($event)"
+              name="generatePdf"
+              class="checkbox checkbox-sm checkbox-primary"
+            />
+            <label for="genPdf" class="text-xs text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+              Generar y descargar recibo oficial PDF (firmado por Ezequiel Enrico Areco)
+            </label>
+          </div>
+
+          <!-- Modal Footer Actions -->
+          <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-200 dark:border-slate-700">
+            <button
+              type="button"
+              (click)="closePaymentModal()"
+              class="btn btn-sm btn-ghost text-slate-600 dark:text-slate-400">
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              [disabled]="isSubmittingPayment()"
+              class="btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white font-medium border-none shadow-sm gap-2">
+              @if (isSubmittingPayment()) {
+                <span class="loading loading-spinner loading-xs"></span>
+                <span>Registrando...</span>
+              } @else {
+                <span>Confirmar e Impactar Pago</span>
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- MODAL 4.3: HISTORIAL DE PAGOS Y ANULACIÓN -->
+  @if (showHistoryModal() && selectedEnrollmentForHistory(); as sel) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-200 dark:border-slate-700 animate-in fade-in zoom-in-95 duration-150">
+        <!-- Modal Header -->
+        <div class="p-5 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+          <div>
+            <span class="text-xs font-semibold uppercase tracking-wider text-slate-500">Historial Financiero</span>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white">Pagos de {{ sel.full_name }}</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Curso: {{ sel.course_title }}</p>
+          </div>
+          <button
+            type="button"
+            (click)="closeHistoryModal()"
+            class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="p-6">
+          @if (historyLoading()) {
+            <div class="py-12 flex flex-col items-center justify-center gap-2 text-slate-500">
+              <span class="loading loading-spinner loading-md text-blue-600"></span>
+              <span class="text-xs">Cargando recibos y pagos...</span>
+            </div>
+          } @else if (historyPayments().length === 0) {
+            <div class="py-12 text-center text-slate-500">
+              <p class="font-medium text-slate-700 dark:text-slate-300">No hay pagos registrados para este alumno.</p>
+              <p class="text-xs text-slate-500 mt-1">Podés registrar el primer cobro desde el botón "Cobrar".</p>
+            </div>
+          } @else {
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-slate-50 dark:bg-slate-900/60 font-semibold text-slate-500 uppercase border-b border-slate-200 dark:border-slate-700">
+                  <tr>
+                    <th class="py-2.5 px-3">Recibo</th>
+                    <th class="py-2.5 px-3">Cuota</th>
+                    <th class="py-2.5 px-3">Fecha</th>
+                    <th class="py-2.5 px-3">Medio</th>
+                    <th class="py-2.5 px-3 text-right">Monto</th>
+                    <th class="py-2.5 px-3 text-center">Estado</th>
+                    <th class="py-2.5 px-3 text-right">Acción</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 dark:divide-slate-700/60">
+                  @for (pay of historyPayments(); track pay.id) {
+                    <tr [ngClass]="pay.status === 'refunded' ? 'opacity-50 line-through bg-rose-50/20' : ''">
+                      <td class="py-2.5 px-3 font-mono font-semibold text-blue-600 dark:text-blue-400">
+                        {{ pay.receipt_number || 'N/A' }}
+                      </td>
+                      <td class="py-2.5 px-3 font-medium">
+                        Cuota {{ pay.period_number }}
+                      </td>
+                      <td class="py-2.5 px-3">
+                        {{ pay.paid_at | date:'dd/MM/yyyy' }}
+                      </td>
+                      <td class="py-2.5 px-3 uppercase text-[11px] text-slate-600 dark:text-slate-300">
+                        {{ pay.payment_method }}
+                      </td>
+                      <td class="py-2.5 px-3 text-right font-mono font-bold text-slate-900 dark:text-white">
+                        ${{ pay.amount | number:'1.0-0' }}
+                      </td>
+                      <td class="py-2.5 px-3 text-center">
+                        @if (pay.status === 'refunded') {
+                          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-rose-100 text-rose-800 dark:bg-rose-900/40 dark:text-rose-300">
+                            Anulado
+                          </span>
+                        } @else {
+                          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
+                            Cobrado
+                          </span>
+                        }
+                      </td>
+                      <td class="py-2.5 px-3 text-right">
+                        @if (pay.status === 'approved') {
+                          <button
+                            type="button"
+                            (click)="voidPayment(pay)"
+                            [disabled]="isVoiding()[pay.id]"
+                            class="btn btn-xs bg-rose-600 hover:bg-rose-700 text-white font-medium border-none shadow-xs"
+                            title="Anular pago y asentar egreso en caja">
+                            @if (isVoiding()[pay.id]) {
+                              <span class="loading loading-spinner loading-xs"></span>
+                            } @else {
+                              Anular
+                            }
+                          </button>
+                        } @else {
+                          <span class="text-slate-400 text-[11px]">—</span>
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="p-4 bg-slate-50 dark:bg-slate-900/60 border-t border-slate-200 dark:border-slate-700 flex justify-end">
+          <button
+            type="button"
+            (click)="closeHistoryModal()"
+            class="btn btn-sm btn-ghost text-slate-600 dark:text-slate-400">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- MODAL 4.4: MATRICULAR ALUMNO MANUALMENTE -->
+  @if (showEnrollModal()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 dark:border-slate-700 animate-in fade-in zoom-in-95 duration-150">
+        <!-- Modal Header -->
+        <div class="bg-gradient-to-r from-slate-900 to-blue-900 text-white p-5 flex items-center justify-between">
+          <div>
+            <span class="text-xs font-semibold uppercase tracking-wider text-blue-300">Matriculación Manual</span>
+            <h3 class="text-lg font-bold">Inscribir Nuevo Alumno</h3>
+          </div>
+          <button
+            type="button"
+            (click)="closeEnrollModal()"
+            class="text-white/80 hover:text-white rounded-lg p-1 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Modal Form -->
+        <form (ngSubmit)="submitEnrollment()" class="p-6 space-y-4">
+          <!-- Nombre del alumno -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              Nombre y Apellido *
+            </label>
+            <input
+              type="text"
+              placeholder="Ej: Marcelo Fernández"
+              [ngModel]="enrollStudentName()"
+              (ngModelChange)="enrollStudentName.set($event)"
+              name="studentName"
+              required
+              class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
+            />
+          </div>
+
+          <!-- Email y Teléfono -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Email del Alumno *
+              </label>
+              <input
+                type="email"
+                placeholder="alumno@email.com"
+                [ngModel]="enrollEmail()"
+                (ngModelChange)="enrollEmail.set($event)"
+                name="email"
+                required
+                class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
+              />
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Teléfono / WhatsApp
+              </label>
+              <input
+                type="tel"
+                placeholder="11 2345-6789"
+                [ngModel]="enrollPhone()"
+                (ngModelChange)="enrollPhone.set($event)"
+                name="phone"
+                class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
+              />
+            </div>
+          </div>
+
+          <!-- Selector de Curso -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              Curso a Cursar *
+            </label>
+            <select
+              [ngModel]="enrollCourseId()"
+              (ngModelChange)="enrollCourseId.set($event); onCourseSelectionChange($event)"
+              name="courseId"
+              required
+              class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-hidden">
+              @for (c of courses(); track c.id) {
+                <option [value]="c.id">{{ c.title }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Checkbox Becado -->
+          <div class="flex items-center gap-2 p-3 bg-cyan-50 dark:bg-cyan-950/30 rounded-lg border border-cyan-200 dark:border-cyan-800/50">
+            <input
+              type="checkbox"
+              id="isScholarship"
+              [ngModel]="enrollIsScholarship()"
+              (ngModelChange)="enrollIsScholarship.set($event)"
+              name="isScholarship"
+              class="checkbox checkbox-sm checkbox-primary"
+            />
+            <label for="isScholarship" class="text-xs text-cyan-900 dark:text-cyan-200 cursor-pointer select-none font-medium">
+              Alumno Becado (acceso completo sin costo ni cuotas a facturar)
+            </label>
+          </div>
+
+          <!-- Precios y Cuotas si no es becado -->
+          @if (!enrollIsScholarship()) {
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Precio Total Acordado ($) *
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  [ngModel]="enrollPrice()"
+                  (ngModelChange)="enrollPrice.set($event)"
+                  name="agreedPrice"
+                  required
+                  class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Cantidad de Cuotas *
+                </label>
+                <select
+                  [ngModel]="enrollInstallments()"
+                  (ngModelChange)="enrollInstallments.set($event)"
+                  name="installmentsCount"
+                  class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-hidden">
+                  <option [value]="1">1 cuota (Pago único)</option>
+                  <option [value]="2">2 cuotas</option>
+                  <option [value]="3">3 cuotas</option>
+                  <option [value]="4">4 cuotas</option>
+                  <option [value]="6">6 cuotas (Recomendado)</option>
+                  <option [value]="8">8 cuotas</option>
+                  <option [value]="10">10 cuotas</option>
+                  <option [value]="12">12 cuotas</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Calculador de cuota estimada -->
+            <div class="text-xs text-slate-500 bg-slate-50 dark:bg-slate-900/50 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 flex justify-between items-center">
+              <span>Cuota calculada:</span>
+              <span class="font-bold text-slate-900 dark:text-white font-mono">
+                ${{ (enrollPrice() / (enrollInstallments() || 1)) | number:'1.0-0' }} / mes
+              </span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Fecha Inicio *
+                </label>
+                <input
+                  type="date"
+                  [ngModel]="enrollStartDate()"
+                  (ngModelChange)="enrollStartDate.set($event)"
+                  name="startDate"
+                  class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
+                />
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  Día Vencimiento Mensual *
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="28"
+                  [ngModel]="enrollPaymentDay()"
+                  (ngModelChange)="enrollPaymentDay.set($event)"
+                  name="paymentDay"
+                  class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
+                />
+              </div>
+            </div>
+          }
+
+          <!-- Notas -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              Observaciones internas
+            </label>
+            <input
+              type="text"
+              placeholder="Ej: Promo redes sociales, ingresa con amigo"
+              [ngModel]="enrollNotes()"
+              (ngModelChange)="enrollNotes.set($event)"
+              name="enrollNotes"
+              class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
+            />
+          </div>
+
+          <!-- Actions -->
+          <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-200 dark:border-slate-700">
+            <button
+              type="button"
+              (click)="closeEnrollModal()"
+              class="btn btn-sm btn-ghost text-slate-600 dark:text-slate-400">
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              [disabled]="isSubmittingEnroll()"
+              class="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white font-medium border-none shadow-sm gap-2">
+              @if (isSubmittingEnroll()) {
+                <span class="loading loading-spinner loading-xs"></span>
+                <span>Matriculando...</span>
+              } @else {
+                <span>Matricular Alumno</span>
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

@@ -86,6 +86,8 @@ import { SupabaseProductReviewRepository } from './features/products/infrastruct
 import { InvoiceRepository } from './features/sales/domain/repositories/invoice.repository';
 import { SupabaseInvoiceRepository } from './features/sales/infrastructure/repositories/supabase-invoice.repository';
 import { CourseRepository } from './features/courses/domain/repositories/course.repository';
+import { AcademyPaymentRepository } from './features/courses/domain/repositories/academy-payment.repository';
+import { SupabaseAcademyPaymentRepository } from './features/courses/infrastructure/repositories/supabase-academy-payment.repository';
 import { SupabaseCourseRepository } from './features/courses/infrastructure/repositories/supabase-course.repository';
 import { NotificationBaseRepository } from './features/messages/domain/repositories/notification.repository';
 import { SupabaseNotificationRepository } from './features/messages/infrastructure/repositories/supabase-notification.repository';
@@ -274,6 +276,7 @@ export const appConfig: ApplicationConfig = {
     },
     { provide: InvoiceRepository, useClass: SupabaseInvoiceRepository },
     { provide: CourseRepository, useClass: SupabaseCourseRepository },
+    { provide: AcademyPaymentRepository, useClass: SupabaseAcademyPaymentRepository },
     {
       provide: NotificationBaseRepository,
       useClass: SupabaseNotificationRepository,

@@ -22,6 +22,9 @@ import { firstValueFrom } from 'rxjs';
 import { ToastService } from '@app/shared/services/toast.service';
 import { AcademySubscriptionService } from '@app/core/services/academy-subscription.service';
 import { MembershipCheckResult } from '@app/features/courses/domain/entities/academy-subscription.entity';
+import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
+import { EnrollmentStatusCalculator } from '@app/features/courses/domain/services/enrollment-status.calculator';
+import { EffectiveEnrollmentStatus } from '@app/features/courses/domain/entities/course.entity';
 
 @Component({
   selector: 'app-student-campus-page',
@@ -96,24 +99,20 @@ import { MembershipCheckResult } from '@app/features/courses/domain/entities/aca
           </div>
         }
 
-        <!-- Grace Period Banner -->
+        <!-- Grace Period Banner (5.2) -->
         @if (isGracePeriod()) {
           <div class="bg-amber-500 text-slate-900 font-bold px-4 py-3 shadow-md relative z-40 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
             <div class="flex items-center gap-2">
               <i class="fas fa-exclamation-triangle text-lg"></i>
-              <span>Tu membresía venció. Tienes 7 días de gracia para renovar.</span>
+              <span>⚠️ Tenés una cuota en período de gracia. Regularizá antes del vencimiento para evitar la suspensión.</span>
             </div>
-            <button (click)="payMembership()" [disabled]="isSubscribing()" class="btn btn-sm bg-slate-900 text-white hover:bg-slate-800 border-none rounded-xl">
-              @if (isSubscribing()) {
-                <span class="loading loading-spinner loading-xs"></span>
-              } @else {
-                <i class="fas fa-credit-card mr-1"></i> Pagar Ahora
-              }
-            </button>
+            <a routerLink="/academy/mis-cursos" class="btn btn-sm bg-slate-900 text-white hover:bg-slate-800 border-none rounded-xl">
+              <i class="fas fa-credit-card mr-1"></i> Pagar Cuota en Mis Cursos
+            </a>
           </div>
         }
 
-        <!-- Suspended or Expired Blocking Modal -->
+        <!-- Suspended or Pending Payment Blocking Modal (5.2 Lazy Block) -->
         @if (isBlocked()) {
           <div class="fixed inset-0 z-[100] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
             <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 max-w-lg w-full text-center shadow-2xl space-y-6">
@@ -121,36 +120,20 @@ import { MembershipCheckResult } from '@app/features/courses/domain/entities/aca
                 <i class="fas fa-lock"></i>
               </div>
               <div>
-                <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-2">Tu acceso a la academia ha expirado</h2>
+                <h2 class="text-2xl font-black text-slate-900 dark:text-white mb-2">Acceso a clases suspendido</h2>
                 <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed">
-                  Tu membresía se encuentra vencida o suspendida. Renueva tu membresía para continuar.
+                  Tu cuota para este curso se encuentra pendiente o vencida. Regularizá tu pago para desbloquear los videos, clases, materiales y exámenes.
                 </p>
               </div>
-              <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 flex justify-between items-center text-left">
-                <div>
-                  <div class="font-bold text-sm text-slate-800 dark:text-white">{{ membershipCheck()?.plan_name || 'Membresía Mensual Academia Pro' }}</div>
-                  <div class="text-xs text-slate-500">Acceso a todas las clases y exámenes</div>
-                </div>
-                <div class="text-right">
-                  <div class="font-black text-lg text-blue-600 dark:text-blue-400">
-                    \${{ (membershipCheck()?.plan_price || 15000) | number }} <span class="text-xs font-normal text-slate-400">/mes</span>
-                  </div>
-                </div>
-              </div>
-              <div class="flex flex-col sm:flex-row gap-3">
-                <button (click)="payMembership()" [disabled]="isSubscribing()" class="btn btn-primary flex-1 shadow-lg shadow-blue-500/20 rounded-xl font-bold">
-                  @if (isSubscribing()) {
-                    <span class="loading loading-spinner loading-sm"></span> Conectando con Mercado Pago...
-                  } @else {
-                    <i class="fas fa-bolt mr-1"></i> Renovar Membresía
-                  }
-                </button>
+              <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                <a routerLink="/academy/mis-cursos" class="btn btn-primary flex-1 shadow-lg shadow-blue-500/20 rounded-xl font-bold">
+                  <i class="fas fa-credit-card mr-1"></i> Pagar Cuota / Regularizar
+                </a>
                 <button routerLink="/academy" class="btn btn-ghost rounded-xl">Volver a la Academia</button>
               </div>
             </div>
           </div>
         }
-
         <!-- Header Banner -->
         <div
           class="bg-blue-900 dark:bg-slate-950 text-white relative overflow-hidden"
@@ -761,6 +744,8 @@ export class StudentCampusPage implements OnInit {
   private router = inject(Router);
   private toastService = inject(ToastService);
   private academySubscriptionService = inject(AcademySubscriptionService);
+  private supabase = inject(SUPABASE_CLIENT);
+  enrollmentEffectiveStatus = signal<EffectiveEnrollmentStatus | null>(null);
 
   loading = signal(true);
   course = signal<Course | null>(null);
@@ -838,36 +823,43 @@ export class StudentCampusPage implements OnInit {
         accessConfirmed = true;
       }
 
-      // 2c. For regular students: check directly in course_enrollments
+      // 2c. For regular students: check enrollment & calculate effective status (5.2)
       if (!accessConfirmed) {
-        const userEmail = userSession?.user?.email || profile?.email || '';
+        const userEmail = (userSession?.user?.email || profile?.email || '').trim().toLowerCase();
         const userId = userSession?.user?.id || profile?.id;
         if (userEmail || userId) {
-          const { enrolled } = await this.coursesService.checkEnrollment(
-            courseId,
-            userEmail,
-            userId,
-          );
-          accessConfirmed = enrolled;
-        }
-      }
+          let q = this.supabase
+            .from('course_enrollments')
+            .select('id, status, payment_plan_status, next_due_date, agreed_price, installments_count, installment_amount, installments_paid')
+            .eq('course_id', courseId)
+            .in('status', ['confirmed', 'in_progress', 'completed']);
 
-      // 2d. Validate Membership Status
-      // Golden Rule: active & grace_period are allowed; suspended & expired are blocked
-      if (accessConfirmed && !this.isAdmin() && !this.isAuthor()) {
-        try {
-          const userId = userSession?.user?.id || profile?.id;
-          const statusRes = await firstValueFrom(this.academySubscriptionService.checkMembershipStatus(userId));
-          this.membershipCheck.set(statusRes);
-          if (statusRes.has_subscription) {
-            if (statusRes.status === 'grace_period') {
-              this.isGracePeriod.set(true);
-            } else if (statusRes.status === 'suspended' || statusRes.status === 'expired') {
-              this.isBlocked.set(true);
+          if (userEmail && userId) {
+            q = q.or(`email.ilike.${userEmail},user_id.eq.${userId}`);
+          } else if (userId) {
+            q = q.eq('user_id', userId);
+          } else {
+            q = q.ilike('email', userEmail);
+          }
+
+          const { data: enrollmentData } = await q.limit(1).maybeSingle();
+          if (enrollmentData) {
+            accessConfirmed = true;
+
+            if (!this.isAdmin() && !this.isAuthor()) {
+              const effectiveStatus = EnrollmentStatusCalculator.calculate(
+                enrollmentData.payment_plan_status || enrollmentData.status,
+                enrollmentData.next_due_date
+              );
+              this.enrollmentEffectiveStatus.set(effectiveStatus);
+
+              if (effectiveStatus === 'grace_period') {
+                this.isGracePeriod.set(true);
+              } else if (effectiveStatus === 'suspended' || effectiveStatus === 'pending_payment') {
+                this.isBlocked.set(true);
+              }
             }
           }
-        } catch {
-          // Graceful fallback
         }
       }
 
@@ -880,7 +872,8 @@ export class StudentCampusPage implements OnInit {
           if (modulesRes.data) {
             this.modules.set(modulesRes.data);
 
-            if (accessConfirmed) {
+            // Lazy blocking: only load contents if user has access AND is not blocked (5.2)
+            if (accessConfirmed && !this.isBlocked()) {
               for (const mod of modulesRes.data) {
                 // Only fetch contents for unlocked modules (or for admins/authors)
                 const shouldLoad =

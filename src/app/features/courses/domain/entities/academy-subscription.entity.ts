@@ -7,7 +7,7 @@ export interface AcademyPlan {
   slug: string;
   description?: string;
   price: number;
-  currency_id: string;
+  currency_id?: string;
   interval_days: number;
   grace_days: number;
   features?: string[];
@@ -19,7 +19,7 @@ export interface AcademyPlan {
 export interface AcademySubscription {
   id: string;
   tenant_id?: string;
-  user_id: string;
+  user_id?: string | null;
   plan_id?: string;
   status: 'active' | 'grace_period' | 'suspended' | 'expired';
   started_at: string;
@@ -42,14 +42,21 @@ export interface AcademySubscription {
 export interface AcademyPayment {
   id: string;
   tenant_id?: string;
-  subscription_id: string;
-  user_id: string;
+  subscription_id?: string | null;
+  enrollment_id?: string | null;
+  user_id?: string | null;
   plan_id?: string;
   amount: number;
-  currency_id: string;
+  currency_id?: string;
   status: 'approved' | 'pending' | 'rejected' | 'cancelled' | 'refunded';
   status_detail?: string;
-  mp_payment_id: string;
+  receipt_number?: string | null;
+  period_number?: number | null;
+  created_by?: string | null;
+  notes?: string | null;
+  receipt_pdf_url?: string | null;
+  mp_payment_id?: string | null;
+  payment_method?: string;
   payment_method_id?: string;
   payment_type_id?: string;
   paid_at: string;

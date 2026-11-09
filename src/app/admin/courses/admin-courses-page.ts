@@ -8,7 +8,7 @@ import {
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { CoursesService, Course } from '@app/core/services/courses.service';
 import { CertificatesService, Certificate } from '@app/features/courses/application/services/certificates.service';
 import { ToastService } from '@app/shared/services/toast.service';
@@ -27,6 +27,7 @@ export class AdminCoursesPage implements OnInit {
   private toastService = inject(ToastService);
   private supabase = inject(SUPABASE_CLIENT);
   private cdr = inject(ChangeDetectorRef);
+  private route = inject(ActivatedRoute);
 
   courses = signal<Course[]>([]);
   certificates = signal<Certificate[]>([]);
@@ -77,9 +78,46 @@ export class AdminCoursesPage implements OnInit {
     ),
   );
 
+  leadsCount = signal<number>(0);
+  monthlyPotentialRevenue = signal<number>(0);
+
   ngOnInit() {
+    const initialTab = this.route.snapshot.queryParamMap.get('tab');
+    if (initialTab === 'certificados' || initialTab === 'pendientes') {
+      this.activeTab.set(initialTab);
+    }
     this.loadCourses();
     this.loadCertificates();
+    this.loadAcademyMetrics();
+  }
+
+  async loadAcademyMetrics() {
+    try {
+      const { count, error } = await this.supabase
+        .from('course_enrollments')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+
+      this.leadsCount.set(error ? 0 : (count ?? 0));
+
+      const { data: enrollments, error: enrErr } = await this.supabase
+        .from('course_enrollments')
+        .select('installment_amount, payment_plan_status')
+        .eq('status', 'confirmed')
+        .not('payment_plan_status', 'in', '("cancelled","scholarship")');
+
+      if (!enrErr && enrollments) {
+        const total = enrollments.reduce((sum: number, e: { installment_amount?: number | null }) => sum + Number(e.installment_amount || 0), 0);
+        this.monthlyPotentialRevenue.set(total);
+      } else {
+        this.monthlyPotentialRevenue.set(0);
+      }
+    } catch {
+      this.leadsCount.set(0);
+      this.monthlyPotentialRevenue.set(0);
+    } finally {
+      this.cdr.markForCheck();
+    }
   }
 
   loadCourses() {
@@ -104,7 +142,7 @@ export class AdminCoursesPage implements OnInit {
       const data = await this.certificatesService.getAllCertificatesAdmin();
       this.certificates.set(data);
     } catch (err) {
-      console.error('Error loading certificates', err);
+      console.warn('[AdminCoursesPage] Could not load certificates:', (err as any)?.message || err);
     } finally {
       this.certificatesLoading.set(false);
       this.cdr.markForCheck();

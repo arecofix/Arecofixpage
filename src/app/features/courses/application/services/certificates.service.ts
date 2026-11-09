@@ -106,7 +106,7 @@ export class CertificatesService {
       .order('issued_at', { ascending: false });
 
     if (error) {
-      console.error('[CertificatesService] Error fetching admin certificates:', error);
+      console.warn('[CertificatesService] Could not fetch admin certificates (offline or network error):', error?.message || error);
       return [];
     }
     return (data || []) as any as Certificate[];

@@ -1,0 +1,420 @@
+<div class="min-h-screen bg-slate-50 dark:bg-slate-900 py-10 text-slate-800 dark:text-slate-100">
+  <div class="container mx-auto px-4 max-w-6xl">
+    <!-- Page Title & Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
+        <span>🎓</span> Mi Academia
+      </h1>
+      <p class="text-slate-600 dark:text-slate-400 mt-1">
+        Bienvenido a tu centro de aprendizaje y formación profesional en Arecofix Academy.
+      </p>
+    </div>
+
+    <!-- Role-based Tabs (Estudiante / Instructor) -->
+    @if (isInstructor() || isAdmin()) {
+      <div role="tablist" class="tabs tabs-boxed mb-8 p-1 bg-slate-200/60 dark:bg-slate-800/60 inline-flex">
+        <button
+          type="button"
+          role="tab"
+          class="tab h-10 px-6 font-bold transition-all"
+          [class.tab-active]="activeTab() === 'estudios'"
+          [class.bg-white]="activeTab() === 'estudios'"
+          [class.dark:bg-slate-700]="activeTab() === 'estudios'"
+          [class.shadow-xs]="activeTab() === 'estudios'"
+          (click)="activeTab.set('estudios')"
+        >
+          <i class="fas fa-user-graduate mr-2"></i> Mis Cursos y Estudios
+        </button>
+        <button
+          type="button"
+          role="tab"
+          class="tab h-10 px-6 font-bold transition-all"
+          [class.tab-active]="activeTab() === 'instructor'"
+          [class.bg-indigo-600]="activeTab() === 'instructor'"
+          [class.text-white]="activeTab() === 'instructor'"
+          [class.shadow-md]="activeTab() === 'instructor'"
+          (click)="activeTab.set('instructor')"
+        >
+          <i class="fas fa-chalkboard-teacher mr-2"></i> Portal de Instructor
+        </button>
+      </div>
+    }
+
+    <!-- Loading State -->
+    @if (loading()) {
+      <div class="flex flex-col items-center justify-center py-24 gap-3">
+        <span class="loading loading-spinner loading-lg text-blue-600"></span>
+        <span class="text-sm text-slate-500">Cargando tus cursos y estado académico...</span>
+      </div>
+    } @else {
+      <!-- TAB 1: Estudiante -->
+      @if (activeTab() === 'estudios') {
+        @if (enrolledCourses().length === 0) {
+          <div class="text-center py-20 bg-white dark:bg-slate-800 rounded-3xl shadow-xs border border-slate-200 dark:border-slate-700 p-8">
+            <div class="w-20 h-20 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">
+              <i class="fas fa-graduation-cap"></i>
+            </div>
+            <h2 class="text-xl font-bold text-slate-800 dark:text-slate-100 mb-2">
+              Aún no tienes cursos inscritos
+            </h2>
+            <p class="text-slate-500 dark:text-slate-400 mb-6 max-w-md mx-auto text-sm">
+              Explorá nuestra academia técnica y descubrí las capacitaciones en electrónica, reparación, programación y más.
+            </p>
+            <a routerLink="/academy" class="btn bg-blue-600 hover:bg-blue-700 text-white font-medium border-none shadow-sm">
+              <i class="fas fa-search mr-2"></i> Explorar Catálogo de Cursos
+            </a>
+          </div>
+        } @else {
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @for (enrollment of enrolledCourses(); track enrollment.id) {
+              @if (enrollment.course; as course) {
+                <div class="card bg-white dark:bg-slate-800 shadow-xs hover:shadow-md transition-all border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col rounded-2xl">
+                  <!-- Course Image & Status Badge -->
+                  <figure class="aspect-video relative bg-slate-100 dark:bg-slate-900">
+                    @if (course.image_url) {
+                      <img
+                        [src]="course.image_url"
+                        [alt]="course.title"
+                        class="w-full h-full object-cover"
+                        (error)="onImgError($event)"
+                      />
+                    } @else {
+                      <div class="flex items-center justify-center w-full h-full text-slate-300 dark:text-slate-600 text-4xl">
+                        <i class="fas fa-book"></i>
+                      </div>
+                    }
+
+                    <!-- Badge de estado de cuota / cursada (5.1) -->
+                    <div class="absolute top-3 right-3 max-w-[90%]">
+                      <span
+                        class="badge border text-xs font-bold py-3 px-3 shadow-sm rounded-lg"
+                        [ngClass]="getBadgeClass(enrollment.effective_status)">
+                        {{ getBadgeLabel(enrollment) }}
+                      </span>
+                    </div>
+                  </figure>
+
+                  <!-- Card Body -->
+                  <div class="card-body p-5 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h2 class="card-title text-lg font-bold text-slate-900 dark:text-white leading-tight mb-2">
+                        {{ course.title }}
+                      </h2>
+                      <p class="text-slate-600 dark:text-slate-400 text-xs line-clamp-2 mb-3">
+                        {{ course.short_description || 'Capacitación profesional en Arecofix Academy.' }}
+                      </p>
+
+                      <!-- Cuotas & Plan de Pagos Info (5.1) -->
+                      @if (enrollment.effective_status !== 'scholarship') {
+                        <div class="bg-slate-50 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-100 dark:border-slate-700/60 mb-3">
+                          <div class="flex items-center justify-between text-xs mb-1.5">
+                            <span class="text-slate-500 font-medium">Cuotas regularizadas:</span>
+                            <span class="font-bold text-slate-800 dark:text-slate-200">
+                              {{ enrollment.installments_paid || 0 }} de {{ enrollment.installments_count || 1 }}
+                            </span>
+                          </div>
+                          <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">
+                            <div
+                              class="bg-blue-600 h-1.5 rounded-full transition-all duration-500"
+                              [style.width.%]="((enrollment.installments_paid || 0) / (enrollment.installments_count || 1)) * 100">
+                            </div>
+                          </div>
+                          @if (enrollment.next_due_date && enrollment.effective_status !== 'completed') {
+                            <div class="text-[11px] text-slate-500 mt-1.5 flex justify-between">
+                              <span>Próximo vencimiento:</span>
+                              <span class="font-mono font-medium text-slate-700 dark:text-slate-300">
+                                {{ enrollment.next_due_date | date:'dd/MM/yyyy' }}
+                              </span>
+                            </div>
+                          }
+                        </div>
+                      } @else {
+                        <div class="bg-cyan-50 dark:bg-cyan-950/30 p-2.5 rounded-xl border border-cyan-200 dark:border-cyan-800/40 text-xs text-cyan-800 dark:text-cyan-300 font-medium flex items-center gap-2 mb-3">
+                          <i class="fas fa-award"></i>
+                          <span>Beca 100% activa — Acceso total bonificado</span>
+                        </div>
+                      }
+                    </div>
+
+                    <!-- Card Action Buttons (5.2) -->
+                    <div class="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-700/60">
+                      <!-- Certificado si ya lo tiene emitido -->
+                      @if (enrollment.certificate) {
+                        <a
+                          [href]="enrollment.certificate.pdf_url || ('/api/academy/certificates/' + enrollment.certificate.id + '/pdf')"
+                          target="_blank"
+                          class="btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white w-full border-none font-semibold">
+                          <i class="fas fa-file-pdf mr-1.5"></i> Descargar Certificado
+                        </a>
+                        <a
+                          [routerLink]="['/academy/verify', enrollment.certificate.id]"
+                          class="btn btn-outline btn-xs w-full font-medium">
+                          <i class="fas fa-qrcode mr-1"></i> Validar Certificado (QR)
+                        </a>
+                      }
+
+                      <!-- Bloqueo Lazy / Botón de Acción según estado -->
+                      @if (enrollment.effective_status === 'suspended' || enrollment.effective_status === 'pending_payment') {
+                        <!-- Acceso bloqueado: botón para pagar cuota -->
+                        <button
+                          type="button"
+                          (click)="openPayModal(enrollment)"
+                          class="btn btn-sm bg-rose-600 hover:bg-rose-700 text-white w-full border-none font-bold shadow-xs gap-1.5">
+                          <i class="fas fa-credit-card"></i> Pagar Cuota / Regularizar
+                        </button>
+                        <span class="text-[11px] text-center text-slate-400 block">
+                          Regularizá tu cuota para desbloquear las clases y exámenes.
+                        </span>
+                      } @else if (enrollment.effective_status === 'grace_period') {
+                        <!-- En gracia: puede ir al aula pero se le recuerda pagar -->
+                        <a
+                          [routerLink]="['/academy', course.slug, 'aula']"
+                          class="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white w-full border-none font-semibold">
+                          <i class="fas fa-chalkboard-teacher mr-1.5"></i> Ir al Aula
+                        </a>
+                        <button
+                          type="button"
+                          (click)="openPayModal(enrollment)"
+                          class="btn btn-xs btn-outline border-amber-500 text-amber-600 dark:text-amber-400 hover:bg-amber-500 hover:text-white w-full font-medium gap-1">
+                          <i class="fas fa-exclamation-triangle"></i> Pagar Cuota (En Gracia)
+                        </button>
+                      } @else {
+                        <!-- Al día / Becado / Completado: acceso directo -->
+                        <a
+                          [routerLink]="['/academy', course.slug, 'aula']"
+                          class="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white w-full border-none font-semibold">
+                          <i class="fas fa-chalkboard-teacher mr-1.5"></i> Ir al Aula
+                        </a>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+            }
+          </div>
+        }
+      }
+
+      <!-- TAB 2: Instructor -->
+      @if (activeTab() === 'instructor') {
+        <div class="bg-indigo-50 dark:bg-slate-800/80 rounded-3xl p-8 border border-indigo-100 dark:border-slate-700 mb-8 shadow-xs">
+          <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-6">
+              <div class="w-16 h-16 rounded-2xl bg-indigo-600 flex items-center justify-center text-white text-2xl shadow-md shadow-indigo-500/20">
+                <i class="fas fa-user-tie"></i>
+              </div>
+              <div>
+                <h2 class="text-2xl font-bold text-slate-900 dark:text-white">Portal de Instructor</h2>
+                <p class="text-slate-600 dark:text-slate-400 text-sm mt-0.5">
+                  Tienes <strong class="text-indigo-600 dark:text-indigo-400">{{ authoredCourses().length }}</strong> programas bajo tu cargo.
+                </p>
+              </div>
+            </div>
+            <a
+              routerLink="/instructor"
+              class="btn bg-indigo-600 hover:bg-indigo-700 text-white border-none rounded-xl px-6">
+              <i class="fas fa-external-link-alt mr-2"></i> Administrador Docente
+            </a>
+          </div>
+        </div>
+
+        @if (authoredCourses().length > 0) {
+          <h3 class="font-bold text-lg text-slate-800 dark:text-white mb-4">Tus Cursos Asignados</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            @for (course of authoredCourses().slice(0, 6); track course.id) {
+              <div class="card bg-white dark:bg-slate-800 shadow-xs border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden p-5 flex flex-col justify-between">
+                <div>
+                  <h4 class="font-bold text-base text-slate-900 dark:text-white mb-2">{{ course.title }}</h4>
+                  <p class="text-xs text-slate-500 line-clamp-2">{{ course.short_description || 'Sin descripción' }}</p>
+                </div>
+                <div class="mt-4">
+                  <a [routerLink]="['/instructor/builder', course.id]" class="btn btn-xs btn-outline border-indigo-300 text-indigo-600 w-full">
+                    <i class="fas fa-edit mr-1"></i> Gestionar Contenidos
+                  </a>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      }
+    }
+  </div>
+
+  <!-- MODAL 5.3: PAGAR CUOTA (ALUMNO) -->
+  @if (showPayModal() && selectedEnrollmentForPay(); as sel) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+      <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-200 dark:border-slate-700 animate-in fade-in zoom-in-95 duration-150 max-h-[90vh] flex flex-col">
+        <!-- Modal Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-5 flex items-center justify-between shrink-0">
+          <div>
+            <span class="text-xs font-semibold uppercase tracking-wider text-blue-200">Arecofix Academy</span>
+            <h3 class="text-lg font-bold">Pagar Cuota de Curso</h3>
+          </div>
+          <button
+            type="button"
+            (click)="closePayModal()"
+            class="text-white/80 hover:text-white p-1 rounded-lg">
+            <i class="fas fa-times text-lg"></i>
+          </button>
+        </div>
+
+        <!-- Modal Content (Scrollable) -->
+        <div class="p-6 overflow-y-auto space-y-5 flex-1">
+          <!-- Summary Card -->
+          <div class="bg-slate-50 dark:bg-slate-900/70 p-4 rounded-xl border border-slate-200 dark:border-slate-700/60 text-xs space-y-1.5">
+            <div class="flex justify-between">
+              <span class="text-slate-500">Curso:</span>
+              <span class="font-bold text-slate-800 dark:text-slate-100">{{ sel.course?.title }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500">Cuota a regularizar:</span>
+              <span class="font-bold text-blue-600 dark:text-blue-400">
+                Cuota N° {{ (sel.installments_paid || 0) + 1 }} de {{ sel.installments_count || 1 }}
+              </span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-slate-500">Importe mensual:</span>
+              <span class="font-bold text-emerald-600 dark:text-emerald-400 font-mono text-sm">
+                ${{ (sel.installment_amount || (sel.agreed_price ? sel.agreed_price / (sel.installments_count || 1) : 0)) | number:'1.0-0' }} ARS
+              </span>
+            </div>
+          </div>
+
+          <!-- Opción 1: Transferencia Bancaria -->
+          <div class="border border-blue-200 dark:border-blue-900/50 rounded-xl p-4 bg-blue-50/40 dark:bg-blue-950/20 space-y-3">
+            <div class="flex items-center gap-2 text-blue-900 dark:text-blue-300 font-bold text-sm">
+              <i class="fas fa-university"></i>
+              <span>Transferencia Bancaria Directa</span>
+            </div>
+            
+            <div class="space-y-2 text-xs">
+              <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700">
+                <div>
+                  <span class="text-[10px] text-slate-400 uppercase font-semibold block">Alias CBU</span>
+                  <span class="font-mono font-bold text-slate-800 dark:text-slate-100 text-sm">ARECOFIX</span>
+                </div>
+                <button
+                  type="button"
+                  (click)="copyToClipboard('ARECOFIX', 'Alias')"
+                  class="btn btn-xs btn-outline border-blue-300 text-blue-600 gap-1">
+                  <i class="fas fa-copy"></i> Copiar
+                </button>
+              </div>
+
+              <div class="flex items-center justify-between bg-white dark:bg-slate-800 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700">
+                <div>
+                  <span class="text-[10px] text-slate-400 uppercase font-semibold block">CBU</span>
+                  <span class="font-mono font-bold text-slate-800 dark:text-slate-100 text-xs">0140026703518851410948</span>
+                </div>
+                <button
+                  type="button"
+                  (click)="copyToClipboard('0140026703518851410948', 'CBU')"
+                  class="btn btn-xs btn-outline border-blue-300 text-blue-600 gap-1">
+                  <i class="fas fa-copy"></i> Copiar
+                </button>
+              </div>
+
+              <div class="text-[11px] text-slate-500 space-y-0.5 pt-1">
+                <div><strong>Banco:</strong> Banco de la Provincia de Buenos Aires</div>
+                <div><strong>Titular:</strong> Ezequiel Enrico Areco</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Opción 2: Mercado Pago (Próximamente) -->
+          <div class="border border-slate-200 dark:border-slate-700 rounded-xl p-3 bg-slate-50 dark:bg-slate-900/40 flex items-center justify-between opacity-70">
+            <div class="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300">
+              <i class="fas fa-credit-card text-blue-500"></i>
+              <span>Mercado Pago (Tarjetas, Débito, Dinero en cuenta)</span>
+            </div>
+            <span class="badge badge-sm badge-ghost text-[10px]">Próximamente</span>
+          </div>
+
+          <!-- Sección 3: Ya transferí -> Subir Comprobante -->
+          <form (ngSubmit)="submitProof()" class="space-y-3 pt-2 border-t border-slate-200 dark:border-slate-700">
+            <h4 class="font-bold text-xs uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-2">
+              <i class="fas fa-cloud-upload-alt text-blue-600"></i>
+              <span>Subir Comprobante de Transferencia</span>
+            </h4>
+
+            <!-- File input -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Adjuntar archivo (PDF, JPG, PNG) *
+              </label>
+              <input
+                type="file"
+                accept=".pdf,image/png,image/jpeg,image/webp"
+                (change)="onProofFileSelected($event)"
+                required
+                class="file-input file-input-bordered file-input-sm w-full text-xs"
+              />
+              @if (selectedProofFile()) {
+                <span class="text-[11px] text-emerald-600 mt-1 block">
+                  ✓ Archivo seleccionado: {{ selectedProofFile()?.name }} ({{ ((selectedProofFile()?.size || 0) / 1024).toFixed(0) }} KB)
+                </span>
+              }
+            </div>
+
+            <!-- Monto transferido -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Monto Transferido ($) *
+              </label>
+              <input
+                type="number"
+                min="1"
+                [ngModel]="proofAmount()"
+                (ngModelChange)="proofAmount.set($event)"
+                name="proofAmount"
+                required
+                class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
+              />
+            </div>
+
+            <!-- Notas -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Número de transacción / Comentarios (opcional)
+              </label>
+              <input
+                type="text"
+                placeholder="Ej: Operación N° 849203 desde Banco Nación"
+                [ngModel]="proofNotes()"
+                (ngModelChange)="proofNotes.set($event)"
+                name="proofNotes"
+                class="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:outline-hidden"
+              />
+            </div>
+
+            <div class="pt-2">
+              <button
+                type="submit"
+                [disabled]="isSubmittingProof() || !selectedProofFile()"
+                class="btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white w-full border-none shadow-sm gap-2">
+                @if (isSubmittingProof()) {
+                  <span class="loading loading-spinner loading-xs"></span>
+                  <span>Enviando Comprobante...</span>
+                } @else {
+                  <i class="fas fa-check-circle"></i>
+                  <span>Enviar Comprobante para Verificación</span>
+                }
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="p-3 bg-slate-50 dark:bg-slate-900/60 border-t border-slate-200 dark:border-slate-700 flex justify-end shrink-0">
+          <button
+            type="button"
+            (click)="closePayModal()"
+            class="btn btn-sm btn-ghost text-slate-600 dark:text-slate-400">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
+

@@ -609,7 +609,17 @@ export class AdminDashboardPage implements OnInit, OnDestroy {
         has_delayed_alert: hasDelayedAlert,
         active_subscriptions_count: isNaN(activeSubs) ? 0 : activeSubs,
         academy_revenue: isNaN(academyRev) ? 0 : academyRev,
-        critical_stock_count: isNaN(critStockCount) ? 0 : critStockCount
+        critical_stock_count: isNaN(critStockCount) ? 0 : critStockCount,
+        alumnos_matriculados: Number(rawKpis['alumnos_matriculados'] ?? activeSubs),
+        alumnos_becados: Number(rawKpis['alumnos_becados'] ?? 0),
+        alumnos_pendientes_pago: Number(rawKpis['alumnos_pendientes_pago'] ?? 0),
+        alumnos_al_dia: Number(rawKpis['alumnos_al_dia'] ?? 0),
+        alumnos_suspendidos: Number(rawKpis['alumnos_suspendidos'] ?? 0),
+        ingresos_mes: Number(rawKpis['ingresos_mes'] ?? academyRev),
+        ingresos_historicos: Number(rawKpis['ingresos_historicos'] ?? 0),
+        facturacion_potencial_mensual: Number(rawKpis['facturacion_potencial_mensual'] ?? 0),
+        certificados_validos: Number(rawKpis['certificados_validos'] ?? 0),
+        suscripciones_activas: Number(rawKpis['suscripciones_activas'] ?? 0)
       },
       alerts: {
         critical_stock_items: critItems,

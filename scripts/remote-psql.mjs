@@ -11,8 +11,9 @@ if (fs.existsSync(sql)) {
   sql = fs.readFileSync(sql, 'utf8');
 }
 
+const user = process.env.PGUSER || 'supabase_admin';
 try {
-  const result = execSync(`ssh -i ssh-key-2026-08-30.key ubuntu@ssh.arecofix.com.ar "docker exec -i supabase-db psql -U postgres"`, {
+  const result = execSync(`ssh -i ssh-key-2026-08-30.key ubuntu@ssh.arecofix.com.ar "docker exec -i -e PGPASSWORD=eze321 supabase-db psql -U ${user} -d postgres"`, {
     input: sql,
     encoding: 'utf-8'
   });

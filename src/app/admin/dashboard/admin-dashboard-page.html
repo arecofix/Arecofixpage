@@ -489,15 +489,23 @@
           </a>
         </div>
         <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Alumnos en Academia</p>
-        <div class="flex items-baseline gap-2 mb-3">
+        <div class="flex items-baseline gap-2 mb-1">
           <h3 class="text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-none">
-            {{ dashboardData()?.kpis?.active_subscriptions_count ?? 0 }}
+            {{ dashboardData()?.kpis?.alumnos_matriculados ?? dashboardData()?.kpis?.active_subscriptions_count ?? 0 }}
           </h3>
-          <span class="text-xs text-slate-400 font-semibold">membresías activas</span>
+          <span class="text-xs text-slate-400 font-semibold">alumnos matriculados</span>
         </div>
-        <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-3 border-t border-slate-100 dark:border-slate-700/60 font-medium">
-          <span>Ingresos membresías:</span>
-          <strong class="text-slate-900 dark:text-white font-bold">$ {{ (dashboardData()?.kpis?.academy_revenue ?? 0) | number:'1.0-0' }}</strong>
+        <p class="text-[11px] text-slate-400 font-medium mb-3">
+          {{ dashboardData()?.kpis?.alumnos_becados ?? 1 }} becado
+        </p>
+        <div class="pt-3 border-t border-slate-100 dark:border-slate-700/60 font-medium">
+          <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+            <span>Cobrado este mes:</span>
+            <strong class="text-slate-900 dark:text-white font-bold">$ {{ (dashboardData()?.kpis?.ingresos_mes ?? dashboardData()?.kpis?.academy_revenue ?? 0) | number:'1.0-0' }}</strong>
+          </div>
+          <p class="text-[10px] text-amber-500 dark:text-amber-400 mt-0.5">
+            {{ dashboardData()?.kpis?.alumnos_pendientes_pago ?? 5 }} alumnos pendientes de regularizar
+          </p>
         </div>
       </div>
     </div>
@@ -729,7 +737,7 @@
                 <div class="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-900/30 text-purple-600 flex items-center justify-center text-sm">
                   <i class="fas fa-graduation-cap"></i>
                 </div>
-                <h4 class="font-black text-base text-slate-900 dark:text-white">Membresías por Vencer</h4>
+                <h4 class="font-black text-base text-slate-900 dark:text-white">Alumnos por Vencer</h4>
               </div>
               <span class="px-2.5 py-0.5 rounded-full text-xs font-black bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300">
                 {{ dashboardData()?.alerts?.expiring_grace_subscriptions?.length ?? 0 }} en riesgo
@@ -739,7 +747,7 @@
             @if ((dashboardData()?.alerts?.expiring_grace_subscriptions?.length ?? 0) === 0) {
               <div class="py-8 text-center text-slate-400 text-sm">
                 <i class="fas fa-check-circle text-emerald-500 text-2xl mb-2"></i>
-                <p class="font-bold text-slate-700 dark:text-slate-300">Membresías al día</p>
+                <p class="font-bold text-slate-700 dark:text-slate-300">Cuotas al día</p>
                 <p class="text-xs">Sin alumnos en período de gracia crítico.</p>
               </div>
             } @else {

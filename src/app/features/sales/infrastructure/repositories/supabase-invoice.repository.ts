@@ -138,7 +138,7 @@ export class SupabaseInvoiceRepository extends InvoiceRepository {
         .from('invoices')
         .select('*')
         .or(`repair_id.eq.${repairId},repair_order_id.eq.${repairId}`)
-        .order('created_at', { ascending: false })
+        .order('issued_at', { ascending: false })
         .limit(1);
 
       if (tenantId) {

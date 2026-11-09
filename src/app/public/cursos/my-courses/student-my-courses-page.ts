@@ -3,342 +3,28 @@ import {
   inject,
   OnInit,
   signal,
-  computed,
   ChangeDetectionStrategy,
+  ChangeDetectorRef
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { CoursesService } from '@app/core/services/courses.service';
 import { AuthService } from '@app/core/services/auth.service';
 import { CourseRepository } from '@app/features/courses/domain/repositories/course.repository';
-import { Course, StudentEnrollment } from '@app/features/courses/domain/entities/course.entity';
+import { Course, StudentEnrollment, EffectiveEnrollmentStatus } from '@app/features/courses/domain/entities/course.entity';
 import { SeoService } from '@app/core/services/seo.service';
 import { CertificatesService, Certificate } from '@app/features/courses/application/services/certificates.service';
-import { AcademySubscriptionService } from '@app/core/services/academy-subscription.service';
 import { ToastService } from '@app/shared/services/toast.service';
-import { firstValueFrom } from 'rxjs';
+import { SUPABASE_CLIENT } from '@app/core/di/supabase-token';
+import { EnrollmentStatusCalculator } from '@app/features/courses/domain/services/enrollment-status.calculator';
+
 @Component({
   selector: 'app-student-my-courses-page',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, FormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <div class="min-h-screen bg-slate-50 dark:bg-slate-900 py-12">
-      <div class="container mx-auto px-4 max-w-6xl">
-        <div class="mb-8">
-          <h1 class="text-3xl font-bold text-slate-800 dark:text-white">
-            Mi Academia
-          </h1>
-          <p class="text-slate-600 dark:text-slate-400 mt-2">
-            Bienvenido a tu centro de aprendizaje y enseñanza.
-          </p>
-        </div>
-
-        <!-- Grace Period Banner -->
-        @if (isGracePeriod()) {
-          <div class="mb-8 p-4 rounded-2xl bg-amber-500 text-slate-900 font-bold shadow-md flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
-            <div class="flex items-center gap-2">
-              <i class="fas fa-exclamation-triangle text-lg"></i>
-              <span>Tu membresía venció. Tienes 7 días de gracia para renovar.</span>
-            </div>
-            <button (click)="payMembership()" [disabled]="isSubscribing()" class="btn btn-sm bg-slate-900 text-white hover:bg-slate-800 border-none rounded-xl">
-              @if (isSubscribing()) {
-                <span class="loading loading-spinner loading-xs"></span>
-              } @else {
-                <i class="fas fa-credit-card mr-1"></i> Pagar Ahora
-              }
-            </button>
-          </div>
-        }
-
-        <!-- Expired/Suspended Banner -->
-        @if (isBlocked()) {
-          <div class="mb-8 p-4 rounded-2xl bg-rose-600 text-white font-bold shadow-md flex flex-col sm:flex-row items-center justify-between gap-3 text-sm">
-            <div class="flex items-center gap-2">
-              <i class="fas fa-lock text-lg"></i>
-              <span>Tu acceso a la academia ha expirado. Renueva tu membresía para continuar.</span>
-            </div>
-            <button (click)="payMembership()" [disabled]="isSubscribing()" class="btn btn-sm bg-white text-rose-700 hover:bg-rose-50 border-none rounded-xl">
-              @if (isSubscribing()) {
-                <span class="loading loading-spinner loading-xs"></span>
-              } @else {
-                <i class="fas fa-bolt mr-1"></i> Renovar Membresía
-              }
-            </button>
-          </div>
-        }
-
-        <!-- Role-based Tabs -->
-        @if (isInstructor() || isAdmin()) {
-          <div
-            role="tablist"
-            class="tabs tabs-boxed mb-8 p-1 bg-slate-200/50 dark:bg-slate-800/50 inline-flex"
-          >
-            <a
-              role="tab"
-              class="tab h-10 px-6 font-bold"
-              [class.tab-active]="activeTab() === 'estudios'"
-              [class.bg-white]="activeTab() === 'estudios'"
-              [class.dark:bg-slate-700]="activeTab() === 'estudios'"
-              [class.shadow-sm]="activeTab() === 'estudios'"
-              (click)="activeTab.set('estudios')"
-            >
-              <i class="fas fa-user-graduate mr-2"></i> Mis Estudios
-            </a>
-            <a
-              role="tab"
-              class="tab h-10 px-6 font-bold"
-              [class.tab-active]="activeTab() === 'instructor'"
-              [class.bg-indigo-600]="activeTab() === 'instructor'"
-              [class.text-white]="activeTab() === 'instructor'"
-              [class.shadow-md]="activeTab() === 'instructor'"
-              [class.shadow-indigo-500/30]="activeTab() === 'instructor'"
-              (click)="activeTab.set('instructor')"
-            >
-              <i class="fas fa-chalkboard-teacher mr-2"></i> Portal de
-              Instructor
-            </a>
-          </div>
-        }
-
-        @if (loading()) {
-          <div class="flex justify-center py-20">
-            <span
-              class="loading loading-spinner loading-lg text-indigo-500"
-            ></span>
-          </div>
-        } @else {
-          <!-- TAB 1: Estudiante -->
-          @if (activeTab() === 'estudios') {
-            @if (enrolledCourses().length === 0) {
-              <div
-                class="text-center py-20 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700"
-              >
-                <div class="text-6xl mb-4 text-slate-300 dark:text-slate-600">
-                  <i class="fas fa-graduation-cap"></i>
-                </div>
-                <h2
-                  class="text-xl font-bold text-slate-700 dark:text-slate-200 mb-2"
-                >
-                  Aún no tienes cursos inscritos
-                </h2>
-                <p
-                  class="text-slate-500 dark:text-slate-400 mb-6 max-w-md mx-auto"
-                >
-                  Explora nuestra academia y descubre el curso perfecto para
-                  llevar tus habilidades al siguiente nivel.
-                </p>
-                <a routerLink="/academy" class="btn btn-primary">
-                  <i class="fas fa-search mr-2"></i> Explorar Cursos
-                </a>
-              </div>
-            } @else {
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @for (enrollment of enrolledCourses(); track enrollment.id) {
-                  @if (enrollment.course; as course) {
-                    <div
-                      class="card bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-all border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col"
-                    >
-                      <figure
-                        class="aspect-video relative bg-slate-100 dark:bg-slate-900"
-                      >
-                        @if (course.image_url) {
-                          <img
-                            [src]="course.image_url"
-                            [alt]="course.title"
-                            class="w-full h-full object-cover"
-                            (error)="onImgError($event)"
-                          />
-                        } @else {
-                          <div
-                            class="flex items-center justify-center w-full h-full text-slate-300 dark:text-slate-600 text-4xl"
-                          >
-                            <i class="fas fa-book"></i>
-                          </div>
-                        }
-                        <div class="absolute top-3 right-3">
-                          <span
-                            class="badge badge-success border-none text-white shadow-sm font-medium"
-                            >Matriculado</span
-                          >
-                        </div>
-                      </figure>
-                      <div class="card-body p-6 flex-1 flex flex-col">
-                        <h2
-                          class="card-title text-xl text-slate-800 dark:text-white leading-tight mb-2"
-                        >
-                          {{ course.title }}
-                        </h2>
-                        <p
-                          class="text-slate-600 dark:text-slate-400 text-sm line-clamp-2 flex-1"
-                        >
-                          {{
-                            course.short_description ||
-                              'Sin descripción'
-                          }}
-                        </p>
-
-                        <div class="divider my-2"></div>
-
-                        <div class="card-actions justify-end mt-2 flex-col gap-2">
-                          @if (enrollment.certificate) {
-                            <a
-                              [href]="enrollment.certificate.pdf_url || ('/api/academy/certificates/' + enrollment.certificate.id + '/pdf')"
-                              target="_blank"
-                              class="btn btn-success w-full text-white download-certificate-btn font-bold"
-                            >
-                              <i class="fas fa-file-pdf mr-2"></i> Descargar Certificado
-                            </a>
-                            <a
-                              [routerLink]="['/academy/verify', enrollment.certificate.id]"
-                              class="btn btn-outline btn-sm w-full font-medium"
-                            >
-                              <i class="fas fa-qrcode mr-2"></i> Validar Certificado (QR)
-                            </a>
-                          } @else if (enrollment.progress === 100) {
-                            <a
-                              [href]="'/api/academy/certificates/' + enrollment.id + '/pdf'"
-                              target="_blank"
-                              class="btn btn-success w-full text-white download-certificate-btn font-bold"
-                            >
-                              <i class="fas fa-file-pdf mr-2"></i> Descargar Certificado
-                            </a>
-                          }
-                          <a
-                            [routerLink]="[
-                              '/academy',
-                              course.slug,
-                              'aula',
-                            ]"
-                            class="btn btn-primary w-full"
-                          >
-                            <i class="fas fa-chalkboard-teacher mr-2"></i> Ir al Aula
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                  }
-                }
-              </div>
-            }
-          }
-
-          <!-- TAB 2: Instructor -->
-          @if (activeTab() === 'instructor') {
-            <div
-              class="bg-indigo-50 dark:bg-slate-800/80 rounded-3xl p-8 border border-indigo-100 dark:border-slate-700 mb-8 shadow-sm"
-            >
-              <div
-                class="flex flex-col md:flex-row items-center justify-between gap-6"
-              >
-                <div class="flex items-center gap-6">
-                  <div
-                    class="w-20 h-20 rounded-full bg-indigo-600 flex items-center justify-center text-white text-3xl shadow-lg shadow-indigo-500/30"
-                  >
-                    <i class="fas fa-user-tie"></i>
-                  </div>
-                  <div>
-                    <h2
-                      class="text-2xl font-black text-slate-900 dark:text-white"
-                    >
-                      Portal de Instructor
-                    </h2>
-                    <p class="text-slate-600 dark:text-slate-400">
-                      Tienes
-                      <strong class="text-indigo-600 dark:text-indigo-400">{{
-                        authoredCourses().length
-                      }}</strong>
-                      cursos propuestos/activos bajo tu cargo.
-                    </p>
-                  </div>
-                </div>
-                <a
-                  routerLink="/instructor"
-                  class="btn bg-indigo-600 hover:bg-indigo-700 text-white border-none rounded-xl px-8 shadow-lg shadow-indigo-500/30 w-full md:w-auto h-14"
-                >
-                  <i class="fas fa-external-link-alt mr-2"></i> Ingresar al
-                  Administrador
-                </a>
-              </div>
-            </div>
-
-            @if (authoredCourses().length > 0) {
-              <h3 class="font-bold text-xl text-slate-800 dark:text-white mb-4">
-                Tus Programas Activos
-              </h3>
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @for (
-                  course of authoredCourses().slice(0, 3);
-                  track course.id
-                ) {
-                  <div
-                    class="card bg-white dark:bg-slate-800 shadow-sm hover:shadow-md transition-all border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col"
-                  >
-                    <figure
-                      class="h-32 relative bg-slate-100 dark:bg-slate-900"
-                    >
-                      @if (course.image_url) {
-                        <img
-                          [src]="course.image_url"
-                          [alt]="course.title"
-                          class="w-full h-full object-cover"
-                        />
-                      }
-                    </figure>
-                    <div class="card-body p-5">
-                      <h2
-                        class="font-bold text-slate-800 dark:text-white text-lg leading-tight line-clamp-2"
-                      >
-                        {{ course.title }}
-                      </h2>
-                      <div class="mt-4">
-                        <a
-                          [routerLink]="['/instructor/builder', course.id]"
-                          class="btn btn-sm btn-outline border-indigo-200 text-indigo-600 hover:bg-indigo-600 hover:text-white w-full"
-                        >
-                          <i class="fas fa-edit mr-1"></i> Editar Curso
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                }
-              </div>
-              @if (authoredCourses().length > 3) {
-                <div class="text-center mt-6">
-                  <a
-                    routerLink="/instructor"
-                    class="btn btn-ghost text-indigo-600"
-                    >Ver todos tus cursos <i class="fas fa-arrow-right ml-1"></i
-                  ></a>
-                </div>
-              }
-            } @else {
-              <div class="text-center py-12">
-                <div
-                  class="w-16 h-16 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400 text-2xl"
-                >
-                  <i class="fas fa-lightbulb"></i>
-                </div>
-                <h3
-                  class="text-lg font-bold text-slate-700 dark:text-slate-200"
-                >
-                  Aún no has propuesto cursos
-                </h3>
-                <p class="text-slate-500 mb-4">
-                  Comienza a crear tu primer curso y compártelo.
-                </p>
-                <a
-                  routerLink="/instructor/builder"
-                  class="btn btn-sm bg-indigo-600 hover:bg-indigo-700 text-white border-none"
-                  >Sugerir Capacitación</a
-                >
-              </div>
-            }
-          }
-        }
-      </div>
-    </div>
-  `,
+  templateUrl: './student-my-courses-page.html'
 })
 export class StudentMyCoursesPage implements OnInit {
   private coursesService = inject(CoursesService);
@@ -346,8 +32,9 @@ export class StudentMyCoursesPage implements OnInit {
   private courseRepo = inject(CourseRepository);
   private seoService = inject(SeoService);
   private certificatesService = inject(CertificatesService);
-  private academySubscriptionService = inject(AcademySubscriptionService);
   private toastService = inject(ToastService);
+  private supabase = inject(SUPABASE_CLIENT);
+  private cdr = inject(ChangeDetectorRef);
 
   enrolledCourses = signal<StudentEnrollment[]>([]);
   authoredCourses = signal<Course[]>([]);
@@ -357,16 +44,20 @@ export class StudentMyCoursesPage implements OnInit {
 
   isInstructor = signal(false);
   isAdmin = signal(false);
-  isGracePeriod = signal(false);
-  isBlocked = signal(false);
-  isSubscribing = signal(false);
+
+  // Modal Pagar Cuota State (5.3)
+  showPayModal = signal(false);
+  selectedEnrollmentForPay = signal<StudentEnrollment | null>(null);
+  selectedProofFile = signal<File | null>(null);
+  proofAmount = signal<number>(0);
+  proofNotes = signal<string>('');
+  isSubmittingProof = signal(false);
 
   async ngOnInit() {
     this.seoService.setPageData({
       title: 'Mis Cursos',
-      description:
-        'Accede a todos tus cursos inscritos y gestiona tu aprendizaje en Arecofix Academy.',
-      imageUrl: 'https://arecofix.com.ar/assets/img/cursos/academy/academy.jpg',
+      description: 'Accede a tus cursos matriculados y gestiona tu aprendizaje en Arecofix Academy.',
+      imageUrl: 'https://arecofix.com.ar/assets/img/cursos/academy/academy.jpg'
     });
 
     const session = await this.authService.getSession();
@@ -375,9 +66,7 @@ export class StudentMyCoursesPage implements OnInit {
 
     if (profile) {
       this.isInstructor.set(profile.role === 'instructor');
-      this.isAdmin.set(
-        profile.role === 'admin' || profile.role === 'super_admin',
-      );
+      this.isAdmin.set(profile.role === 'admin' || profile.role === 'super_admin');
     }
 
     const userEmail = user?.email || profile?.email || '';
@@ -387,9 +76,9 @@ export class StudentMyCoursesPage implements OnInit {
       this.loadMyCourses(userEmail, userId);
     } else {
       this.loading.set(false);
+      this.cdr.markForCheck();
     }
 
-    // If instructor/admin, pre-load authored courses
     if (profile && (this.isInstructor() || this.isAdmin())) {
       try {
         const allCourses = await this.courseRepo.getAll();
@@ -404,65 +93,190 @@ export class StudentMyCoursesPage implements OnInit {
   async loadMyCourses(email?: string, userId?: string) {
     this.coursesService.getUserEnrolledCourses(email, userId).subscribe(async (res) => {
       const validEnrollments = (res.data || []).filter((e) => !!e.course);
-      
+
       try {
         const certs = email ? await this.certificatesService.getStudentCertificates(email) : [];
         const certMap = new Map<string, Certificate>();
-        certs.forEach(c => certMap.set(c.course_id, c));
-        
-        const enriched: StudentEnrollment[] = validEnrollments.map(e => ({
-          ...e,
-          certificate: certMap.get(e.course_id) || certMap.get(e.course?.id || '') || e.certificate
-        }));
-        
+        certs.forEach((c) => certMap.set(c.course_id, c));
+
+        const enriched: StudentEnrollment[] = validEnrollments.map((e) => {
+          const effectiveStatus = EnrollmentStatusCalculator.calculate(
+            e.payment_plan_status || e.status,
+            e.next_due_date
+          );
+
+          return {
+            ...e,
+            effective_status: effectiveStatus,
+            certificate: certMap.get(e.course_id) || certMap.get(e.course?.id || '') || e.certificate
+          };
+        });
+
         this.enrolledCourses.set(enriched);
       } catch (err) {
-        this.enrolledCourses.set(validEnrollments);
+        const calculated: StudentEnrollment[] = validEnrollments.map((e) => ({
+          ...e,
+          effective_status: EnrollmentStatusCalculator.calculate(
+            e.payment_plan_status || e.status,
+            e.next_due_date
+          )
+        }));
+        this.enrolledCourses.set(calculated);
       }
-      
-      this.loading.set(false);
-    });
 
-    // Check membership status
-    if (userId && !this.isAdmin()) {
-      try {
-        const memStatus = await firstValueFrom(this.academySubscriptionService.checkMembershipStatus(userId));
-        if (memStatus && memStatus.has_subscription) {
-          if (memStatus.status === 'grace_period') {
-            this.isGracePeriod.set(true);
-          } else if (memStatus.status === 'suspended' || memStatus.status === 'expired') {
-            this.isBlocked.set(true);
-          }
-        }
-      } catch {
-        // Fallback
-      }
+      this.loading.set(false);
+      this.cdr.markForCheck();
+    });
+  }
+
+  // --- BADGES Y LABELS (5.1) ---
+  getBadgeClass(status?: EffectiveEnrollmentStatus): string {
+    switch (status) {
+      case 'active':
+        return 'bg-emerald-500 text-white border-emerald-600';
+      case 'grace_period':
+        return 'bg-amber-500 text-slate-900 border-amber-600';
+      case 'suspended':
+        return 'bg-rose-600 text-white border-rose-700';
+      case 'pending_payment':
+        return 'bg-slate-600 text-white border-slate-700';
+      case 'completed':
+        return 'bg-blue-600 text-white border-blue-700';
+      case 'scholarship':
+        return 'bg-cyan-500 text-white border-cyan-600';
+      default:
+        return 'bg-slate-500 text-white border-slate-600';
     }
   }
 
-  payMembership() {
-    this.isSubscribing.set(true);
-    this.academySubscriptionService.createSubscriptionPreference({
-      backUrl: typeof window !== 'undefined' ? window.location.href.split('?')[0] : undefined
-    }).subscribe({
-      next: (res) => {
-        this.isSubscribing.set(false);
-        if (res.success && res.init_point) {
-          if (typeof window !== 'undefined') {
-            window.location.href = res.init_point;
-          }
-        } else {
-          this.toastService.show(res.error || 'Error al conectar con Mercado Pago', 'error');
-        }
-      },
-      error: () => {
-        this.isSubscribing.set(false);
-        this.toastService.show('Error al iniciar suscripción', 'error');
+  getBadgeLabel(enrollment: StudentEnrollment): string {
+    switch (enrollment.effective_status) {
+      case 'active': {
+        const due = enrollment.next_due_date ? new Date(enrollment.next_due_date).toLocaleDateString('es-AR') : '';
+        return due ? `● Al día — Vto: ${due}` : '● Al día';
       }
-    });
+      case 'grace_period': {
+        if (enrollment.next_due_date) {
+          const deadline = new Date(new Date(enrollment.next_due_date).getTime() + 7 * 86400000).toLocaleDateString('es-AR');
+          return `⚠️ En gracia hasta ${deadline}`;
+        }
+        return '⚠️ En período de gracia';
+      }
+      case 'suspended':
+        return '❌ Acceso suspendido';
+      case 'pending_payment':
+        return '⏳ Pendiente de pago';
+      case 'completed':
+        return '✓ Curso completado';
+      case 'scholarship':
+        return '🎓 Becado';
+      default:
+        return 'Matriculado';
+    }
   }
 
-  /** Fallback graceful cuando una imagen del CDN falla al cargar */
+  // --- MODAL PAGAR CUOTA (5.3) ---
+  openPayModal(enrollment: StudentEnrollment) {
+    this.selectedEnrollmentForPay.set(enrollment);
+    const amount = enrollment.installment_amount || (enrollment.agreed_price ? Math.round(enrollment.agreed_price / (enrollment.installments_count || 1)) : 0);
+    this.proofAmount.set(amount);
+    this.proofNotes.set('');
+    this.selectedProofFile.set(null);
+    this.showPayModal.set(true);
+  }
+
+  closePayModal() {
+    this.showPayModal.set(false);
+    this.selectedEnrollmentForPay.set(null);
+    this.selectedProofFile.set(null);
+  }
+
+  onProofFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.selectedProofFile.set(input.files[0]);
+    }
+  }
+
+  copyToClipboard(text: string, label: string) {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      this.toastService.show(`${label} copiado al portapapeles: ${text}`, 'success');
+    }
+  }
+
+  async submitProof() {
+    const enrollment = this.selectedEnrollmentForPay();
+    const file = this.selectedProofFile();
+    if (!enrollment || !file) {
+      this.toastService.show('Seleccioná el archivo de comprobante', 'error');
+      return;
+    }
+
+    const amount = Number(this.proofAmount());
+    if (isNaN(amount) || amount <= 0) {
+      this.toastService.show('Ingresá un importe válido', 'error');
+      return;
+    }
+
+    this.isSubmittingProof.set(true);
+    try {
+      const session = await this.authService.getSession();
+      const userId = session?.user?.id || enrollment.user_id;
+
+      // 1. Subir archivo a bucket 'comprobantes'
+      const cleanFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+      const storagePath = `${userId || 'anon'}/${Date.now()}_${cleanFileName}`;
+
+      const { data: uploadData, error: uploadError } = await this.supabase.storage
+        .from('comprobantes')
+        .upload(storagePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        console.error('Error uploading payment proof:', uploadError);
+        this.toastService.show('Error al subir el comprobante a almacenamiento: ' + uploadError.message, 'error');
+        return;
+      }
+
+      // Obtener URL del archivo
+      const { data: publicUrlData } = this.supabase.storage
+        .from('comprobantes')
+        .getPublicUrl(storagePath);
+
+      const fileUrl = publicUrlData?.publicUrl || storagePath;
+
+      // 2. Insertar en tabla academy_payment_proofs
+      const { error: insertError } = await this.supabase
+        .from('academy_payment_proofs')
+        .insert({
+          enrollment_id: enrollment.id,
+          user_id: userId,
+          amount: amount,
+          file_url: fileUrl,
+          notes: this.proofNotes().trim() || null,
+          status: 'pending'
+        });
+
+      if (insertError) {
+        console.error('Error registering payment proof record:', insertError);
+        this.toastService.show('Error al registrar el comprobante: ' + insertError.message, 'error');
+        return;
+      }
+
+      this.toastService.show('Comprobante recibido correctamente. Lo verificaremos a la brevedad.', 'success');
+      this.closePayModal();
+    } catch (e: any) {
+      console.error('Unexpected error submitting proof:', e);
+      this.toastService.show(e.message || 'Error inesperado al enviar comprobante', 'error');
+    } finally {
+      this.isSubmittingProof.set(false);
+      this.cdr.markForCheck();
+    }
+  }
+
   onImgError(event: Event): void {
     const img = event.target as HTMLImageElement;
     if (img && !img.src.includes('assets/img/branding/inicio.jpg')) {

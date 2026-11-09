@@ -73,6 +73,28 @@ export interface CourseModule {
 }
 
 export type EnrollmentStatus = 'pending' | 'confirmed' | 'rejected' | 'in_progress' | 'completed' | 'cancelled';
+export type PaymentPlanStatus =
+  | 'none'
+  | 'pending_payment'
+  | 'pending'
+  | 'active'
+  | 'in_progress'
+  | 'grace_period'
+  | 'suspended'
+  | 'completed'
+  | 'scholarship'
+  | 'cancelled'
+  | 'overdue';
+export type EffectiveEnrollmentStatus =
+  | 'active'
+  | 'grace_period'
+  | 'suspended'
+  | 'completed'
+  | 'scholarship'
+  | 'cancelled'
+  | 'pending_payment'
+  | 'pending'
+  | 'rejected';
 
 export interface StudentEnrollment {
     id?: string;
@@ -82,6 +104,16 @@ export interface StudentEnrollment {
     email: string;
     phone?: string;
     status: EnrollmentStatus;
+    agreed_price?: number;
+    installments_count?: number;
+    installment_amount?: number;
+    installments_paid?: number;
+    next_due_date?: string | null;
+    expires_at?: string | null;
+    payment_plan_status?: PaymentPlanStatus;
+    effective_status?: EffectiveEnrollmentStatus;
+    notes?: string | null;
+    updated_at?: string;
     tenant_id?: string;
     created_at?: string;
     course?: { 

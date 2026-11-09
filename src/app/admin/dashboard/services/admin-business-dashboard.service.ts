@@ -26,6 +26,16 @@ export interface DashboardKPIs {
   active_subscriptions_count: number;
   academy_revenue: number;
   critical_stock_count: number;
+  alumnos_matriculados?: number;
+  alumnos_becados?: number;
+  alumnos_pendientes_pago?: number;
+  alumnos_al_dia?: number;
+  alumnos_suspendidos?: number;
+  ingresos_mes?: number;
+  ingresos_historicos?: number;
+  facturacion_potencial_mensual?: number;
+  certificados_validos?: number;
+  suscripciones_activas?: number;
 }
 
 export interface CriticalStockItem {
