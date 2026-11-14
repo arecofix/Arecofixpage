@@ -1,123 +1,631 @@
-@if (content$ | async; as content) {
-<!-- 1. HERO SECTION: Premium Dark Gradient (No defer for LCP) -->
-<section
-  class="relative min-h-[90vh] flex items-center pt-24 pb-32 lg:pb-48 overflow-hidden bg-gray-50 dark:bg-[#0a0a0a] text-gray-900 dark:text-white transition-colors duration-300">
-  <div class="absolute inset-0 z-0">
-    <div
-      class="absolute top-[-20%] right-[-10%] w-[250px] h-[250px] md:w-[500px] md:h-[500px] bg-blue-600/10 rounded-full blur-[60px] md:blur-[100px] animate-pulse-slow">
-    </div>
-    <div
-      class="absolute bottom-[-20%] left-[-10%] w-[200px] h-[200px] md:w-[400px] md:h-[400px] bg-purple-600/5 rounded-full blur-2xl md:blur-[80px]">
-    </div>
-  </div>
+@let c = content();
+
+@if (c) {
+<!-- ═══════════════════════════════════════════════════════
+       1. HERO — Split con dashboard window + floating cards
+  ═══════════════════════════════════════════════════════ -->
+<section id="hero" aria-labelledby="hero-title"
+  class="relative min-h-[85vh] flex items-center pt-20 pb-16 lg:pt-28 lg:pb-24 overflow-hidden text-gray-900 dark:text-[#e2e8f0] transition-colors duration-300"
+  style="font-family: 'Montserrat', system-ui, sans-serif">
+  <div
+    class="pointer-events-none absolute inset-0 z-0 text-gray-900 dark:text-white opacity-[0.035] dark:opacity-[0.05]"
+    style="background-image: linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px); background-size: 56px 56px; mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black 20%, transparent 90%); -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black 20%, transparent 90%);"
+    aria-hidden="true"></div>
+
+  <div
+    class="pointer-events-none absolute -top-40 right-0 w-[600px] h-[600px] rounded-full blur-[140px] opacity-[0.07] motion-reduce:opacity-[0.04]"
+    style="background-color: var(--bp, #15803d)" aria-hidden="true"></div>
+
   <div class="container mx-auto px-4 relative z-30">
-    <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
-      <div class="lg:w-1/2 text-center lg:text-left">
-        <div class="flex flex-col items-center lg:items-start gap-2.5 mb-6 sm:mb-8">
-          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass-panel">
-            <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-            <span class="text-xs font-mono text-gray-700 dark:text-gray-300 tracking-wider uppercase">Disponible para
-              nuevos Proyectos</span>
-          </div>
-          @if (content.hero.badge) {
+    <div class="grid lg:grid-cols-12 items-center gap-10 lg:gap-16">
+      <div class="lg:col-span-6 text-center lg:text-left">
+        <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2 mb-7">
           <div
-            class="inline-flex items-center px-4 py-1.5 rounded-2xl sm:rounded-full glass-panel text-center lg:text-left max-w-xl shadow-xs">
-            <span class="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 leading-snug">
-              {{ content.hero.badge }}
+            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111] shadow-sm">
+            <span class="relative flex w-1.5 h-1.5" aria-hidden="true">
+              <span class="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping"
+                style="background-color: var(--bp, #15803d)"></span>
+              <span class="relative inline-flex w-1.5 h-1.5 rounded-full"
+                style="background-color: var(--bp, #15803d)"></span>
+            </span>
+            <span class="text-[11px] font-mono uppercase tracking-wide text-gray-700 dark:text-gray-300">
+              {{ c.hero.availableForProjects }}
             </span>
           </div>
-          }
         </div>
-        <h1
-          class="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-[1.15] sm:leading-[1.1] tracking-tight text-gradient">
-          {{ content.hero.title }}
+
+        <h1 id="hero-title"
+          class="text-3xl sm:text-4xl lg:text-5xl xl:text-[3.25rem] font-black mb-6 leading-[1.05] tracking-tight text-gray-900 dark:text-white">
+          {{ c.hero.title }}
         </h1>
-        <p
-          class="text-base sm:text-lg lg:text-xl text-gray-700 dark:text-gray-300 mb-8 sm:mb-10 leading-relaxed max-w-2xl mx-auto lg:mx-0 font-normal dark:font-light font-body">
-          {{ content.hero.subtitle }}
+
+        <p class="text-base sm:text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
+          {{ c.hero.subtitle }}
         </p>
-        <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+
+        <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3">
           <a routerLink="/contacto"
-            class="px-8 py-4 bg-gray-900 text-white dark:bg-white dark:text-black rounded-lg font-bold text-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-all transform hover:scale-105 shadow-xl shadow-blue-900/10 dark:shadow-[0_0_20px_rgba(255,255,255,0.3)] flex items-center justify-center cursor-pointer">
-            {{ content.hero.ctaPrimary }}
+            class="group inline-flex items-center justify-center gap-2 px-7 py-3.5 text-white rounded-lg font-semibold text-base shadow-lg transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5 min-h-[52px] min-w-[200px]"
+            style="background-color: var(--bp, #15803d)">
+            {{ c.hero.ctaPrimary }}
+            <svg class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none"
+              stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
           </a>
           <a routerLink="/portfolio"
-            class="px-8 pt-3 pb-3.5 sm:pt-3.5 sm:pb-4 leading-none glass-panel text-gray-900 dark:text-white rounded-lg font-medium text-base sm:text-lg hover:bg-black/5 dark:hover:bg-white/5 transition-all text-center flex items-center justify-center cursor-pointer min-h-[54px] sm:min-h-[58px]">
-            <span class="inline-flex items-center -translate-y-[1px]">
-              {{ content.hero.ctaSecondary }}
-            </span>
+            class="inline-flex items-center justify-center px-7 py-3.5 border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#111] text-gray-900 dark:text-white rounded-lg font-semibold text-base hover:bg-gray-50 dark:hover:bg-[#1a1a1a] transition-colors min-h-[52px] min-w-[200px]">
+            {{ c.hero.ctaSecondary }}
           </a>
         </div>
       </div>
-      <div class="lg:w-1/2 relative hidden lg:block animate-float">
+
+      <div class="lg:col-span-6 relative hidden lg:block">
         <div
-          class="relative z-10 glass-card p-2 rounded-2xl transform rotate-1 hover:rotate-0 transition-duration-500 w-full">
-          <div class="relative w-full aspect-video rounded-xl overflow-hidden">
-            <img ngSrc="assets/img/services/software-illustration.webp" alt="Dashboard Preview" class="object-cover"
-              fill priority>
-          </div>
+          class="relative rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-2xl bg-white dark:bg-[#0a0a0a] ring-1 ring-gray-900/5 dark:ring-white/5 transition-transform duration-500 hover:scale-[1.02]">
           <div
-            class="absolute -bottom-10 -left-10 bg-[#1e1e1e] p-4 rounded-lg border border-gray-700 shadow-xl hidden md:block">
-            <div class="flex gap-2 mb-2">
-              <div class="w-3 h-3 rounded-full bg-red-500"></div>
-              <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-              <div class="w-3 h-3 rounded-full bg-green-500"></div>
-            </div>
-            <div class="font-mono text-xs text-green-400">
-              > git push origin production<br>
-              <span class="text-white">Build success... </span>
+            class="h-9 bg-gray-100 dark:bg-[#111] border-b border-gray-200 dark:border-gray-800 flex items-center px-4 gap-1.5">
+            <div class="w-3 h-3 rounded-full bg-red-400/80"></div>
+            <div class="w-3 h-3 rounded-full bg-amber-400/80"></div>
+            <div class="w-3 h-3 rounded-full bg-green-400/80"></div>
+            <div
+              class="ml-4 flex-1 max-w-[200px] bg-white dark:bg-[#1a1a1a] rounded-md h-5 flex items-center px-3 border border-gray-200 dark:border-gray-800">
+              <svg class="w-3 h-3 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              <span class="text-[10px] text-gray-400 font-mono">{{ c.hero.dashboardUrl }}</span>
             </div>
           </div>
+          <img ngSrc="assets/img/services/software-illustration.webp" [alt]="c.hero.imageAlt" width="1200" height="800"
+            priority sizes="(min-width: 1280px) 50vw, 50vw" class="w-full h-auto object-cover" />
+        </div>
+
+        <div
+          class="absolute -bottom-6 -left-6 bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 p-4 rounded-xl shadow-xl flex items-center gap-3 animate-float motion-reduce:animate-none z-10"
+          style="animation-delay: 1s">
+          <div
+            class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <div>
+            <p class="text-[10px] font-mono uppercase tracking-widest text-gray-500 dark:text-gray-400">{{
+              c.hero.statusLabel }}</p>
+            <p class="text-sm font-bold text-gray-900 dark:text-white">{{ c.hero.statusValue }}</p>
+          </div>
+        </div>
+
+        <div
+          class="absolute -top-6 -right-6 bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 p-3 rounded-xl shadow-xl flex items-center gap-3 animate-float motion-reduce:animate-none z-10">
+          <div class="text-2xl font-black text-gray-900 dark:text-white">{{ c.hero.uptimeValue }}</div>
+          <div class="text-[10px] leading-tight text-gray-500 dark:text-gray-400 font-mono uppercase max-w-[70px]">{{
+            c.hero.uptimeLabel }}</div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- DEFERRED SECTIONS FOR PERFORMANCE -->
-
-@defer (on viewport) {
-<app-home-pillars [businessPillars]="content.businessPillars" />
+<!-- ═══════════════════════════════════════════════════════
+       2. METRICS — Trust bar
+  ═══════════════════════════════════════════════════════ -->
+@defer (on viewport; prefetch on idle) {
+<app-home-metrics [metrics]="c.metrics" />
 } @placeholder {
-<div class="h-96 bg-gray-50 dark:bg-black/20 animate-pulse"></div>
+<div class="h-32 bg-white dark:bg-[#183616] animate-pulse motion-reduce:animate-none" aria-hidden="true"></div>
+} @error {
+<div class="text-center py-12 text-sm text-red-500" role="alert">No se pudieron cargar las métricas.</div>
 }
 
-@defer (on viewport) {
-<app-home-services [services]="content.services" />
+<!-- ═══════════════════════════════════════════════════════
+       3. PROJECTS — Cards anchas en desktop
+  ═══════════════════════════════════════════════════════ -->
+<section class="py-24 md:py-32 bg-white dark:bg-[#0a0a0a]">
+  <!-- Contenedor ampliado -->
+  <div class="container mx-auto px-4 max-w-screen-2xl">
+
+    <div class="text-center mb-16 max-w-3xl mx-auto">
+      <h2 class="text-3xl md:text-5xl font-black text-gray-900 dark:text-white mb-4 tracking-tight">{{ c.projects.title
+        }}</h2>
+      <p class="text-lg md:text-xl text-gray-600 dark:text-gray-400">{{ c.projects.subtitle }}</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+      @for (item of c.projects.items; track item.title) {
+      <a [routerLink]="item.link"
+        class="group flex flex-col h-full rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#111] hover:border-emerald-500/50 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
+
+        <!-- Imagen más panorámica -->
+        <div class="relative w-full aspect-[16/9] overflow-hidden bg-gray-200 dark:bg-[#1a1a1a]">
+          <img [src]="item.image" [alt]="item.title"
+            class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          </div>
+          <div
+            class="absolute top-4 right-4 w-10 h-10 bg-white/90 dark:bg-black/80 backdrop-blur-md rounded-full flex items-center justify-center text-gray-900 dark:text-white opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 17L17 7M17 7H7M17 7v10">
+              </path>
+            </svg>
+          </div>
+        </div>
+
+        <div class="p-6 md:p-8 flex flex-col flex-grow">
+          <div class="flex flex-wrap gap-2 mb-4">
+            @for (tag of item.tags; track tag) {
+            <span
+              class="px-2.5 py-1 text-[10px] font-mono uppercase tracking-widest bg-white dark:bg-[#0a0a0a] text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-800 rounded-md">
+              {{ tag }}
+            </span>
+            }
+          </div>
+
+          <h3
+            class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-emerald-500 transition-colors">
+            {{ item.title }}
+          </h3>
+
+          <p class="text-gray-600 dark:text-gray-400 leading-relaxed text-sm md:text-base mb-6 line-clamp-4">
+            {{ item.description }}
+          </p>
+
+          <div class="mt-auto pt-4 border-t border-gray-200 dark:border-gray-800 flex items-center justify-between">
+            <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400 group-hover:underline">Ver Caso de
+              Estudio</span>
+            <div
+              class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </a>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+       4. SERVICES — Grid editorial con hover state
+  ═══════════════════════════════════════════════════════ -->
+<section class="py-24 bg-gray-50 dark:bg-[#070e07] border-y border-gray-200 dark:border-gray-800">
+  <div class="container mx-auto px-4 max-w-6xl">
+    <div class="text-center mb-16 max-w-3xl mx-auto">
+      <h2 class="text-3xl md:text-5xl font-black text-gray-900 dark:text-white mb-4 tracking-tight">{{ c.services.title
+        }}</h2>
+      <p class="text-lg text-gray-600 dark:text-gray-400">{{ c.services.subtitle }}</p>
+    </div>
+
+    <div class="flex flex-wrap justify-center gap-6">
+      @for (item of c.services.items; track item.title) {
+      <div
+        class="w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] group flex flex-col p-8 rounded-2xl bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 hover:border-emerald-500/50 hover:shadow-xl transition-all duration-300">
+        <div
+          class="w-14 h-14 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-2xl mb-6 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+          <i [class]="item.icon" aria-hidden="true"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">{{ item.title }}</h3>
+        <p class="text-gray-600 dark:text-gray-400 leading-relaxed text-sm">{{ item.description }}</p>
+      </div>
+      }
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+       6. METHODOLOGY — Cómo trabajamos
+  ═══════════════════════════════════════════════════════ -->
+@defer (on viewport; prefetch on idle) {
+<app-home-methodology [methodology]="c.methodology" />
 } @placeholder {
-<div class="h-96 bg-gray-100 dark:bg-black/40 animate-pulse"></div>
+<div class="h-96 bg-gray-50 dark:bg-[#0b140c] animate-pulse motion-reduce:animate-none" aria-hidden="true"></div>
+} @error {
+<div class="text-center py-12 text-sm text-red-500" role="alert">No se pudo cargar la sección de metodología.</div>
 }
 
-@defer (on viewport) {
-<app-home-tech-stack [techServices]="content.techServices" />
+<!-- ═══════════════════════════════════════════════════════
+       7. REVIEWS — Prueba social
+  ═══════════════════════════════════════════════════════ -->
+<section class="py-24 bg-gray-50 dark:bg-[#070e07]">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-4">{{ c.reviews.title }}</h2>
+      <p class="text-lg text-gray-600 dark:text-gray-400">{{ c.reviews.subtitle }}</p>
+    </div>
+    <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+      @for (item of c.reviews.items; track item.name) {
+      <div class="p-8 rounded-2xl bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 shadow-sm">
+        <div class="flex text-amber-400 mb-4" aria-hidden="true">
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+          <i class="fas fa-star"></i>
+        </div>
+        <p class="text-lg text-gray-700 dark:text-gray-300 italic mb-6">"{{ item.text }}"</p>
+        <div class="flex items-center gap-4">
+          <img [src]="item.image" [alt]="item.name" class="w-12 h-12 rounded-full object-cover bg-gray-200" />
+          <div>
+            <h4 class="font-bold text-gray-900 dark:text-white">{{ item.name }}</h4>
+            <p class="text-sm text-gray-500 dark:text-gray-400">{{ item.role }} · {{ item.company }}</p>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+       8. INDUSTRIES — 4 columnas en desktop
+  ═══════════════════════════════════════════════════════ -->
+<section class="py-24 bg-white dark:bg-[#0a0a0a]">
+  <div class="container mx-auto px-4 max-w-7xl">
+    <div class="text-center mb-16 max-w-3xl mx-auto">
+      <h2 class="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-4">{{ c.industries.title }}</h2>
+      <p class="text-lg text-gray-600 dark:text-gray-400">{{ c.industries.subtitle }}</p>
+    </div>
+
+    <!-- 1 → 2 → 4 columnas según breakpoint -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      @for (item of c.industries.items; track item.title) {
+      <div
+        class="group flex flex-col h-full p-6 rounded-2xl bg-gray-50 dark:bg-[#111] border border-gray-200 dark:border-gray-800 hover:border-emerald-500/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+
+        <!-- Ícono arriba -->
+        <div
+          class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform duration-300">
+          <i [class]="item.icon" aria-hidden="true"></i>
+        </div>
+
+        <!-- Título -->
+        <h3 class="text-base font-bold text-gray-900 dark:text-white mb-2 leading-tight">
+          {{ item.title }}
+        </h3>
+
+        <!-- Descripción (flex-grow para empujar los pills al fondo) -->
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed mb-4 flex-grow">
+          {{ item.description }}
+        </p>
+
+        <!-- Pills de ejemplos ancladas al fondo -->
+        <div class="flex flex-wrap gap-1.5 mt-auto pt-3 border-t border-gray-200 dark:border-gray-800">
+          @for (example of item.examples; track example) {
+          <span
+            class="px-2 py-0.5 text-[9px] font-mono uppercase tracking-wider bg-white dark:bg-[#0a0a0a] text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-800 rounded">
+            {{ example }}
+          </span>
+          }
+        </div>
+
+      </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+       9. GITHUB + TECH STACK — Fusionado
+  ═══════════════════════════════════════════════════════ -->
+<section class="py-24 bg-gray-50 dark:bg-[#070e07] border-y border-gray-200 dark:border-gray-800">
+  <div class="container mx-auto px-4">
+    <div class="grid lg:grid-cols-12 gap-10 lg:gap-16 items-center max-w-6xl mx-auto mb-20">
+      <div class="lg:col-span-5 relative order-2 lg:order-1">
+        <div
+          class="relative rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-2xl ring-1 ring-black/5 dark:ring-white/5 group bg-[#0a0a0a]">
+          <img ngSrc="assets/img/services/software-illustration(1).webp" [alt]="c.github.subtitle" width="800"
+            height="600" sizes="(min-width: 1280px) 40vw, 90vw"
+            class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/40 pointer-events-none"
+            aria-hidden="true"></div>
+
+          <div
+            class="absolute top-4 left-4 inline-flex items-center gap-2 px-3 py-1.5 bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-md border border-gray-200 dark:border-gray-700 rounded-full shadow-xl">
+            <svg class="w-3.5 h-3.5 text-gray-900 dark:text-white" viewBox="0 0 24 24" fill="currentColor"
+              aria-hidden="true">
+              <path
+                d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+            </svg>
+            <span class="text-[10px] font-mono uppercase tracking-widest text-gray-700 dark:text-gray-300">Open
+              Source</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-7 order-1 lg:order-2">
+        <h2 class="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-3">{{ c.github.title }}</h2>
+        <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">{{ c.github.subtitle }}</p>
+
+        <div class="flex gap-8 mb-8">
+          <div>
+            <div class="flex items-center gap-1.5 mb-1">
+              <i class="fas fa-star text-amber-500 text-xs" aria-hidden="true"></i>
+              <span class="text-[10px] text-gray-500 uppercase tracking-widest">Stars</span>
+            </div>
+            <div class="text-2xl font-black text-gray-900 dark:text-white leading-none">{{ c.github.stars }}</div>
+          </div>
+          <div>
+            <div class="flex items-center gap-1.5 mb-1">
+              <i class="fas fa-code-branch text-blue-500 text-xs" aria-hidden="true"></i>
+              <span class="text-[10px] text-gray-500 uppercase tracking-widest">Forks</span>
+            </div>
+            <div class="text-2xl font-black text-gray-900 dark:text-white leading-none">{{ c.github.forks }}</div>
+          </div>
+        </div>
+
+        <div
+          class="bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 rounded-xl p-5 shadow-sm hover:border-emerald-500/50 transition-colors">
+          <div class="flex items-center gap-2 mb-2 text-blue-600 dark:text-blue-400 font-mono font-bold text-sm">
+            <i class="fas fa-book text-sm leading-none" aria-hidden="true"></i>
+            <span>{{ c.github.repoName }}</span>
+          </div>
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-4 leading-relaxed">{{ c.github.repoDescription }}</p>
+          <a [href]="c.github.link" target="_blank" rel="noopener noreferrer"
+            class="group inline-flex items-center justify-center gap-2 w-full px-5 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold text-sm rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+            </svg>
+            <span>Ver en GitHub</span>
+            <svg
+              class="w-3.5 h-3.5 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+              fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 17L17 7M17 7H7M17 7v10" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto pt-16 border-t border-gray-200 dark:border-gray-800/50">
+      <div class="text-center mb-8">
+        <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ c.techStack.title }}</h3>
+        <p class="text-gray-600 dark:text-gray-400">{{ c.techStack.subtitle }}</p>
+      </div>
+      <div class="flex flex-wrap justify-center gap-4">
+        @for (tech of c.techStack.items; track tech.name) {
+        <div
+          class="group flex items-center gap-3 px-5 py-4 rounded-xl bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 hover:border-emerald-500/50 transition-colors min-w-[180px] shadow-sm">
+          <div
+            class="w-10 h-10 rounded-lg bg-gray-50 dark:bg-[#0a0a0a] flex items-center justify-center text-2xl text-gray-700 dark:text-gray-300 group-hover:text-emerald-500 transition-colors">
+            <i [class]="tech.icon" aria-hidden="true"></i>
+          </div>
+          <div class="text-left">
+            <div class="font-bold text-sm text-gray-900 dark:text-white">{{ tech.name }}</div>
+            <div class="text-[10px] text-gray-500 uppercase tracking-wider">{{ tech.role }}</div>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+     10. FAQ — 2 columnas en desktop
+═══════════════════════════════════════════════════════ -->
+<section class="py-24 bg-gray-50 dark:bg-[#070e07]">
+  <div class="container mx-auto px-4 max-w-6xl">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-5xl font-black text-gray-900 dark:text-white mb-4 tracking-tight">{{ c.faq.title }}
+      </h2>
+      <p class="text-lg text-gray-600 dark:text-gray-400">Resolvé tus dudas antes de dar el siguiente paso.</p>
+    </div>
+
+    <!-- Grid de 2 columnas -->
+    <div class="grid md:grid-cols-2 gap-6 items-start">
+      @for (item of c.faq.items; track item.question) {
+      <details
+        class="group bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 cursor-pointer hover:border-emerald-500/50 transition-colors">
+        <summary class="flex justify-between items-center font-bold text-gray-900 dark:text-white text-base list-none">
+          {{ item.question }}
+          <!-- Ícono que rota y cambia a color esmeralda -->
+          <span
+            class="w-8 h-8 rounded-full bg-gray-100 dark:bg-[#0a0a0a] flex items-center justify-center text-gray-500 group-open:bg-emerald-100 group-open:text-emerald-600 dark:group-open:bg-emerald-900/30 dark:group-open:text-emerald-400 transition-all">
+            <i class="fas fa-chevron-down text-sm transition-transform duration-300 group-open:rotate-180"></i>
+          </span>
+        </summary>
+        <p class="text-gray-600 dark:text-gray-400 mt-4 leading-relaxed text-sm">{{ item.answer }}</p>
+      </details>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════
+       11. BUSINESS PILLARS — Ecosistema
+  ═══════════════════════════════════════════════════════ -->
+@defer (on viewport; prefetch on idle) {
+<app-home-pillars [businessPillars]="c.businessPillars" />
 } @placeholder {
-<div class="h-48 bg-white dark:bg-black animate-pulse"></div>
+<div class="h-96 bg-gray-50 dark:bg-[#183616]/20 animate-pulse motion-reduce:animate-none" aria-hidden="true"></div>
+} @error {
+<div class="text-center py-12 text-sm text-red-500" role="alert">No se pudo cargar la sección de pillars.</div>
 }
 
-@defer (on viewport) {
-<app-home-methodology [methodology]="content.methodology" />
-} @placeholder {
-<div class="h-96 bg-gray-50 dark:bg-[#0a0a0a] animate-pulse"></div>
-}
+<!-- ═══════════════════════════════════════════════════════
+       12. QUOTE — 4 respuestas + multi-step form
+  ═══════════════════════════════════════════════════════ -->
+<section class="relative py-24 bg-emerald-950 dark:bg-[#051105] text-white overflow-hidden">
+  @if (c.quote.image) {
+  <div class="absolute inset-0 z-0" aria-hidden="true">
+    <img [src]="c.quote.image" alt="" class="w-full h-full object-cover opacity-[0.1]" />
+    <div class="absolute inset-0 bg-gradient-to-br from-emerald-950/95 via-emerald-900/90 to-emerald-950/95"></div>
+  </div>
+  }
 
-@defer (on viewport) {
-<app-home-metrics [metrics]="content.metrics" />
-} @placeholder {
-<div class="h-32 bg-white dark:bg-black animate-pulse"></div>
-}
+  <div class="container mx-auto px-4 max-w-6xl relative z-10">
 
-@defer (on viewport) {
-<app-home-industries [industries]="content.industries" />
-} @placeholder {
-<div class="h-96 bg-gray-50 dark:bg-[#050505] animate-pulse"></div>
-}
+    <!-- Header -->
+    <div class="text-center mb-14 max-w-3xl mx-auto">
+      <h2 class="text-3xl md:text-5xl font-black mb-4">{{ c.quote.title }}</h2>
+      <p class="text-emerald-200 text-lg">{{ c.quote.subtitle }}</p>
+    </div>
 
-@defer (on viewport) {
-<app-home-remote-work [remoteWork]="content.remoteWork" />
-} @placeholder {
-<div class="h-96 bg-blue-900 animate-pulse"></div>
-}
+    <!-- 4 respuestas rápidas -->
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
+      @for (faq of c.quote.faqs; track faq.question) {
+      <div class="bg-emerald-900/40 backdrop-blur-sm border border-emerald-800/50 rounded-2xl p-5">
+        <div
+          class="w-10 h-10 rounded-lg bg-emerald-800/60 text-emerald-300 flex items-center justify-center text-lg mb-3">
+          <i [class]="faq.icon" aria-hidden="true"></i>
+        </div>
+        <h3 class="font-bold text-white mb-1.5 text-sm">{{ faq.question }}</h3>
+        <p class="text-emerald-200/80 text-xs leading-relaxed">{{ faq.answer }}</p>
+      </div>
+      }
+    </div>
 
+    <!-- Multi-step form -->
+    <div
+      class="max-w-2xl mx-auto bg-emerald-950/70 backdrop-blur-sm p-6 sm:p-10 rounded-3xl border border-emerald-800/50 shadow-2xl">
 
+      <!-- Progress indicator -->
+      <div class="flex items-center justify-center gap-2 mb-8" role="progressbar" [attr.aria-valuenow]="currentStep()"
+        aria-valuemin="1" aria-valuemax="3">
+        @for (s of [1, 2, 3]; track s) {
+        <div class="h-1.5 rounded-full transition-all duration-300" [class.bg-emerald-400]="currentStep() >= s"
+          [class.bg-emerald-900]="currentStep() < s" [class.w-12]="currentStep() === s"
+          [class.w-6]="currentStep() !== s"></div>
+        }
+        @if (currentStep() === 4) {
+        <div class="h-1.5 rounded-full w-full bg-emerald-400 transition-all duration-300"></div>
+        }
+      </div>
 
+      <!-- ═══ STEP 1: ¿Qué necesitás? ═══ -->
+      @if (currentStep() === 1) {
+      <div class="animate-in">
+        <p class="text-emerald-300 text-xs font-mono uppercase tracking-widest mb-2">{{ c.quote.steps.stepLabel }} 1 / 3
+        </p>
+        <h3 class="text-2xl font-black text-white mb-6">{{ c.quote.steps.problemQuestion }}</h3>
+        <div class="space-y-3" role="radiogroup">
+          @for (opt of c.quote.steps.problemOptions; track opt.value) {
+          <button type="button" (click)="selectProblem(opt.value)"
+            class="w-full text-left flex items-center gap-4 p-4 rounded-xl bg-emerald-900/40 border-2 border-emerald-800/50 hover:border-emerald-400 hover:bg-emerald-900/60 transition-all group"
+            [attr.aria-checked]="selectedProblem() === opt.value" role="radio">
+            <div
+              class="w-12 h-12 shrink-0 rounded-lg bg-emerald-800/50 text-emerald-300 flex items-center justify-center text-xl group-hover:bg-emerald-700/60 transition-colors">
+              <i [class]="opt.icon" aria-hidden="true"></i>
+            </div>
+            <div class="flex-1">
+              <div class="font-bold text-white">{{ opt.label }}</div>
+              <div class="text-xs text-emerald-300/80 mt-0.5">{{ opt.description }}</div>
+            </div>
+            <svg class="w-5 h-5 text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity" fill="none"
+              stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+          }
+        </div>
+      </div>
+      }
+
+      <!-- ═══ STEP 2: ¿Qué tan grande? ═══ -->
+      @if (currentStep() === 2) {
+      <div class="animate-in">
+        <p class="text-emerald-300 text-xs font-mono uppercase tracking-widest mb-2">{{ c.quote.steps.stepLabel }} 2 / 3
+        </p>
+        <h3 class="text-2xl font-black text-white mb-6">{{ c.quote.steps.sizeQuestion }}</h3>
+        <div class="space-y-3" role="radiogroup">
+          @for (opt of c.quote.steps.sizeOptions; track opt.value) {
+          <button type="button" (click)="selectSize(opt.value)"
+            class="w-full text-left flex items-center gap-4 p-4 rounded-xl bg-emerald-900/40 border-2 border-emerald-800/50 hover:border-emerald-400 hover:bg-emerald-900/60 transition-all group"
+            [attr.aria-checked]="selectedSize() === opt.value" role="radio">
+            <div
+              class="w-12 h-12 shrink-0 rounded-lg bg-emerald-800/50 text-emerald-300 flex items-center justify-center text-xl group-hover:bg-emerald-700/60 transition-colors">
+              <i [class]="opt.icon" aria-hidden="true"></i>
+            </div>
+            <div class="flex-1">
+              <div class="font-bold text-white">{{ opt.label }}</div>
+              <div class="text-xs text-emerald-300/80 mt-0.5">{{ opt.description }}</div>
+            </div>
+            <svg class="w-5 h-5 text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity" fill="none"
+              stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+          }
+        </div>
+        <button type="button" (click)="goBack()"
+          class="mt-6 text-emerald-300 hover:text-white text-sm font-semibold flex items-center gap-1 transition-colors">
+          ← {{ c.quote.steps.backLabel }}
+        </button>
+      </div>
+      }
+
+      <!-- ═══ STEP 3: Teléfono ═══ -->
+      @if (currentStep() === 3) {
+      <div class="animate-in">
+        <p class="text-emerald-300 text-xs font-mono uppercase tracking-widest mb-2">{{ c.quote.steps.stepLabel }} 3 / 3
+        </p>
+        <h3 class="text-2xl font-black text-white mb-2">{{ c.quote.steps.contactQuestion }}</h3>
+        <p class="text-emerald-300/80 text-sm mb-6">{{ c.quote.steps.contactHint }}</p>
+
+        <input type="tel" inputmode="tel" autocomplete="tel" [value]="phoneInput()" (input)="onPhoneInput($event)"
+          [placeholder]="c.quote.steps.phonePlaceholder"
+          class="w-full px-5 py-4 rounded-xl bg-emerald-900/60 border-2 border-emerald-700/50 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 text-white placeholder-emerald-400/40 transition-all text-lg font-mono"
+          [class.border-red-400]="submitError()" [attr.aria-invalid]="!!submitError()" />
+
+        @if (submitError()) {
+        <p class="text-red-300 text-sm mt-2 font-medium" role="alert">{{ submitError() }}</p>
+        }
+
+        <div class="mt-6 flex flex-col sm:flex-row gap-3">
+          <button type="button" (click)="goBack()"
+            class="px-5 py-3 border border-emerald-700/50 text-emerald-200 font-semibold rounded-xl hover:bg-emerald-900/60 transition-colors">
+            ← {{ c.quote.steps.backLabel }}
+          </button>
+          <button type="button" (click)="submitQuote()" [disabled]="isSubmitting()"
+            class="flex-1 inline-flex items-center justify-center gap-2 px-8 py-3 bg-white text-emerald-950 font-bold rounded-xl hover:bg-emerald-50 disabled:opacity-60 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+            @if (isSubmitting()) {
+            <div class="w-4 h-4 border-2 border-emerald-950/30 border-t-emerald-950 rounded-full animate-spin"></div>
+            {{ c.quote.steps.submittingLabel }}
+            } @else {
+            {{ c.quote.steps.submitLabel }}
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+            }
+          </button>
+        </div>
+      </div>
+      }
+
+      <!-- ═══ STEP 4: Success ═══ -->
+      @if (currentStep() === 4) {
+      <div class="text-center animate-in">
+        <div class="w-20 h-20 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-6">
+          <div class="w-14 h-14 rounded-full bg-emerald-500 text-white flex items-center justify-center text-3xl">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+        </div>
+        <h3 class="text-2xl font-black text-white mb-3">{{ c.quote.steps.successTitle }}</h3>
+        <p class="text-emerald-200 mb-8 max-w-md mx-auto">{{ c.quote.steps.successMessage }}</p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+          <a [href]="'https://wa.me/' + whatsappNumber" target="_blank" rel="noopener noreferrer"
+            class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-white font-bold rounded-xl transition-colors">
+            <i class="fab fa-whatsapp text-xl" aria-hidden="true"></i>
+            {{ c.quote.steps.successCta }}
+          </a>
+          <button type="button" (click)="resetForm()"
+            class="px-6 py-3 border border-emerald-700/50 text-emerald-200 font-semibold rounded-xl hover:bg-emerald-900/60 transition-colors">
+            ← {{ c.quote.steps.backLabel }}
+          </button>
+        </div>
+      </div>
+      }
+
+    </div>
+  </div>
+</section>
 }

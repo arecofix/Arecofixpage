@@ -1,18 +1,16 @@
-@if (!isPortfolioRoute()) {
+@if (showHeader()) {
 <public-layout-header></public-layout-header>
 }
 
-<div [ngClass]="[themeClass(), isHighContrast() ? 'high-contrast' : '']"
-  class="min-h-[100dvh] flex flex-col transition-all duration-300 relative text-gray-900 dark:text-gray-100 font-sans"
-  [class.pt-16]="!isPortfolioRoute()">
-  <main class="flex-grow flex flex-col relative w-full">
+<div [ngClass]="themeClass()" [class.high-contrast]="isHighContrast()"
+  class="min-h-[100dvh] flex flex-col relative text-gray-900 dark:text-gray-100 transition-colors duration-300">
+  <main class="flex-grow flex flex-col relative w-full"
+    [style.padding-top]="showHeader() ? 'var(--header-height)' : '0'">
     <router-outlet></router-outlet>
   </main>
 
-  <!-- El footer va directo acá, el flex-grow de main lo empuja al fondo -->
   <app-footer></app-footer>
 
-  <!-- Widgets dentro del contenedor principal para heredar temas y alto contraste -->
   <app-accessibility-sidebar></app-accessibility-sidebar>
   <app-ai-chatbot></app-ai-chatbot>
 </div>

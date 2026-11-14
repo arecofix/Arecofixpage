@@ -3,11 +3,14 @@ import {
   inject,
   signal,
   computed,
+  effect,
   OnDestroy,
   OnInit,
   PLATFORM_ID,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
+  ElementRef,
+  viewChild,
 } from '@angular/core';
 import {
   FormBuilder,
@@ -54,15 +57,27 @@ type CheckoutStep =
   | 'mp_redirect';
 type PaymentMethodChoice = 'digital' | 'cash' | 'credit_card';
 
+type AppliedCoupon = {
+  code: string;
+  type: 'percent' | 'fixed';
+  value: number;
+};
+
 @Component({
   selector: 'app-checkout-page',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, CommonModule, HydrationPreserveDirective],
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    CommonModule,
+    HydrationPreserveDirective,
+  ],
   templateUrl: './checkout-page.html',
   changeDetection: ChangeDetectionStrategy.Default,
   styleUrl: './checkout-page.css',
 })
 export class CheckoutPage implements OnInit, OnDestroy {
+  // ── Inyecciones ────────────────────────────────────────
   cdr = inject(ChangeDetectorRef, { optional: true });
   cartService = inject(CartService);
   orderService = inject(OrderService);
@@ -78,6 +93,8 @@ export class CheckoutPage implements OnInit, OnDestroy {
   branchService = inject(BranchService);
   shippingService = inject(ShippingService);
   mercadopagoService = inject(MercadoPagoService);
+
+  private platformId = inject(PLATFORM_ID);
 
   // ── Form ───────────────────────────────────────────────
   checkoutForm: FormGroup = this.fb.group({
@@ -115,22 +132,51 @@ export class CheckoutPage implements OnInit, OnDestroy {
   // Cross-selling
   recommendedProducts = signal<Product[]>([]);
 
-  // Points & Discounts
+  // ── Points ─────────────────────────────────────────────
   availablePoints = signal<number>(0);
   usePoints = signal<boolean>(false);
   pointsDiscountValue = computed(() => {
-    // Definir el valor de los puntos. Ej: 100 puntos = $100 de descuento. (1 punto = $1)
     if (this.usePoints()) {
-      const maxDiscount = this.cartService.totalPrice(); // No descontar más del total
-      const potentialDiscount = this.availablePoints();
-      return Math.min(potentialDiscount, maxDiscount);
+      const maxDiscount = this.cartService.totalPrice();
+      return Math.min(this.availablePoints(), maxDiscount);
     }
     return 0;
   });
 
+  // ── Coupon ─────────────────────────────────────────────
+  // TODO: mover a CouponService con validación server-side.
+  private readonly DEMO_COUPONS: Record<
+    string,
+    { type: 'percent' | 'fixed'; value: number }
+  > = {
+      DESCUENTO10: { type: 'percent', value: 10 },
+      BIENVENIDO: { type: 'fixed', value: 500 },
+    };
+  appliedCoupon = signal<AppliedCoupon | null>(null);
+  couponDiscount = computed(() => {
+    const c = this.appliedCoupon();
+    if (!c) return 0;
+    const base = this.cartService.totalPrice();
+    const amount =
+      c.type === 'percent' ? base * (c.value / 100) : c.value;
+    return Math.max(0, Math.min(amount, base));
+  });
+
+  // ── Total mostrado en UI (nunca negativo) ─────────────
+  displayTotal = computed(() =>
+    Math.max(
+      0,
+      this.cartService.totalPrice() +
+      (this.shippingQuote()?.cost ?? 0) -
+      this.couponDiscount() -
+      this.pointsDiscountValue(),
+    ),
+  );
+
   // ── Reservation countdown (15 min = 900 s) ─────────────
   reservationSeconds = signal(900);
   private countdownInterval: ReturnType<typeof setInterval> | null = null;
+  countdownExpired = computed(() => this.reservationSeconds() <= 0);
 
   countdownDisplay = computed(() => {
     const s = this.reservationSeconds();
@@ -141,12 +187,29 @@ export class CheckoutPage implements OnInit, OnDestroy {
 
   countdownPct = computed(() => (this.reservationSeconds() / 900) * 100);
 
-  // expose payment service signals directly to template
+  // ── Barcode estático (no se recrea en cada CD) ────────
+  readonly barcodeBars = Array.from({ length: 30 }, (_, i) => i + 1);
+
+  // ── Expose signals del PaymentService ──────────────────
   orderStatus = computed(() => this.paymentService.orderStatus());
   isUploadingProof = computed(() => this.paymentService.isUploadingProof());
 
+  // ── Foco entre steps (a11y) ────────────────────────────
+  stepHeading = viewChild<ElementRef<HTMLElement>>('stepHeading');
+
+  constructor() {
+    effect(() => {
+      // track sólo `step()`; el heading se resuelve después del render
+      const _step = this.step();
+      queueMicrotask(() => this.stepHeading()?.nativeElement.focus());
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // Lifecycle
+  // ─────────────────────────────────────────────────────────
   ngOnInit(): void {
-    // Check for Mercado Pago return query parameters
+    // Mercado Pago return query params
     this.route.queryParams.subscribe((params) => {
       const status = params['status'] || params['collection_status'];
       const paymentId = params['payment_id'] || params['collection_id'];
@@ -160,51 +223,51 @@ export class CheckoutPage implements OnInit, OnDestroy {
         if (status === 'approved') {
           this.cartService.clearCart();
           this.step.set('paid');
-          this.notificationService.showSuccess('¡Pago confirmado con éxito por Mercado Pago!');
-        } else if (status === 'rejected' || status === 'failure' || status === 'cancelled') {
+          this.notificationService.showSuccess(
+            '¡Pago confirmado con éxito por Mercado Pago!',
+          );
+        } else if (
+          status === 'rejected' ||
+          status === 'failure' ||
+          status === 'cancelled'
+        ) {
           this.step.set('payment_failure');
-          this.notificationService.showError('El pago fue rechazado o cancelado.');
+          this.notificationService.showError(
+            'El pago fue rechazado o cancelado.',
+          );
         } else if (status === 'pending' || status === 'in_process') {
           this.cartService.clearCart();
           this.step.set('payment_pending');
-          this.notificationService.showInfo('Tu pago está pendiente de acreditación.');
+          this.notificationService.showInfo(
+            'Tu pago está pendiente de acreditación.',
+          );
         }
       }
     });
 
-    // Pre-fill form if user is logged in
+    // Pre-fill si el usuario está logueado
     const user = this.authService.getCurrentUser();
     if (user?.email) {
       this.checkoutForm.patchValue({ email: user.email });
-      // Fetch fresh profile to get exact points
       this.profileService.getProfile(user.id).then((profile) => {
-        if (profile?.points) {
-          this.availablePoints.set(profile.points);
-        }
+        if (profile?.points) this.availablePoints.set(profile.points);
       });
     }
 
-    // Subscribe to postal code changes to calculate shipping
+    // Shipping por CP
     this.checkoutForm
       .get('address.postal_code')
       ?.valueChanges.pipe(debounceTime(800), distinctUntilChanged())
       .subscribe((cp) => {
-        if (cp && cp.length === 4) {
-          this.calculateShipping(cp);
-        } else {
-          this.shippingQuote.set(null);
-        }
+        if (cp && cp.length === 4) this.calculateShipping(cp);
+        else this.shippingQuote.set(null);
       });
 
-    // Check initial value if exists
     const initialCp = this.checkoutForm.get('address.postal_code')?.value;
-    if (initialCp && initialCp.length === 4) {
-      this.calculateShipping(initialCp);
-    }
+    if (initialCp && initialCp.length === 4) this.calculateShipping(initialCp);
 
-    // Load cross-selling items
+    // Cross-selling
     this.productService.getData({ _page: 1 }).subscribe((res) => {
-      // Filter out items already in the cart
       const inCartIds = this.cartService.cartItems().map((i) => i.product.id);
       const suggestions = (res.data || [])
         .filter((p) => !inCartIds.includes(p.id))
@@ -213,38 +276,61 @@ export class CheckoutPage implements OnInit, OnDestroy {
     });
   }
 
-  retryPayment(): void {
-    this.step.set('payment_method');
-    this.cdr?.detectChanges();
-  }
-
-  addRecommendedToCart(product: Product) {
-    this.cartService.addToCart(product);
-    this.notificationService.showSuccess(`${product.name} agregado al pedido.`);
-    // Remove from suggestions
-    this.recommendedProducts.update((list) =>
-      list.filter((p) => p.id !== product.id),
-    );
-  }
-
-  private calculateShipping(cp: string) {
-    this.isCalculatingShipping.set(true);
-    const cartTotal = this.cartService.totalPrice();
-    this.shippingService.calculateShipping(cp, cartTotal).subscribe({
-      next: (quote) => {
-        this.shippingQuote.set(quote);
-        this.isCalculatingShipping.set(false);
-      },
-      error: () => {
-        this.shippingQuote.set(null);
-        this.isCalculatingShipping.set(false);
-      },
-    });
-  }
-
   ngOnDestroy(): void {
     this._stopCountdown();
     this.paymentService.stopPolling();
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // Helpers de template
+  // ─────────────────────────────────────────────────────────
+
+  showError(path: string): boolean {
+    const ctrl = this.checkoutForm.get(path);
+    return !!ctrl && ctrl.invalid && (ctrl.touched || ctrl.dirty);
+  }
+
+  async copyToClipboard(
+    text: string,
+    btn: EventTarget | null,
+  ): Promise<void> {
+    const el = btn as HTMLElement | null;
+    if (!el) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      const prev = el.innerHTML;
+      el.innerHTML = '<i class="fas fa-check"></i> Copiado';
+      setTimeout(() => (el.innerHTML = prev), 1500);
+    } catch {
+      // Fallback para navegadores sin Clipboard API
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+      } finally {
+        document.body.removeChild(ta);
+      }
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // Navegación entre steps
+  // ─────────────────────────────────────────────────────────
+
+  goBackToForm(): void {
+    this.selectedMethod.set(null);
+    this._stopCountdown();
+    this.step.set('form');
+  }
+
+  retryPayment(): void {
+    this.selectedMethod.set(null);
+    this.step.set('payment_method');
+    // sólo reiniciamos el countdown si ya expiró
+    if (this.countdownExpired()) this._startCountdown();
+    this.cdr?.detectChanges();
   }
 
   async goToPaymentMethod(): Promise<void> {
@@ -263,6 +349,10 @@ export class CheckoutPage implements OnInit, OnDestroy {
     this._startCountdown();
   }
 
+  // ─────────────────────────────────────────────────────────
+  // Puntos y cupón
+  // ─────────────────────────────────────────────────────────
+
   toggleUsePoints(): void {
     if (this.availablePoints() > 0) {
       this.usePoints.set(!this.usePoints());
@@ -270,15 +360,62 @@ export class CheckoutPage implements OnInit, OnDestroy {
   }
 
   applyCoupon(code: string): void {
-    if (!code || code.trim() === '') return;
-    this.notificationService.showError('Cupón inválido o expirado.');
+    const trimmed = (code || '').trim().toUpperCase();
+    if (!trimmed) return;
+
+    const def = this.DEMO_COUPONS[trimmed];
+    if (!def) {
+      this.appliedCoupon.set(null);
+      this.notificationService.showError('Cupón inválido o expirado.');
+      return;
+    }
+    this.appliedCoupon.set({ code: trimmed, ...def });
+    this.notificationService.showSuccess(`Cupón "${trimmed}" aplicado.`);
   }
+
+  // ─────────────────────────────────────────────────────────
+  // Selección de método
+  // ─────────────────────────────────────────────────────────
 
   selectMethod(method: PaymentMethodChoice): void {
     this.selectedMethod.set(method);
   }
 
-  // ── Step: create PENDING_PAYMENT order in Supabase ─────
+  // ─────────────────────────────────────────────────────────
+  // Cross-selling (compatibilidad con templates viejos)
+  // ─────────────────────────────────────────────────────────
+
+  addRecommendedToCart(product: Product) {
+    this.cartService.addToCart(product);
+    this.notificationService.showSuccess(`${product.name} agregado al pedido.`);
+    this.recommendedProducts.update((list) =>
+      list.filter((p) => p.id !== product.id),
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // Shipping
+  // ─────────────────────────────────────────────────────────
+
+  private calculateShipping(cp: string) {
+    this.isCalculatingShipping.set(true);
+    const cartTotal = this.cartService.totalPrice();
+    this.shippingService.calculateShipping(cp, cartTotal).subscribe({
+      next: (quote) => {
+        this.shippingQuote.set(quote);
+        this.isCalculatingShipping.set(false);
+      },
+      error: () => {
+        this.shippingQuote.set(null);
+        this.isCalculatingShipping.set(false);
+      },
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // Crear orden + derivar al flujo de pago elegido
+  // ─────────────────────────────────────────────────────────
+
   async placeOrder(): Promise<void> {
     if (this.isProcessing()) return;
 
@@ -290,17 +427,28 @@ export class CheckoutPage implements OnInit, OnDestroy {
       return;
     }
 
+    if (this.countdownExpired()) {
+      this.notificationService.showError(
+        'La reserva expiró. Volvé al formulario para renovarla.',
+      );
+      return;
+    }
+
     const cartItems = this.cartService.cartItems();
     if (!cartItems || cartItems.length === 0) {
       this.notificationService.showError('Tu carrito está vacío.');
       return;
     }
 
-    // Atomic pre-checkout stock validation
+    // Validación atómica de stock
     for (const item of cartItems) {
-      if (item.product.stock !== undefined && item.product.stock !== null && item.product.stock < item.quantity) {
+      if (
+        item.product.stock !== undefined &&
+        item.product.stock !== null &&
+        item.product.stock < item.quantity
+      ) {
         this.notificationService.showError(
-          `Stock insuficiente para "${item.product.name}". Disponible: ${item.product.stock}, solicitado: ${item.quantity}`
+          `Stock insuficiente para "${item.product.name}". Disponible: ${item.product.stock}, solicitado: ${item.quantity}`,
         );
         return;
       }
@@ -311,15 +459,23 @@ export class CheckoutPage implements OnInit, OnDestroy {
     const formVal = this.checkoutForm.getRawValue();
     const subtotal = this.cartService.totalPrice();
     const shippingCost = this.shippingQuote()?.cost || 0;
-    const discount = this.pointsDiscountValue();
-    const total = Math.max(0, subtotal + shippingCost - discount);
 
-    const addressStr = `${formVal.address.street} ${formVal.address.number}, ${formVal.address.neighborhood ? formVal.address.neighborhood + ', ' : ''}${formVal.address.city} (CP: ${formVal.address.postal_code})`;
+    // Descuentos SEPARADOS (cupón no toca puntos del perfil)
+    const pointsDiscount = this.pointsDiscountValue();
+    const couponDiscount = this.couponDiscount();
+    const totalDiscount = pointsDiscount + couponDiscount;
+    const total = Math.max(0, subtotal + shippingCost - totalDiscount);
+
+    const addressStr = `${formVal.address.street} ${formVal.address.number}, ${formVal.address.neighborhood
+        ? formVal.address.neighborhood + ', '
+        : ''
+      }${formVal.address.city} (CP: ${formVal.address.postal_code})`;
 
     const currentUser = this.authService.getCurrentUser();
     let guestSessionId: string | undefined;
     if (!currentUser && isPlatformBrowser(this.platformId)) {
-      guestSessionId = localStorage.getItem('cart_session_id') || undefined;
+      guestSessionId =
+        localStorage.getItem('cart_session_id') || undefined;
     }
 
     const order: Order = {
@@ -328,9 +484,9 @@ export class CheckoutPage implements OnInit, OnDestroy {
       customer_phone: formVal.phone,
       shipping_address: formVal.address,
       status: 'pending_payment',
-      subtotal: subtotal,
+      subtotal,
       tax: 0,
-      discount: discount,
+      discount: totalDiscount,
       total,
       total_amount: total,
       payment_method: method,
@@ -357,21 +513,25 @@ export class CheckoutPage implements OnInit, OnDestroy {
       const created = await firstValueFrom(
         this.orderService.createOrder(order),
       );
-
       if (!created) throw new Error('No se pudo crear la orden.');
 
       this.currentOrder.set(created);
       this.paymentService.orderStatus.set('pending_payment');
 
-      // Save contact message (non-fatal)
+      // Mensaje de contacto (no bloqueante)
       const itemsList = cartItems
-        .map(
-          (i) => {
-            const p = i.product.convertedPrice || i.product.price;
-            return `- ${i.product.name} (x${i.quantity}) - $${(p * i.quantity).toFixed(2)}`;
-          }
-        )
+        .map((i) => {
+          const p = i.product.convertedPrice || i.product.price;
+          return `- ${i.product.name} (x${i.quantity}) - $${(p * i.quantity).toFixed(2)}`;
+        })
         .join('\n');
+
+      const methodLabel =
+        method === 'digital'
+          ? 'Pago Digital'
+          : method === 'credit_card'
+            ? 'Mercado Pago'
+            : 'Efectivo (Rapipago/PagoFácil)';
 
       this.contactService
         .createMessage({
@@ -379,14 +539,25 @@ export class CheckoutPage implements OnInit, OnDestroy {
           email: formVal.email,
           phone: formVal.phone,
           subject: `[RESERVA STOCK] #${created.order_number} - ${formVal.name} - $${total.toFixed(2)}`,
-          message: `Reserva de Stock #${created.order_number}\n\nCliente: ${formVal.name}\nEmail: ${formVal.email}\nTeléfono: ${formVal.phone}\nDirección: ${addressStr}\nLogística: ${this.shippingQuote()?.provider || 'Retiro'}\nCosto Envío: $${shippingCost}\n\nProductos:\n${itemsList}\n\nTotal: $${total.toFixed(2)}\n\nMétodo: ${method === 'digital' ? 'Pago Digital' : method === 'credit_card' ? 'Mercado Pago' : 'Efectivo (Rapipago/PagoFácil)'}\n\nNotas: ${formVal.notes || 'Ninguna'}`,
+          message:
+            `Reserva de Stock #${created.order_number}\n\n` +
+            `Cliente: ${formVal.name}\n` +
+            `Email: ${formVal.email}\n` +
+            `Teléfono: ${formVal.phone}\n` +
+            `Dirección: ${addressStr}\n` +
+            `Logística: ${this.shippingQuote()?.provider || 'Retiro'}\n` +
+            `Costo Envío: $${shippingCost}\n\n` +
+            `Productos:\n${itemsList}\n\n` +
+            `Descuento cupón: $${couponDiscount.toFixed(2)}\n` +
+            `Descuento puntos: $${pointsDiscount.toFixed(2)}\n` +
+            `Total: $${total.toFixed(2)}\n\n` +
+            `Método: ${methodLabel}\n\n` +
+            `Notas: ${formVal.notes || 'Ninguna'}`,
         })
-        .catch((e: any) =>
+        .catch((e: unknown) =>
           console.warn('Contact message error (non-fatal):', e),
         );
-      
-      this.cartService.clearCart();
-        
+
       if (method === 'cash') {
         const ticket = this.paymentService.buildPaymentTicket(
           created.id!,
@@ -408,18 +579,22 @@ export class CheckoutPage implements OnInit, OnDestroy {
         this.mpPaymentUrl.set(intent.init_point);
         this.step.set('mp_redirect');
       } else {
-        // Digital: show instructions to complete payment externally
+        // Digital: instrucciones externas
         this.step.set('pending_payment');
       }
 
+      // Limpieza del carrito (UNA sola vez, después de crear la orden)
       this.cartService.clearCart();
 
-      // Start polling for payment confirmation (every 20s)
+      // Polling de confirmación (cada 20s)
       this.paymentService.startPolling(created.id!, 20000);
 
-      // Deduct points from user if they were used
-      if (discount > 0 && order.user_id) {
-        const remainingPoints = this.availablePoints() - discount;
+      // Descontar SÓLO puntos del perfil (cupón no toca puntos)
+      if (pointsDiscount > 0 && order.user_id) {
+        const remainingPoints = Math.max(
+          0,
+          this.availablePoints() - pointsDiscount,
+        );
         try {
           await this.authService.updateUserProfile(order.user_id, {
             points: remainingPoints,
@@ -432,16 +607,12 @@ export class CheckoutPage implements OnInit, OnDestroy {
       }
     } catch (error: any) {
       console.error('Checkout error:', error);
-      this.isProcessing.set(false);
 
       let errorMsg = error?.message || 'Error desconocido';
-
-      // Specifically handle permission errors to be clear for the user
       if (errorMsg.includes('permisos') || error?.code === '42501') {
         errorMsg =
           'No tienes permisos para crear la orden. Asegúrate de que tu sesión sea válida o contacta a soporte si el problema persiste.';
       }
-
       this.notificationService.showError(
         `Error al procesar tu reserva: ${errorMsg}`,
       );
@@ -450,13 +621,15 @@ export class CheckoutPage implements OnInit, OnDestroy {
     }
   }
 
-  // ── Proof upload ────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────
+  // Comprobante
+  // ─────────────────────────────────────────────────────────
+
   onProofFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
 
-    // Only images/pdf
     if (!file.type.startsWith('image/') && file.type !== 'application/pdf') {
       this.notificationService.showError(
         'Solo se aceptan imágenes o PDF como comprobante.',
@@ -499,9 +672,11 @@ export class CheckoutPage implements OnInit, OnDestroy {
     }
   }
 
-  // ── Helpers ─────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────
+  // Helpers de formato y WhatsApp
+  // ─────────────────────────────────────────────────────────
+
   formatTicketCode(code: string): string {
-    // Format in groups of 4 for readability: AFXX XXXX XXXX XXXX
     return code.replace(/(.{4})/g, '$1 ').trim();
   }
 
@@ -523,7 +698,9 @@ export class CheckoutPage implements OnInit, OnDestroy {
     )}`;
   }
 
-  private platformId = inject(PLATFORM_ID);
+  // ─────────────────────────────────────────────────────────
+  // Countdown interno
+  // ─────────────────────────────────────────────────────────
 
   private _startCountdown(): void {
     this._stopCountdown();

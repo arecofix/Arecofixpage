@@ -1,4 +1,15 @@
-// Todas las secciones usan var(--bp) heredada del layout padre (BranchLayoutComponent)
+/* ═══════════════════════════════════════════════════════════
+   BRANCH STORE — Premium Montserrat & Dynamic Brand Styles
+═══════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
+
+/* Todas las secciones heredan o usan var(--bp) como color de marca dinámico */
+.bh-store-root {
+  font-family: 'Montserrat', system-ui, sans-serif;
+  color: #0f172a;
+  box-sizing: border-box;
+}
 
 /* ============================
    UTILIDAD COMPARTIDA
@@ -10,14 +21,15 @@
   text-transform: uppercase;
   letter-spacing: 1.5px;
   color: var(--bp);
-  background: color-mix(in srgb, var(--bp) 10%, transparent);
-  padding: 0.3rem 0.9rem;
+  background: color-mix(in srgb, var(--bp) 12%, transparent);
+  padding: 0.4rem 1rem;
   border-radius: 9999px;
   margin-bottom: 1rem;
+  font-family: 'Montserrat', sans-serif;
 
   &--light {
     color: white;
-    background: rgba(255,255,255,0.15);
+    background: rgba(255, 255, 255, 0.18);
   }
 }
 
@@ -26,7 +38,7 @@
    ============================ */
 .bh-hero {
   position: relative;
-  padding: 6rem 1.5rem 3rem;
+  padding: 6rem 1.5rem 3.5rem;
   overflow: hidden;
   text-align: center;
 
@@ -37,7 +49,6 @@
     background:
       radial-gradient(ellipse at 60% 0%, color-mix(in srgb, var(--bp) 15%, transparent) 0%, transparent 70%),
       radial-gradient(ellipse at 10% 80%, color-mix(in srgb, var(--bp) 8%, transparent) 0%, transparent 60%);
-    // Dot pattern sutil
     background-image:
       radial-gradient(color-mix(in srgb, var(--bp) 12%, transparent) 1px, transparent 1px),
       radial-gradient(ellipse at 60% 0%, color-mix(in srgb, var(--bp) 15%, transparent) 0%, transparent 70%);
@@ -89,6 +100,7 @@
     border-radius: 9999px;
     font-size: 1.1rem;
     font-weight: 700;
+    font-family: 'Montserrat', sans-serif;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 8px 24px color-mix(in srgb, var(--bp) 35%, transparent);
@@ -117,14 +129,21 @@
   align-items: center;
   gap: 0.6rem;
   background: white;
-  border: 1px solid rgba(0,0,0,0.06);
+  border: 1px solid rgba(189, 192, 193, 0.3);
   border-radius: 9999px;
   padding: 0.6rem 1.3rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
   animation: bhFadeUp 0.6s ease-out both;
 
-  &__icon { font-size: 1.2rem; }
-  &__label { font-size: 0.9rem; font-weight: 700; color: #334155; }
+  &__icon {
+    font-size: 1.2rem;
+  }
+
+  &__label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #334155;
+  }
 }
 
 /* ============================
@@ -161,7 +180,6 @@
     line-height: 1.8;
   }
 
-  // Card stack visual en el lado derecho
   &__card-stack {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -170,18 +188,28 @@
 
   &__card {
     background: #f8fafc;
-    border: 1px solid rgba(0,0,0,0.05);
+    border: 1px solid rgba(189, 192, 193, 0.25);
     border-radius: 1rem;
     padding: 1.5rem 1rem;
     text-align: center;
     transition: all 0.25s ease;
 
-    span { font-size: 2rem; display: block; margin-bottom: 0.5rem; }
-    p { font-size: 0.875rem; font-weight: 700; color: #334155; margin: 0; }
+    span {
+      font-size: 2rem;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #334155;
+      margin: 0;
+    }
 
     &:hover {
-      border-color: color-mix(in srgb, var(--bp) 30%, transparent);
-      box-shadow: 0 4px 16px color-mix(in srgb, var(--bp) 10%, transparent);
+      border-color: color-mix(in srgb, var(--bp) 40%, transparent);
+      box-shadow: 0 6px 20px color-mix(in srgb, var(--bp) 12%, transparent);
       transform: translateY(-2px);
     }
   }
@@ -223,7 +251,7 @@
 
 .bh-service-card {
   background: white;
-  border: 1px solid rgba(0,0,0,0.05);
+  border: 1px solid rgba(189, 192, 193, 0.25);
   border-radius: 1.25rem;
   padding: 2rem 1.75rem;
   transition: all 0.3s ease;
@@ -233,7 +261,8 @@
   &::before {
     content: '';
     position: absolute;
-    top: 0; left: 0;
+    top: 0;
+    left: 0;
     width: 4px;
     height: 100%;
     background: var(--bp);
@@ -244,10 +273,12 @@
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 16px 32px rgba(0,0,0,0.08);
-    border-color: color-mix(in srgb, var(--bp) 25%, transparent);
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.08);
+    border-color: color-mix(in srgb, var(--bp) 35%, transparent);
 
-    &::before { opacity: 1; }
+    &::before {
+      opacity: 1;
+    }
   }
 
   &__icon {
@@ -306,14 +337,15 @@
 
 .bh-product-card {
   background: #f8fafc;
-  border: 1px solid rgba(0,0,0,0.05);
+  border: 1px solid rgba(189, 192, 193, 0.25);
   border-radius: 1.25rem;
   overflow: hidden;
   transition: all 0.3s ease;
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 28px rgba(0,0,0,0.08);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+    border-color: color-mix(in srgb, var(--bp) 30%, transparent);
   }
 
   &__img-wrap {
@@ -330,18 +362,21 @@
       transition: transform 0.4s ease;
     }
 
-    &:hover img { transform: scale(1.05); }
+    &:hover img {
+      transform: scale(1.05);
+    }
   }
 
   &__global-badge {
     position: absolute;
-    top: 0.75rem; right: 0.75rem;
-    background: rgba(255,255,255,0.9);
+    top: 0.75rem;
+    right: 0.75rem;
+    background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(4px);
     color: var(--bp);
     font-size: 0.7rem;
     font-weight: 700;
-    padding: 0.2rem 0.6rem;
+    padding: 0.25rem 0.65rem;
     border-radius: 9999px;
   }
 
@@ -371,6 +406,7 @@
     padding: 0.6rem;
     border-radius: 0.5rem;
     font-weight: 700;
+    font-family: 'Montserrat', sans-serif;
     cursor: pointer;
     transition: all 0.2s ease;
 
@@ -396,6 +432,7 @@
     padding: 0.65rem 1.5rem;
     border-radius: 0.5rem;
     font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
     cursor: pointer;
     transition: all 0.2s ease;
 
@@ -404,18 +441,29 @@
       color: var(--bp);
     }
 
-    &:disabled { opacity: 0.4; cursor: not-allowed; }
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
   }
 
-  span { font-weight: 600; color: #64748b; }
+  span {
+    font-weight: 600;
+    color: #64748b;
+  }
 }
 
 /* Loading / Empty */
-.bh-loading { display: flex; justify-content: center; padding: 4rem 0; }
+.bh-loading {
+  display: flex;
+  justify-content: center;
+  padding: 4rem 0;
+}
 
 .bh-spinner {
-  width: 44px; height: 44px;
-  border: 4px solid rgba(0,0,0,0.08);
+  width: 44px;
+  height: 44px;
+  border: 4px solid rgba(0, 0, 0, 0.08);
   border-top-color: var(--bp);
   border-radius: 50%;
   animation: bhSpin 0.9s linear infinite;
@@ -434,9 +482,8 @@
 .bh-contact {
   padding: 6rem 1.5rem;
   background: linear-gradient(135deg,
-    color-mix(in srgb, var(--bp) 85%, #0f172a),
-    color-mix(in srgb, var(--bp) 60%, #0f172a)
-  );
+      color-mix(in srgb, var(--bp) 85%, #0f172a),
+      color-mix(in srgb, var(--bp) 60%, #0f172a));
   text-align: center;
 
   &__inner {
@@ -452,7 +499,7 @@
   }
 
   &__sub {
-    color: rgba(255,255,255,0.8);
+    color: rgba(255, 255, 255, 0.85);
     font-size: 1.1rem;
     line-height: 1.7;
     margin-bottom: 2.5rem;
@@ -465,7 +512,9 @@
     gap: 1rem;
   }
 
-  &__wsp, &__email, &__phone {
+  &__wsp,
+  &__email,
+  &__phone {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
@@ -473,35 +522,44 @@
     border-radius: 9999px;
     font-weight: 700;
     font-size: 1rem;
+    font-family: 'Montserrat', sans-serif;
     text-decoration: none;
     transition: all 0.25s ease;
 
-    &:hover { transform: translateY(-2px); }
+    &:hover {
+      transform: translateY(-2px);
+    }
   }
 
   &__wsp {
     background: #25d366;
     color: white;
-    box-shadow: 0 4px 16px rgba(37,211,102,0.4);
+    box-shadow: 0 4px 16px rgba(37, 211, 102, 0.4);
 
-    &:hover { box-shadow: 0 8px 24px rgba(37,211,102,0.5); }
+    &:hover {
+      box-shadow: 0 8px 24px rgba(37, 211, 102, 0.5);
+    }
   }
 
   &__email {
-    background: rgba(255,255,255,0.15);
+    background: rgba(255, 255, 255, 0.15);
     color: white;
-    border: 1.5px solid rgba(255,255,255,0.4);
+    border: 1.5px solid rgba(255, 255, 255, 0.4);
     backdrop-filter: blur(4px);
 
-    &:hover { background: rgba(255,255,255,0.25); }
+    &:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
   }
 
   &__phone {
-    background: rgba(255,255,255,0.1);
+    background: rgba(255, 255, 255, 0.1);
     color: white;
-    border: 1.5px solid rgba(255,255,255,0.3);
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
 
-    &:hover { background: rgba(255,255,255,0.2); }
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
   }
 }
 
@@ -509,10 +567,19 @@
    ANIMACIONES
    ============================ */
 @keyframes bhFadeUp {
-  from { opacity: 0; transform: translateY(28px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes bhSpin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }

@@ -1,128 +1,151 @@
-import { ChangeDetectionStrategy, Component, inject, OnInit, DOCUMENT } from '@angular/core';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
+import { NgOptimizedImage } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
 
 import { PreferencesService } from '../../shared/services/preferences.service';
-import { SeoService } from '@app/core/services/seo.service';
-import { environment } from '../../../environments/environment';
 import { ContactService } from '@app/core/services/contact.service';
+import { NotificationService } from '@app/core/services/notification.service';
+import { environment } from '../../../environments/environment';
 
-import { HOME_CONTENT, HomeContent, QuoteForm } from './public-home.content';
-import { HomeServicesComponent } from './components/home-services.component';
-import { HomeTechStackComponent } from './components/home-tech-stack.component';
+import {
+  HOME_CONTENT,
+  HomeContent,
+  QuoteOption,
+} from './public-home.content';
+
 import { HomeMethodologyComponent } from './components/home-methodology.component';
-import { HomeIndustriesComponent } from './components/home-industries.component';
 import { HomePillarsComponent } from './components/home-pillars.component';
 import { HomeMetricsComponent } from './components/home-metrics.component';
-import { HomeRemoteWorkComponent } from './components/home-remote-work.component';
 
+type StepNumber = 1 | 2 | 3 | 4;
 
 @Component({
   selector: 'app-public-home-page',
   standalone: true,
   imports: [
-    CommonModule, 
-    RouterModule, 
-    FormsModule,
+    RouterModule,
     NgOptimizedImage,
-    HomeServicesComponent,
-    HomeTechStackComponent,
     HomeMethodologyComponent,
-    HomeIndustriesComponent,
     HomePillarsComponent,
     HomeMetricsComponent,
-    HomeRemoteWorkComponent,
-
   ],
   templateUrl: './public-home-page.html',
-  styles: `
-    .tech-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: 2rem;
-    }
-  `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PublicHomePage implements OnInit {
-  private seoService = inject(SeoService);
-  private contactService = inject(ContactService);
+export class PublicHomePage {
+  private readonly preferences = inject(PreferencesService);
+  private readonly contactService = inject(ContactService);
+  private readonly notifications = inject(NotificationService);
 
-  whatsappNumber = environment.contact.whatsappNumber;
+  readonly whatsappNumber = environment.contact.whatsappNumber;
 
-  // Quote Form State
-  quoteModel: QuoteForm = {
-    name: '',
-    email: '',
-    phone: '',
-    company: '',
-    projectType: 'web',
-    budget: 'mid',
-    description: '',
-    cta: ''
-  };
-  sendingQuote = false;
+  readonly content = toSignal(
+    this.preferences.language$.pipe(
+      map((lang: string): HomeContent => {
+        const key: 'en' | 'es' = lang === 'es' ? 'es' : 'en';
+        return HOME_CONTENT[key];
+      }),
+    ),
+    { initialValue: HOME_CONTENT.es },
+  );
 
-  homeContent = HOME_CONTENT;
-  content$: Observable<HomeContent>;
+  // ── Multi-step quote form ────────────────────────────
+  readonly currentStep = signal<StepNumber>(1);
+  readonly selectedProblem = signal<string | null>(null);
+  readonly selectedSize = signal<string | null>(null);
+  readonly phoneInput = signal<string>('');
+  readonly isSubmitting = signal(false);
+  readonly submitError = signal<string | null>(null);
 
-  constructor(public preferencesService: PreferencesService) {
-    this.content$ = this.preferencesService.language$.pipe(
-      map((lang: string) => {
-          // Merge missing keys for ES if needed (quick patch logic, ideally strictly typed)
-          const key = lang as keyof typeof this.homeContent;
-          const content = this.homeContent[key] as any;
-          if (lang === 'es') {
-             content.coursesTeaser = this.homeContent.es.coursesTeaser || (this.homeContent as any)['es']['coursesTeaser'];
-          }
-          return content;
-      })
-    );
+  selectProblem(value: string): void {
+    this.selectedProblem.set(value);
+    setTimeout(() => this.currentStep.set(2), 180);
   }
 
-  ngOnInit() {
-    this.setSEO();
+  selectSize(value: string): void {
+    this.selectedSize.set(value);
+    setTimeout(() => this.currentStep.set(3), 180);
   }
 
-  setSEO() {
-    // Handled by Router Data
+  goBack(): void {
+    const step = this.currentStep();
+    if (step > 1 && step < 4) {
+      this.currentStep.set((step - 1) as StepNumber);
+    }
+    this.submitError.set(null);
   }
 
-
-  scrollToSection(element: HTMLElement) {
-    element.scrollIntoView({ behavior: 'smooth' });
+  onPhoneInput(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.phoneInput.set(value);
+    this.submitError.set(null);
   }
 
-  async sendQuote() {
-    if (!this.quoteModel.name || !this.quoteModel.email || !this.quoteModel.description) {
-      alert('Por favor completa los campos principales.');
+  resetForm(): void {
+    this.currentStep.set(1);
+    this.selectedProblem.set(null);
+    this.selectedSize.set(null);
+    this.phoneInput.set('');
+    this.submitError.set(null);
+  }
+
+  async submitQuote(): Promise<void> {
+    const phone = this.phoneInput().trim();
+    if (!phone || phone.replace(/\D/g, '').length < 6) {
+      this.submitError.set('Ingresá un número válido');
       return;
     }
 
-    this.sendingQuote = true;
+    const problemValue = this.selectedProblem();
+    const sizeValue = this.selectedSize();
+    if (!problemValue || !sizeValue) {
+      this.submitError.set('Faltan datos del proyecto');
+      return;
+    }
+
+    const content = this.content();
+    const problem = content.quote.steps.problemOptions.find(
+      (o: QuoteOption) => o.value === problemValue,
+    );
+    const size = content.quote.steps.sizeOptions.find(
+      (o: QuoteOption) => o.value === sizeValue,
+    );
+
+    this.isSubmitting.set(true);
+    this.submitError.set(null);
+
     try {
-      await this.contactService.createMessage({
-        name: this.quoteModel.name,
-        email: this.quoteModel.email,
-        phone: this.quoteModel.phone,
-        subject: `Presupuesto IT: ${this.quoteModel.projectType} - ${this.quoteModel.company}`,
-        message: `Presupuesto: ${this.quoteModel.budget}\nDescripción: ${this.quoteModel.description}`
+      const result = await this.contactService.createMessage({
+        name: `Lead: ${problem?.label ?? problemValue} — ${size?.label ?? sizeValue}`,
+        email: `lead-${Date.now()}@arecofix.com.ar`,
+        phone,
+        subject: `[NUEVO LEAD] ${problem?.label ?? problemValue} · ${size?.label ?? sizeValue} · ${phone}`,
+        message:
+          `Nuevo lead desde la home.\n\n` +
+          `Proyecto: ${problem?.label ?? problemValue}\n` +
+          `Tamaño: ${size?.label ?? sizeValue}\n` +
+          `WhatsApp: ${phone}\n\n` +
+          `Acción: contactar por WhatsApp en las próximas 24h.`,
       });
 
-      alert('Solicitud enviada. Nos pondremos en contacto pronto.');
+      if (result?.error) {
+        throw new Error(result.error.message);
+      }
 
-      // Reset form
-      this.quoteModel = { ...this.quoteModel, name: '', email: '', phone: '', company: '', description: '' };
-    } catch (error) {
-      console.error(error);
-      alert('Error al enviar. Por favor intenta por WhatsApp.');
-      const text = `Hola, quiero cotizar un proyecto de ${this.quoteModel.projectType}. Mi presupuesto es ${this.quoteModel.budget}.`;
-      window.open(`https://wa.me/${this.whatsappNumber}?text=${encodeURIComponent(text)}`, '_blank');
+      this.notifications.showSuccess('Lead enviado. Te contactamos pronto.');
+      this.currentStep.set(4);
+    } catch (err) {
+      console.error('Lead submit error:', err);
+      this.submitError.set(content.quote.steps.errorMessage);
     } finally {
-      this.sendingQuote = false;
+      this.isSubmitting.set(false);
     }
   }
 }
