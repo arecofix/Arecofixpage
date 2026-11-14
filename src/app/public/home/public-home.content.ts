@@ -602,7 +602,7 @@ export const HOME_CONTENT: Record<'en' | 'es', HomeContent> = {
       title:
         'Consultoría IT. Tecnología a medida que resuelve los problemas de tu negocio.',
       subtitle:
-        'Si sentís que perdés tiempo con programas que no se entienden o anotando datos por todos lados, te desarrollamos un sistema a medida: fácil de usar, sin tecnicismos y pensado para escalar. Nosotros nos ocupamos de la tecnología, vos de tus ventas.',
+        'Si sentís que perdés tiempo con programas que no se entienden o anotando datos por todos lados, te desarrollamos una aplicacion a medida: fácil de usar y pensado para escalar. Nosotros nos ocupamos del sistema, vos de tus ventas.',
       subtitleMobile:
         'Si sentís que perdés tiempo con programas que no se entienden, nosotros te desarrollamos un sistema a medida, fácil de usar y pensado para que crezcas de forma escalable.',
       ctaPrimary: 'Agendar una asesoría gratuita',

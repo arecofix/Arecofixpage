@@ -10,10 +10,14 @@ import {
   PLATFORM_ID,
   HostListener,
   effect,
+  untracked,
+  ElementRef,
+  viewChild,
 } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
 import { CommonModule, isPlatformBrowser, NgOptimizedImage } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { environment } from '@env/environment';
 import { AuthService } from '@app/core/services/auth.service';
 import { CartService } from '@app/shared/services/cart.service';
@@ -24,21 +28,31 @@ import { Product } from '@app/features/products/domain/entities/product.entity';
 import { ProductRepository } from '@app/features/products/domain/repositories/product.repository';
 import { CategoryRepository } from '@app/features/products/domain/repositories/category.repository';
 import { CoursesService, Course } from '@app/core/services/courses.service';
-import { Category } from '@app/features/products/domain/entities/category.entity';
 import { NavItem } from '@app/shared/models/navigation.model';
 import { NAVIGATION_ITEMS, THEME_STYLES, VIEW_ALL_LABELS } from '@app/shared/models/navigation.data';
 import { NavItemRecursiveComponent } from '@app/shared/components/nav-item-recursive/nav-item-recursive.component';
 import { ThemeToggleComponent } from '@app/shared/components/theme-toggle/theme-toggle.component';
-import { SearchUtils } from '@app/shared/utils/search.utils';
+
 import { map, switchMap, catchError, filter } from 'rxjs/operators';
-import { Subscription, firstValueFrom, of } from 'rxjs';
+import { Subscription, of } from 'rxjs';
 
 import { NavigationStateService } from '@app/core/services/navigation-state.service';
 import { HasPermissionDirective } from '@app/shared/directives/has-permission.directive';
 import { FormatPricePipe } from '@app/shared/pipes/format-price.pipe';
 
+// ── Constants ──────────────────────────────────────────────
+const IDLE_CALLBACK_TIMEOUT_MS = 4000;
+const IDLE_FALLBACK_MS = 2000;
+const MEGA_MENU_CLOSE_DELAY_MS = 200;
+const SCROLL_HIDE_THRESHOLD_PX = 50;
+const SCROLL_DELTA_THRESHOLD_PX = 10;
+const IOS_ZOOM_RESET_DELAY_MS = 150;
+const IOS_ZOOM_RESET_RESTORE_MS = 300;
+const DEFAULT_VIEWPORT_CONTENT = 'width=device-width, initial-scale=1.0, viewport-fit=cover';
+
 @Component({
   selector: 'public-layout-header',
+  standalone: true,
   imports: [
     RouterLink,
     RouterLinkActive,
@@ -52,473 +66,443 @@ import { FormatPricePipe } from '@app/shared/pipes/format-price.pipe';
     FormatPricePipe,
   ],
   templateUrl: './public-layout-header.html',
-  styles: `
-    :host {
-      display: block;
-    }
-  `,
+  styles: `:host { display: block; }`,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PublicLayoutHeader implements OnInit, OnDestroy {
-  // ── Dependencies ──────────────────────────────────
-  public appName: string = environment.appName;
-  public authService = inject(AuthService);
-  public cartService = inject(CartService);
-  public themeService = inject(ThemeService);
-  public searchService = inject(SearchService);
-  public navState = inject(NavigationStateService);
-  private router = inject(Router);
-  private cdr = inject(ChangeDetectorRef);
-  private platformId = inject(PLATFORM_ID);
-  private productRepo = inject(ProductRepository);
-  private categoryRepo = inject(CategoryRepository);
-  private coursesService = inject(CoursesService);
+  // ── Inyecciones ──────────────────────────────────────────
+  public readonly appName = environment.appName;
+  public readonly authService = inject(AuthService);
+  public readonly cartService = inject(CartService);
+  public readonly themeService = inject(ThemeService);
+  public readonly searchService = inject(SearchService);
+  public readonly navState = inject(NavigationStateService);
 
-  public user$ = this.authService.authState$.pipe(map((state) => state.profile || state.user));
+  private readonly router = inject(Router);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly platformId = inject(PLATFORM_ID);
+  private readonly productRepo = inject(ProductRepository);
+  private readonly categoryRepo = inject(CategoryRepository);
+  private readonly coursesService = inject(CoursesService);
 
-  public currentUrl = signal<string>(this.router.url);
+  /** Cached at construction — safe because PLATFORM_ID never changes for a given execution. */
+  private readonly isBrowser = isPlatformBrowser(this.platformId);
 
-  get isAcademyMode(): boolean {
-    return this.router.url.includes('/academy');
-  }
+  // ── Element refs para manejo de click-outside ────────────
+  private readonly desktopSearchWrapper = viewChild<ElementRef<HTMLElement>>('desktopSearchWrapper');
+  private readonly mobileSearchWrapper = viewChild<ElementRef<HTMLElement>>('mobileSearchWrapper');
 
-  get isCelularLandingMode(): boolean {
-    const urlPath = this.router.url.split('?')[0];
+  // ── Auth state ───────────────────────────────────────────
+  public readonly user = toSignal(
+    this.authService.authState$.pipe(map((state) => state.profile || state.user)),
+    { initialValue: null },
+  );
+
+  // ── URL actual (signal) ──────────────────────────────────
+  public readonly currentUrl = signal<string>(this.router.url);
+
+  // ── Derived URL state (computed — cachea hasta que cambie currentUrl) ──
+  public readonly isAcademyMode = computed(() => this.currentUrl().includes('/academy'));
+
+  public readonly isCelularLandingMode = computed(() => {
+    const urlPath = this.currentUrl().split('?')[0];
     return urlPath === '/celular' || urlPath.startsWith('/celular/');
+  });
+
+  public readonly showCart = computed(() => {
+    const url = this.currentUrl();
+    return url !== '/' && !this.isCelularLandingMode() && !this.isAcademyMode();
+  });
+
+  public readonly searchPlaceholder = computed(() =>
+    this.isAcademyMode() ? 'Buscar cursos...' : 'Buscar productos...',
+  );
+
+  // ── Search state ─────────────────────────────────────────
+  public readonly searchQuery = signal('');
+  public readonly products = signal<Product[]>([]);
+  public readonly coursesResults = signal<Course[]>([]);
+  public readonly showResults = signal(false);
+  public readonly isSearching = signal(false);
+  public readonly searchFocusRequested = signal(false);
+
+  /** Alias de compatibilidad — mismo signal que products. */
+  public readonly filteredProducts = this.products;
+
+  // ── Navigation Data ──────────────────────────────────────
+  public readonly navItems = signal<NavItem[]>(NAVIGATION_ITEMS);
+
+  public readonly megaMenuItems = computed(() =>
+    this.navItems().filter((item) => item.children && item.children.length > 0),
+  );
+
+  public readonly directLinks = computed(() =>
+    this.navItems().filter((item) => !item.children || item.children.length === 0),
+  );
+
+  // ── Mobile drawer ────────────────────────────────────────
+  public readonly isMobileMenuOpen = this.navState.isMobileMenuOpen;
+
+  // ── Mega menu ────────────────────────────────────────────
+  public readonly activeMegaMenu = signal<string | null>(null);
+  private megaMenuTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  // ── Cart ─────────────────────────────────────────────────
+  public readonly isCartOpen = this.cartService.isCartOpen;
+
+  // ── Navbar visibility ────────────────────────────────────
+  public readonly isVisible = signal(true);
+  private lastScrollTop = 0;
+  private scrollRafId: number | null = null;
+
+  private readonly subscriptions = new Subscription();
+
+  constructor() {
+    // Al agregar al carrito, forzar navbar visible
+    effect(() => {
+      const items = this.cartService.cartItems();
+      untracked(() => {
+        if (items.length > 0) {
+          this.showNavbar();
+          this.lastScrollTop = this.isBrowser
+            ? window.scrollY || document.documentElement.scrollTop
+            : 0;
+        }
+      });
+    });
   }
 
-  /** Flag: the drawer was opened specifically for search (triggers immediate focus). */
-  public searchFocusRequested = signal(false);
+  // ── Lifecycle ────────────────────────────────────────────
+  ngOnInit(): void {
+    if (this.isBrowser) {
+      this.scheduleIdleTask(() => {
+        this.loadDynamicCategories();
+      });
+    }
 
-  private subscriptions = new Subscription();
+    // Una sola suscripción a NavigationEnd: actualiza URL + resetea visibilidad
+    this.subscriptions.add(
+      this.router.events
+        .pipe(filter((event) => event instanceof NavigationEnd))
+        .subscribe(() => {
+          this.currentUrl.set(this.router.url);
+          this.showNavbar();
+          this.lastScrollTop = this.isBrowser
+            ? window.scrollY || document.documentElement.scrollTop
+            : 0;
+        }),
+    );
 
-  // ── Navigation Data ───────────────────────────────
-  /**
-   * Static navigation items from the centralized data file.
-   * The menu is fully data-driven: add items to navigation.data.ts
-   * and they automatically appear in both desktop and mobile menus.
-   */
-  readonly navItems = signal<NavItem[]>(NAVIGATION_ITEMS);
+    // Focus requests externos (desde otros componentes)
+    this.subscriptions.add(
+      this.searchService.focusRequested$.subscribe(() => {
+        if (!this.isMobileMenuOpen()) {
+          this.searchFocusRequested.set(true);
+          this.navState.openMobileMenu();
+        }
+      }),
+    );
 
-  /** Top-level items that have children → rendered as mega-menus or dropdowns */
-  readonly megaMenuItems = computed(() =>
-    this.navItems().filter((item) => item.children && item.children.length > 0)
-  );
+    // Búsqueda debounced server-side
+    this.subscriptions.add(
+      this.searchService.debouncedQuery$
+        .pipe(
+          switchMap((term) => {
+            this.searchQuery.set(term);
+            this.showResults.set(!!term);
 
-  /** Top-level items without children → rendered as simple links */
-  readonly directLinks = computed(() =>
-    this.navItems().filter((item) => !item.children || item.children.length === 0)
-  );
+            if (!term || term.length <= 1) {
+              this.products.set([]);
+              this.coursesResults.set([]);
+              this.isSearching.set(false);
+              return of(null);
+            }
 
-  // ── Search Logic (OPTIMIZED: Server-side search) ──────────────────
-  public searchQuery = signal('');
-  public products = signal<Product[]>([]);
-  public coursesResults = signal<Course[]>([]);
-  public showResults = signal(false);
-  public isSearching = signal(false);
+            this.isSearching.set(true);
 
-  /**
-   * We no longer pre-load all products. Instead, we react to optimized search terms
-   * and query the database directly for the best matches.
-   */
-  public filteredProducts = this.products;
+            if (this.isAcademyMode()) {
+              return this.coursesService.getCourses().pipe(
+                map((res) => {
+                  const filtered = (res.data ?? []).filter((c) =>
+                    c.title.toLowerCase().includes(term.toLowerCase()),
+                  );
+                  this.coursesResults.set(filtered.slice(0, 10));
+                  this.isSearching.set(false);
+                }),
+                catchError((err) => {
+                  console.error('Course search error:', err);
+                  this.isSearching.set(false);
+                  return of(null);
+                }),
+              );
+            }
 
-  // ── Mobile Menu ───────────────────────────────────
-  public isMobileMenuOpen = this.navState.isMobileMenuOpen;
+            return this.productRepo.search(term).pipe(
+              map((results) => {
+                this.products.set(results.slice(0, 10));
+                this.isSearching.set(false);
+              }),
+              catchError((err) => {
+                console.error('Product search error:', err);
+                this.isSearching.set(false);
+                return of(null);
+              }),
+            );
+          }),
+        )
+        .subscribe(),
+    );
+  }
 
-  toggleMobileMenu() {
+  ngOnDestroy(): void {
+    if (this.megaMenuTimeout) clearTimeout(this.megaMenuTimeout);
+    if (this.scrollRafId !== null && this.isBrowser) {
+      cancelAnimationFrame(this.scrollRafId);
+    }
+    this.subscriptions.unsubscribe();
+  }
+
+  // ── Scroll (throttled con requestAnimationFrame) ─────────
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    if (!this.isBrowser || this.scrollRafId !== null) return;
+
+    this.scrollRafId = requestAnimationFrame(() => {
+      this.scrollRafId = null;
+      this.handleScroll();
+    });
+  }
+
+  private handleScroll(): void {
+    const currentScroll = window.scrollY || document.documentElement.scrollTop;
+
+    if (currentScroll < SCROLL_HIDE_THRESHOLD_PX) {
+      this.showNavbar();
+      this.lastScrollTop = currentScroll;
+      return;
+    }
+
+    const delta = currentScroll - this.lastScrollTop;
+    if (delta > 0 && Math.abs(delta) > SCROLL_DELTA_THRESHOLD_PX) {
+      this.hideNavbar();
+      this.lastScrollTop = currentScroll;
+    } else if (delta < 0) {
+      this.showNavbar();
+      this.lastScrollTop = currentScroll;
+    }
+  }
+
+  // ── Click outside (search dropdown) ──────────────────────
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.isBrowser || !this.showResults()) return;
+
+    const target = event.target as HTMLElement;
+    const desktop = this.desktopSearchWrapper()?.nativeElement;
+    const mobile = this.mobileSearchWrapper()?.nativeElement;
+
+    const clickedInsideDesktop = desktop?.contains(target) ?? false;
+    const clickedInsideMobile = mobile?.contains(target) ?? false;
+
+    if (!clickedInsideDesktop && !clickedInsideMobile) {
+      this.showResults.set(false);
+    }
+  }
+
+  // ── Visibility helpers ───────────────────────────────────
+  private showNavbar(): void {
+    if (!this.isVisible()) this.isVisible.set(true);
+  }
+
+  private hideNavbar(): void {
+    if (this.isVisible()) this.isVisible.set(false);
+  }
+
+  // ── Idle task helper ─────────────────────────────────────
+  private scheduleIdleTask(task: () => void): void {
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(() => task(), { timeout: IDLE_CALLBACK_TIMEOUT_MS });
+    } else {
+      setTimeout(() => task(), IDLE_FALLBACK_MS);
+    }
+  }
+
+  // ── Categories dinámicas ─────────────────────────────────
+  private loadDynamicCategories(): void {
+    this.categoryRepo.getAll({ column: 'name', ascending: true }).subscribe({
+      next: (categories) => {
+        if (!categories?.length) return;
+
+        this.navItems.update((currentItems) => {
+          const newItems = [...currentItems];
+          const tienda = newItems.find((item) => item.id === 'tienda');
+          const todasCategorias = tienda?.children?.find((child) => child.id === 'tienda-categorias');
+
+          if (!todasCategorias) return newItems;
+
+          todasCategorias.children = categories
+            .filter((cat) => !!cat.slug)
+            .map((cat) => ({
+              id: `dynamic-cat-${cat.id}`,
+              label: cat.name,
+              path: `/productos/categoria/${encodeURIComponent(cat.slug)}`,
+              icon: 'fas fa-tag',
+              theme: 'tienda',
+            }));
+
+          return newItems;
+        });
+      },
+      error: (err) => {
+        // RLS policy o auth pendiente — no es fatal
+        console.warn(
+          '[PublicLayoutHeader] Dynamic categories deferred (RLS/auth):',
+          err?.message ?? err,
+        );
+      },
+    });
+  }
+
+  // ── Mobile menu ──────────────────────────────────────────
+  toggleMobileMenu(): void {
     this.navState.toggleMobileMenu();
     if (!this.navState.isMobileMenuOpen()) {
       this.searchFocusRequested.set(false);
     }
   }
 
-  closeMobileMenu() {
+  closeMobileMenu(): void {
     this.navState.closeMobileMenu();
     this.searchFocusRequested.set(false);
   }
 
-  /**
-   * Opens the mobile drawer and requests focus on the search input.
-   * Triggered by the navbar lupa icon.
-   */
   openMobileSearch(): void {
     this.searchFocusRequested.set(true);
     this.navState.openMobileMenu();
     this.searchService.requestSearchFocus();
   }
 
-  /** Close mobile drawer when a nav link (not accordion toggle) is clicked */
-  onMobileNavClick(event: Event) {
+  onMobileNavClick(event: Event): void {
     const target = event.target as HTMLElement;
-    const anchor = target.closest('a[routerLink], a[ng-reflect-router-link]');
-    if (anchor) {
+    if (target.closest('a[routerLink], a[ng-reflect-router-link]')) {
       this.closeMobileMenu();
     }
   }
 
-  // ── Desktop Mega Menu ─────────────────────────────
-  public activeMegaMenu = signal<string | null>(null);
-  private megaMenuTimeout: ReturnType<typeof setTimeout> | null = null;
-
-  openMegaMenu(id: string) {
+  // ── Mega menu ────────────────────────────────────────────
+  openMegaMenu(id: string): void {
     if (this.megaMenuTimeout) clearTimeout(this.megaMenuTimeout);
     this.activeMegaMenu.set(id);
   }
 
-  closeMegaMenuDelayed() {
-    this.megaMenuTimeout = setTimeout(() => {
-      this.activeMegaMenu.set(null);
-    }, 200);
+  closeMegaMenuDelayed(): void {
+    this.megaMenuTimeout = setTimeout(
+      () => this.activeMegaMenu.set(null),
+      MEGA_MENU_CLOSE_DELAY_MS,
+    );
   }
 
-  keepMegaMenuOpen() {
+  keepMegaMenuOpen(): void {
     if (this.megaMenuTimeout) clearTimeout(this.megaMenuTimeout);
   }
 
-  // ── Cart ──────────────────────────────────────────
-  public isCartOpen = this.cartService.isCartOpen;
-  
-  get showCart(): boolean {
-    return this.router.url !== '/' && !this.isCelularLandingMode && !this.isAcademyMode;
-  }
-
-  public toggleCart() {
+  // ── Cart ─────────────────────────────────────────────────
+  toggleCart(): void {
     this.cartService.toggleCart();
   }
 
-  // ── Navbar Visibility (auto-hide on scroll) ───────
-  public isVisible = signal(true);
-  private lastScrollTop = 0;
-
-  constructor() {
-    // Defer product loading — not needed until user interacts with search
-    // Show navbar when item added to cart
-    effect(() => {
-      const items = this.cartService.cartItems();
-      if (items.length > 0) {
-        this.showNavbar();
-        this.lastScrollTop = isPlatformBrowser(this.platformId)
-          ? window.scrollY || document.documentElement.scrollTop
-          : 0;
-      }
-    });
+  // ── Search ───────────────────────────────────────────────
+  onSearchInput(): void {
+    const value = this.searchQuery();
+    this.searchService.updateQuery(value);
+    this.showResults.set(value.length > 0);
   }
 
-  ngOnInit(): void {
-    // Defer product loading to idle time — not needed until search
-    if (isPlatformBrowser(this.platformId)) {
-      if ('requestIdleCallback' in window) {
-        window.requestIdleCallback(() => {
-          this.loadProducts();
-          this.loadDynamicCategories();
-        }, { timeout: 4000 });
-      } else {
-        setTimeout(() => {
-          this.loadProducts();
-          this.loadDynamicCategories();
-        }, 2000);
-      }
-    }
-
-    // Keep currentUrl up to date
-    this.subscriptions.add(
-      this.router.events.pipe(
-        filter(event => event instanceof NavigationEnd)
-      ).subscribe(() => {
-        this.currentUrl.set(this.router.url);
-        this.cdr.markForCheck();
-      })
-    );
-
-    // Reset navbar visibility on navigation
-    this.subscriptions.add(
-      this.router.events.pipe(
-        filter(event => event instanceof NavigationEnd)
-      ).subscribe(() => {
-        this.showNavbar();
-        this.lastScrollTop = isPlatformBrowser(this.platformId)
-          ? window.scrollY || document.documentElement.scrollTop
-          : 0;
-      })
-    );
-
-    // Listen for external search-focus requests (e.g. from other components)
-    this.subscriptions.add(
-      this.searchService.focusRequested$.subscribe(() => {
-        if (!this.isMobileMenuOpen()) {
-          this.searchFocusRequested.set(true);
-          this.navState.openMobileMenu();
-          this.cdr.markForCheck();
-        }
-      })
-    );
-
-    // Debounced search — fetch results from the server on demand
-    this.subscriptions.add(
-      this.searchService.debouncedQuery$.pipe(
-        switchMap((term) => {
-          this.searchQuery.set(term);
-          this.showResults.set(!!term);
-          
-          if (term && term.length > 1) {
-            this.isSearching.set(true);
-            this.cdr.markForCheck();
-            
-            if (this.isAcademyMode) {
-              return this.coursesService.getCourses().pipe(
-                map(res => {
-                  const filtered = (res.data || []).filter(c => c.title.toLowerCase().includes(term.toLowerCase()));
-                  this.coursesResults.set(filtered.slice(0, 10));
-                  this.isSearching.set(false);
-                  this.cdr.markForCheck();
-                }),
-                catchError(err => {
-                  console.error('Search error:', err);
-                  this.isSearching.set(false);
-                  this.cdr.markForCheck();
-                  return of(null);
-                })
-              );
-            } else {
-              return this.productRepo.search(term).pipe(
-                map(results => {
-                  this.products.set(results.slice(0, 10)); // Take top results
-                  this.isSearching.set(false);
-                  this.cdr.markForCheck();
-                }),
-                catchError(err => {
-                  console.error('Search error:', err);
-                  this.isSearching.set(false);
-                  this.cdr.markForCheck();
-                  return of(null);
-                })
-              );
-            }
-          } else {
-            this.products.set([]);
-            this.coursesResults.set([]);
-            this.isSearching.set(false);
-            this.cdr.markForCheck();
-            return of(null);
-          }
-        })
-      ).subscribe()
-    );
+  onSearchFocus(): void {
+    if (this.searchQuery().length > 1) this.showResults.set(true);
   }
 
-  @HostListener('window:scroll')
-  onWindowScroll() {
-    if (!isPlatformBrowser(this.platformId)) return;
-
-    const currentScroll = window.scrollY || document.documentElement.scrollTop;
-
-    if (currentScroll < 50) {
-      this.showNavbar();
-      this.lastScrollTop = currentScroll;
-      return;
-    }
-
-    const scrollDelta = currentScroll - this.lastScrollTop;
-    if (scrollDelta > 0 && Math.abs(scrollDelta) > 10) {
-      this.hideNavbar();
-      this.lastScrollTop = currentScroll;
-    } else if (scrollDelta < 0) {
-      this.showNavbar();
-      this.lastScrollTop = currentScroll;
-    }
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    if (!isPlatformBrowser(this.platformId) || !this.showResults()) return;
-    
-    const target = event.target as HTMLElement;
-    const searchWrapper = document.querySelector('.desktop-search-wrapper');
-    const mobileSearchWrapper = document.querySelector('.mobile-search-wrapper');
-    
-    const clickedInsideDesktop = searchWrapper && searchWrapper.contains(target);
-    const clickedInsideMobile = mobileSearchWrapper && mobileSearchWrapper.contains(target);
-    
-    if (!clickedInsideDesktop && !clickedInsideMobile) {
-      this.showResults.set(false);
-      this.cdr.markForCheck();
-    }
-  }
-
-  private showNavbar() {
-    if (!this.isVisible()) {
-      this.isVisible.set(true);
-      this.cdr.markForCheck();
-    }
-  }
-
-  private hideNavbar() {
-    if (this.isVisible()) {
-      this.isVisible.set(false);
-      this.cdr.markForCheck();
-    }
-  }
-
-  ngOnDestroy() {
-    if (this.megaMenuTimeout) clearTimeout(this.megaMenuTimeout);
-    this.subscriptions.unsubscribe();
-  }
-
-  /**
-   * DEPRECATED: We no longer load all products into memory.
-   * Search is now triggered on-demand via searchService.debouncedQuery$.
-   */
-  /**
-   * Fetches active categories from the database and injects them 
-   * into the 'Tienda' -> 'Todas las Categorías' navigation item.
-   */
-  async loadDynamicCategories() {
-    try {
-      this.categoryRepo.getAll({ column: 'name', ascending: true }).subscribe({
-        next: (categories) => {
-          if (!categories || categories.length === 0) return;
-
-          this.navItems.update(currentItems => {
-            // Clone high-level structure to avoid mutation issues
-            const newItems = [...currentItems];
-            const tienda = newItems.find(item => item.id === 'tienda');
-            
-            if (tienda && tienda.children) {
-              const todasCategorias = tienda.children.find(child => child.id === 'tienda-categorias');
-              
-              if (todasCategorias) {
-                // Convert DB categories to NavItems
-                todasCategorias.children = categories.map(cat => ({
-                  id: `dynamic-cat-${cat.id}`,
-                  label: cat.name,
-                  path: `/productos/categoria/${cat.slug}`,
-                  icon: 'fas fa-tag', // Default icon for dynamic categories
-                  theme: 'tienda'
-                }));
-                
-                this.cdr.markForCheck();
-              }
-            }
-            return newItems;
-          });
-        },
-        error: (err) => {
-          // Gracefully log developer warning and mark CD
-          console.warn('[PublicLayoutHeader] Dynamic categories loading deferred (database read RLS policy restricted/auth dependent).', err);
-          this.cdr.markForCheck();
-        }
-      });
-    } catch (err) {
-      console.error('Error loading dynamic categories:', err);
-    }
-  }
-
-  async loadProducts() {
-    // No-op - loading on demand now
-  }
-
-  public onSearchInput(): void {
-    this.searchService.updateQuery(this.searchQuery());
-    this.showResults.set(!!this.searchQuery());
-  }
-
-  public onSearchFocus(): void {
-    if (this.searchQuery().length > 1) {
-      this.showResults.set(true);
-    }
-  }
-
-  public clearSearch(): void {
+  clearSearch(): void {
     this.searchQuery.set('');
     this.showResults.set(false);
     this.searchService.updateQuery('');
   }
 
-  public goToSearch(): void {
+  goToSearch(): void {
     const query = this.searchQuery().trim();
-    if (query) {
-      this.showResults.set(false);
-      this.closeMobileMenu();
-      if (this.isAcademyMode) {
-        this.router.navigate(['/academy'], { queryParams: { q: query } });
-      } else {
-        this.router.navigate(['/productos'], { queryParams: { q: query, _page: 1 } });
-      }
+    if (!query) return;
+
+    this.showResults.set(false);
+    this.closeMobileMenu();
+
+    if (this.isAcademyMode()) {
+      this.router.navigate(['/academy'], { queryParams: { q: query } });
+    } else {
+      this.router.navigate(['/productos'], { queryParams: { q: query, _page: 1 } });
     }
   }
 
   /**
-   * FIX: iOS Safari doesn't automatically "un-zoom" when an input is blurred.
-   * This trick temporarily toggles the viewport scale to force a reset.
+   * iOS Safari no resetea el zoom al blur del input.
+   * Toggleamos el viewport temporalmente para forzar el reset.
    */
-  public onSearchBlur(): void {
-    if (!isPlatformBrowser(this.platformId)) return;
+  onSearchBlur(): void {
+    if (!this.isBrowser) return;
+    if (!window.matchMedia('(max-width: 768px)').matches) return;
 
-    // Check if it's likely a mobile device (touch support + small width)
-    const isMobile = window.matchMedia('(max-width: 768px)').matches;
-    if (!isMobile) return;
-
-    // We use a small timeout to allow any pending clicks (like selecting a product) to finish
     setTimeout(() => {
       const meta = document.querySelector('meta[name="viewport"]');
-      if (meta) {
-        const originalContent = meta.getAttribute('content');
-        // Force a specific scale briefly to reset any browser zoom
-        meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0');
+      if (!meta) return;
 
-        // Restore to original after a tiny delay
-        setTimeout(() => {
-          meta.setAttribute('content', originalContent || 'width=device-width, initial-scale=1.0, viewport-fit=cover');
-        }, 300);
-      }
-    }, 150);
+      const original = meta.getAttribute('content');
+      meta.setAttribute(
+        'content',
+        'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0',
+      );
+
+      setTimeout(
+        () => meta.setAttribute('content', original || DEFAULT_VIEWPORT_CONTENT),
+        IOS_ZOOM_RESET_RESTORE_MS,
+      );
+    }, IOS_ZOOM_RESET_DELAY_MS);
   }
 
-  public selectProduct(product: Product) {
-    this.searchQuery.set('');
-    this.showResults.set(false);
-    this.searchService.updateQuery('');
+  selectProduct(product: Product): void {
+    this.clearSearch();
     this.closeMobileMenu();
     this.router.navigate(['/productos/detalle', product.slug || product.id]);
   }
 
-  public selectCourse(course: Course) {
-    this.searchQuery.set('');
-    this.showResults.set(false);
-    this.searchService.updateQuery('');
+  selectCourse(course: Course): void {
+    this.clearSearch();
     this.closeMobileMenu();
     this.router.navigate(['/academy', course.slug || course.id]);
   }
 
-  // ── Auth ──────────────────────────────────────────
-  async logout() {
+  // ── Auth ─────────────────────────────────────────────────
+  async logout(): Promise<void> {
     try {
       await this.authService.signOut();
-      this.cdr.markForCheck();
       this.goToRoute('/login');
     } catch (err) {
-      console.error('Error during logout:', err);
+      console.error('Logout error:', err);
     }
   }
 
-  // ── Navigation Helper ─────────────────────────────
-  public goToRoute(route: string) {
-    if (isPlatformBrowser(this.platformId)) {
-      if (document.activeElement instanceof HTMLElement) {
-        document.activeElement.blur();
-      }
+  // ── Navigation helper ────────────────────────────────────
+  goToRoute(route: string): void {
+    if (this.isBrowser && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
     }
     this.closeMobileMenu();
     this.router.navigate([route]);
   }
 
-  // ── Theme Helpers (for template) ──────────────────
+  // ── Theme helpers ────────────────────────────────────────
   getThemeStyles(theme: string) {
     return THEME_STYLES[theme] ?? THEME_STYLES['general'];
   }
 
-  /** Context-aware label for the mega menu footer link */
   getMegaFooterLabel(itemId: string): string {
     return VIEW_ALL_LABELS[itemId] ?? 'Ver más';
   }
