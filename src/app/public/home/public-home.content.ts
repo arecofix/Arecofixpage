@@ -205,7 +205,7 @@ export const HOME_CONTENT: Record<'en' | 'es', HomeContent> = {
           title: 'ZARX — C4ISR Civil Defense & Emergency Response System',
           description:
             'Tactical platform that turns crisis uncertainty into actionable information. ZARX integrates real-time geolocation, secure communication and critical infrastructure monitoring (fires, IoT) in a single interface. Built to work even when the network fails (offline-first), it enables civil defense and security forces to coordinate resources and save lives with precise data in seconds, not hours.',
-          image: 'assets/img/gsm/zarx.png',
+          image: 'assets/img/gsm/zarx.webp',
           tags: ['C4ISR', 'Offline-First', 'Angular', 'Supabase'],
           link: '/portfolio',
         },
@@ -213,7 +213,7 @@ export const HOME_CONTENT: Record<'en' | 'es', HomeContent> = {
           title: 'Business Intelligence Dashboard (ERP)',
           description:
             'Unified command center that centralizes operations, finances and customer service in a single screen. Designed to scale businesses with multiple branches, unifying E-commerce, Technical Service, Academy and Cash in real time with actionable metrics.',
-          image: 'assets/img/projects/panel.png',
+          image: 'assets/img/projects/are.webp',
           tags: ['Java', 'Spring Boot', 'Angular'],
           link: '/portfolio',
         },
