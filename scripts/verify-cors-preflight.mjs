@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Automated CORS Preflight Healthcheck for Supabase Kong Gateway
- * Verifies that custom headers (x-guest-session) are accepted in preflight OPTIONS.
+ * Verifies that custom headers (x-guest-session) are accepted in preflight OPTIONs.
  */
 
 const targetUrl = process.env.SUPABASE_URL || 'https://db.arecofix.com.ar';
