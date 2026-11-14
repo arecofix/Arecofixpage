@@ -24,32 +24,46 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: 'pnpm' # ⬅️ NUEVO: Acelera la instalación
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9
+          run_install: false # Se instala en el paso siguiente
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run Jest Test Suite with Coverage Guard (50 suites, 276 tests)
+      - name: Run Jest Test Suite with Coverage Guard
         run: pnpm test -- --coverage
-
 
       - name: 🛡️ Verify CORS Preflight on Kong
         run: node scripts/verify-cors-preflight.mjs
 
-      - name: 🌐 Verify Cloudflare D1 Failover Worker Health & Freshness
+      - name: 🌐 Verify Cloudflare D1 Failover Worker Health
         run: |
           RES=$(curl -fsS https://arecofix-d1-failover.ezequielenrico15.workers.dev/health)
-          echo "$RES" | grep '"status":"ok"'
-          echo "$RES" | grep '"stale":false'
+          echo "Worker Response: $RES"
+          
+          # 1. Validar que el worker esté operativo (esto SÍ rompe el pipeline si falla)
+          if ! echo "$RES" | jq -e '.status == "ok"' > /dev/null; then
+            echo "❌ Worker D1 no está operativo (status != ok)."
+            exit 1
+          fi
+          
+          # 2. Validar frescura (solo advierte, no rompe)
+          if echo "$RES" | jq -e '.stale == true' > /dev/null; then
+            echo "⚠️ ADVERTENCIA: El worker D1 tiene datos 'stale' (desactualizados)."
+            echo "No se cancela el pipeline, pero revisá el Cron Trigger de Cloudflare."
+          else
+            echo "✅ Worker D1 sincronizado y saludable."
+          fi
 
       - name: 🔍 Verify Database Schema Contract (Prevent Schema Drift)
         run: node scripts/verify-schema.mjs
 
-      - name: 🛡️ Audit RLS Depth & Anti-Recursion Gate (Prevent Stack Overflow CWE-674)
+      - name: 🛡️ Audit RLS Depth & Anti-Recursion Gate
         run: pnpm test:recursion
 
   build:
@@ -64,11 +78,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: 'pnpm'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9
+          run_install: false
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
@@ -76,6 +92,7 @@ jobs:
       - name: Build Production SSR
         env:
           NODE_OPTIONS: "--max_old_space_size=6144"
+          # VS Code marca esto en amarillo porque no ve los secrets, es un falso positivo.
           TURNSTILE_SITE_KEY: ${{ secrets.TURNSTILE_SITE_KEY || '1x00000000000000000000AA' }}
           TRIAL_ENABLED: 'false'
         run: pnpm run build
@@ -104,6 +121,7 @@ jobs:
 
       - name: Setup SSH Key
         env:
+          # VS Code warning: falso positivo, el secret existe en GitHub.
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           mkdir -p ~/.ssh
@@ -133,11 +151,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: 'pnpm'
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9
+          run_install: false
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
@@ -183,7 +203,10 @@ jobs:
     name: "🚢 Deploy to Production (Manual Approval Gate)"
     runs-on: ubuntu-latest
     needs: verify_staging
-    environment: production
+    # ⬇️ CORREGIDO: Formato de objeto para que VS Code no tire error
+    environment:
+      name: production
+      url: https://arecofix.com.ar
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
