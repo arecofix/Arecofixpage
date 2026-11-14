@@ -1,30 +1,48 @@
 #!/usr/bin/env node
 /**
  * ==============================================================================
- * ARECOFIX - STAGING DEPLOYMENT ORCHESTRATOR (scripts/deploy-staging.mjs)
+ * ARECOFIX - AUTOMATED PRODUCTION DEPLOYMENT ORCHESTRATOR (scripts/deploy.mjs)
+ * ==============================================================================
+ * Orquestador de despliegue atómico a producción vía SSH Tunnel y PM2.
+ * 
+ * Flujo:
+ * 1. Validación de clave SSH y conectividad.
+ * 2. Compilación de producción (Angular 21 SSR).
+ * 3. Empaquetado comprimido atómico (tar.gz).
+ * 4. Backup automático de la versión previa en la VPS (dist_backup).
+ * 5. Transferencia segura vía SCP.
+ * 6. Descompresión y rotación atómica en /home/ubuntu/arecofix/dist.
+ * 7. Recarga de proceso PM2 (arecofix-frontend).
+ * 8. Warm-up (espera de estabilización de Node/SSR).
+ * 9. Healthcheck de disponibilidad HTTP 200 en https://arecofix.com.ar.
+ * 10. Rollback automático en caso de fallo crítico en el healthcheck.
  * ==============================================================================
  */
 
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
-import http from 'http';
+import https from 'https';
 
 const CONFIG = {
   sshHost: process.env.DEPLOY_SSH_HOST || 'ssh.arecofix.com.ar',
   sshUser: process.env.DEPLOY_SSH_USER || 'ubuntu',
   sshKey: process.env.DEPLOY_SSH_KEY || 'ssh-key-2026-08-30.key',
-  remoteDir: '/home/ubuntu/arecofix-staging',
-  pm2App: 'arecofix-frontend-staging',
-  healthcheckPort: 4001,
-  archiveName: 'dist-staging.tar.gz'
+  remoteDir: process.env.DEPLOY_REMOTE_DIR || '/home/ubuntu/arecofix',
+  pm2App: process.env.DEPLOY_PM2_APP || 'arecofix-frontend',
+  domain: process.env.DEPLOY_HEALTHCHECK_URL || 'https://arecofix.com.ar',
+  archiveName: 'dist.tar.gz'
 };
 
 const startTime = Date.now();
 
 function log(step, msg) {
   const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-  console.log(`\x1b[36m[${elapsed}s]\x1b[0m \x1b[1m\x1b[33m[STAGING:${step}]\x1b[0m ${msg}`);
+  console.log(`\x1b[36m[${elapsed}s]\x1b[0m \x1b[1m\x1b[32m[${step}]\x1b[0m ${msg}`);
+}
+
+function logError(step, msg) {
+  console.error(`\x1b[31m[ERROR][${step}] ${msg}\x1b[0m`);
 }
 
 function run(cmd, desc) {
@@ -36,94 +54,134 @@ function runSilent(cmd) {
   return execSync(cmd, { encoding: 'utf-8', env: process.env }).trim();
 }
 
-async function main() {
-  console.log('\n🚀 INICIANDO DESPLIEGUE A STAGING (arecofix-staging)\n');
-
-  // 1. Validar clave SSH
-  if (!fs.existsSync(CONFIG.sshKey)) {
-    throw new Error(`Clave SSH no encontrada en: ${CONFIG.sshKey}`);
-  }
-
-  // 1.5 Validar contrato de esquema contra Supabase
-  log('SCHEMA', 'Verificando contrato de esquema para prevenir Schema Drift...');
-  run('node scripts/verify-schema.mjs', 'Validación de esquema PostgREST');
-
-  // 2. Compilar bundle si se requiere
-  if (!process.argv.includes('--skip-build')) {
-    log('BUILD', 'Compilando aplicación Angular SSR...');
-    run('pnpm run build', 'ng build --configuration production');
-  }
-
-  // 3. Empaquetar
-  log('PACKAGE', 'Empaquetando dist...');
-  run(`tar -czf ${CONFIG.archiveName} -C dist arecofix`, 'Comprimiendo bundle');
-
-  // 4. Copiar a staging
-  log('TRANSFER', 'Transfiriendo bundle a la VPS...');
-  run(
-    `scp -i ${CONFIG.sshKey} -o StrictHostKeyChecking=no ${CONFIG.archiveName} ${CONFIG.sshUser}@${CONFIG.sshHost}:${CONFIG.remoteDir}/${CONFIG.archiveName}`,
-    'SCP bundle'
-  );
-  
-  // Copiar también ecosystem.staging.config.cjs y server-init.mjs
-  run(
-    `scp -i ${CONFIG.sshKey} -o StrictHostKeyChecking=no ecosystem.staging.config.cjs ${CONFIG.sshUser}@${CONFIG.sshHost}:${CONFIG.remoteDir}/ecosystem.staging.config.cjs`,
-    'SCP ecosystem config'
-  );
-  run(
-    `scp -i ${CONFIG.sshKey} -o StrictHostKeyChecking=no server-init.staging.mjs ${CONFIG.sshUser}@${CONFIG.sshHost}:${CONFIG.remoteDir}/server-init.mjs`,
-    'SCP server-init.mjs'
-  );
-
-  // 5. Descomprimir e iniciar/recargar PM2
-  log('PM2', 'Descomprimiendo y recargando PM2 en staging...');
-  const remoteCmd = `
-    cd ${CONFIG.remoteDir} &&
-    mkdir -p dist &&
-    tar -xzf ${CONFIG.archiveName} -C dist/ &&
-    rm -f ${CONFIG.archiveName} &&
-    (pm2 reload ecosystem.staging.config.cjs --update-env || pm2 start ecosystem.staging.config.cjs)
-  `.replace(/\n\s+/g, ' ');
-
-  run(`ssh -i ${CONFIG.sshKey} -o StrictHostKeyChecking=no ${CONFIG.sshUser}@${CONFIG.sshHost} "${remoteCmd}"`, 'Remote deploy');
-
-  // 6. Limpieza local
-  if (fs.existsSync(CONFIG.archiveName)) {
-    fs.unlinkSync(CONFIG.archiveName);
-  }
-
-  // 7. Healthcheck en staging con reintentos
-  log('HEALTH', 'Esperando 3s e iniciando verificación de salud...');
-  await new Promise((r) => setTimeout(r, 3000));
-
-  let verified = false;
-  let lastOutput = '';
-  for (let attempt = 1; attempt <= 5; attempt++) {
-    log('HEALTH', `Intento ${attempt}/5: verificando http://localhost:${CONFIG.healthcheckPort}/...`);
-    const checkCmd = `ssh -i ${CONFIG.sshKey} -o StrictHostKeyChecking=no ${CONFIG.sshUser}@${CONFIG.sshHost} "curl -sI -H 'Host: staging.arecofix.com.ar' http://localhost:${CONFIG.healthcheckPort}/ | head -n 5"`;
+async function verifyHealth(url, maxRetries = 5, delayMs = 3000) {
+  log('HEALTH', `Verificando disponibilidad de ${url}...`);
+  for (let i = 1; i <= maxRetries; i++) {
     try {
-      lastOutput = runSilent(checkCmd);
-      if (lastOutput.includes('200') || lastOutput.includes('301') || lastOutput.includes('302')) {
-        console.log('\n--- Output Healthcheck Staging ---');
-        console.log(lastOutput);
-        console.log('---------------------------------\n');
-        verified = true;
-        break;
+      const statusCode = await new Promise((resolve, reject) => {
+        const req = https.get(url, { rejectUnauthorized: false, timeout: 5000 }, (res) => {
+          resolve(res.statusCode);
+        });
+        req.on('error', reject);
+        req.on('timeout', () => { req.destroy(); reject(new Error('Timeout')); });
+      });
+
+      if (statusCode === 200 || statusCode === 301 || statusCode === 302) {
+        log('HEALTH', `Intento ${i}/${maxRetries}: Servidor respondió HTTP ${statusCode} OK.`);
+        return true;
       }
-    } catch {
-      // Reintentar
+      log('HEALTH', `Intento ${i}/${maxRetries}: Respuesta HTTP ${statusCode}. Reintentando en ${delayMs}ms...`);
+    } catch (e) {
+      log('HEALTH', `Intento ${i}/${maxRetries}: Fallo de conexión (${e.message}). Reintentando...`);
     }
-    await new Promise((r) => setTimeout(r, 2000));
+    await new Promise(r => setTimeout(r, delayMs));
+  }
+  return false;
+}
+
+async function main() {
+  console.log('\x1b[1m\x1b[35m');
+  console.log('======================================================================');
+  console.log('   🚀 ARECOFIX - DESPLIEGUE AUTOMATIZADO A PRODUCCIÓN');
+  console.log('======================================================================\x1b[0m\n');
+
+  // 1. Verificación de llave SSH
+  const keyPath = path.resolve(process.cwd(), CONFIG.sshKey);
+  if (!fs.existsSync(keyPath)) {
+    logError('AUTH', `Clave SSH no encontrada en: ${keyPath}`);
+    process.exit(1);
+  }
+  log('AUTH', `Clave SSH detectada: ${CONFIG.sshKey}`);
+
+  // 1.5 Verificación de contrato de esquema contra Supabase
+  log('SCHEMA', 'Verificando contrato de esquema en base de datos para prevenir Schema Drift...');
+  try {
+    run('node scripts/verify-schema.mjs', 'Validando tablas y columnas requeridas en PostgREST...');
+  } catch (err) {
+    logError('SCHEMA', 'Schema drift detectado. Falta migración o la API no la expone. Despliegue abortado.');
+    process.exit(1);
   }
 
-  if (verified) {
-    log('SUCCESS', '✅ Staging desplegado y respondiendo 200 OK.');
+  // 2. Compilación de producción Angular SSR
+  const skipBuild = process.argv.includes('--skip-build');
+  if (!skipBuild) {
+    log('BUILD', 'Iniciando compilación de producción con Angular 21 SSR...');
+    try {
+      run('pnpm run build', 'Compilando bundle cliente y servidor...');
+    } catch (err) {
+      logError('BUILD', 'Fallo en la compilación de Angular. Despliegue abortado.');
+      process.exit(1);
+    }
   } else {
-    throw new Error(`Staging no respondió exitosamente tras 5 intentos:\n${lastOutput}`);
+    log('BUILD', 'Omitiendo compilación local (--skip-build activo).');
+  }
+
+  // 3. Empaquetado atómico
+  log('PACKAGE', 'Empaquetando artefactos de producción en archivo comprimido...');
+  const distPath = path.join(process.cwd(), 'dist');
+  if (!fs.existsSync(distPath)) {
+    logError('PACKAGE', 'Carpeta dist/ no existe. Ejecuta el build primero.');
+    process.exit(1);
+  }
+
+  const archiveLocalPath = path.join(process.cwd(), CONFIG.archiveName);
+  try {
+    if (fs.existsSync(archiveLocalPath)) fs.unlinkSync(archiveLocalPath);
+    run(`tar -czf ${CONFIG.archiveName} -C dist arecofix`, 'Generando dist.tar.gz...');
+  } catch (err) {
+    logError('PACKAGE', 'Fallo al comprimir dist.tar.gz.');
+    process.exit(1);
+  }
+
+  const archiveSizeMb = (fs.statSync(archiveLocalPath).size / (1024 * 1024)).toFixed(2);
+  log('PACKAGE', `Paquete generado exitosamente: ${CONFIG.archiveName} (${archiveSizeMb} MB)`);
+
+  const sshOpts = `-i "${CONFIG.sshKey}" -o StrictHostKeyChecking=no -o ConnectTimeout=10`;
+  const remoteTarget = `${CONFIG.sshUser}@${CONFIG.sshHost}`;
+
+  try {
+    // 4. Backup automático en VPS
+    log('BACKUP', 'Creando backup de la versión actual en la VPS...');
+    const backupCmd = `ssh ${sshOpts} ${remoteTarget} "mkdir -p ${CONFIG.remoteDir}/dist_backup && cp -rf ${CONFIG.remoteDir}/dist/arecofix ${CONFIG.remoteDir}/dist_backup/ 2>/dev/null || true"`;
+    run(backupCmd);
+
+    // 5. Transferencia segura vía SCP
+    log('TRANSFER', `Subiendo ${CONFIG.archiveName} a ${CONFIG.sshHost}...`);
+    const scpCmd = `scp ${sshOpts} "${archiveLocalPath}" ${remoteTarget}:${CONFIG.remoteDir}/${CONFIG.archiveName}`;
+    run(scpCmd);
+
+    // 6. Extracción atómica y reinicio de PM2 en VPS
+    log('DEPLOY', 'Extrayendo versión en VPS y reiniciando PM2...');
+    const remoteExecCmd = `ssh ${sshOpts} ${remoteTarget} "tar -xzf ${CONFIG.remoteDir}/${CONFIG.archiveName} -C ${CONFIG.remoteDir}/dist/ && rm -f ${CONFIG.remoteDir}/${CONFIG.archiveName} && pm2 reload ${CONFIG.pm2App} || pm2 restart ${CONFIG.pm2App}"`;
+    run(remoteExecCmd);
+
+    // 🟢 NUEVO: Warm-up delay para evitar transiciones de 502 Bad Gateway
+    log('HEALTH', 'Esperando 5s para que el servidor SSR se estabilice en PM2...');
+    await new Promise(r => setTimeout(r, 5000));
+
+    // 7. Healthcheck de producción
+    const isHealthy = await verifyHealth(CONFIG.domain);
+    if (!isHealthy) {
+      logError('HEALTH', '¡ALERTA! El servidor no respondió 200 tras el despliegue.');
+      log('ROLLBACK', 'Iniciando rollback automático a la versión de respaldo...');
+      const rollbackCmd = `ssh ${sshOpts} ${remoteTarget} "cp -rf ${CONFIG.remoteDir}/dist_backup/arecofix ${CONFIG.remoteDir}/dist/ && pm2 restart ${CONFIG.pm2App}"`;
+      run(rollbackCmd);
+      logError('ROLLBACK', 'Rollback completado. La versión anterior fue restaurada.');
+      process.exit(1);
+    }
+
+    log('SUCCESS', `🎉 ¡Despliegue completado con éxito en ${((Date.now() - startTime) / 1000).toFixed(1)}s!`);
+    console.log(`\x1b[32m✔ Dominio en línea: ${CONFIG.domain}\x1b[0m\n`);
+
+  } catch (deployError) {
+    logError('DEPLOY', `Error durante el proceso de despliegue: ${deployError.message}`);
+    process.exit(1);
+  } finally {
+    // Limpieza de archivo temporal local
+    if (fs.existsSync(archiveLocalPath)) {
+      try { fs.unlinkSync(archiveLocalPath); } catch { }
+    }
   }
 }
 
-main().catch((err) => {
-  console.error('\n❌ ERROR EN DESPLIEGUE A STAGING:', err.message);
-  process.exit(1);
-});
+main();
