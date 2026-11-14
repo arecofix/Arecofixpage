@@ -4,7 +4,6 @@
 <!-- ═══════════════════════════════════════════════════════
        1. HERO — Split con dashboard window + floating cards
   ═══════════════════════════════════════════════════════ -->
-<!-- MODIFICADO: pt-32 en mobile para que no lo tape el navbar, pb-24 para no generar tanto espacio al final -->
 <section id="hero" aria-labelledby="hero-title"
   class="relative w-full max-w-[100vw] overflow-hidden min-h-0 lg:min-h-[85vh] lg:flex lg:items-center pt-32 pb-24 lg:pt-28 lg:pb-24 text-gray-900 dark:text-[#e2e8f0] transition-colors duration-300"
   style="font-family: var(--font-body)">
@@ -42,7 +41,7 @@
           </div>
         </div>
 
-        <!-- Título - MODIFICADO: text-2xl en mobile para achicar -->
+        <!-- Título -->
         <h1 id="hero-title"
           class="w-full max-w-full text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-[3.25rem] font-black mb-3 lg:mb-6 leading-tight tracking-tight text-gray-900 dark:text-white break-words"
           style="font-family: var(--font-heading)">
@@ -55,17 +54,17 @@
           {{ c.hero.subtitle }}
         </p>
 
-        <!-- Párrafo Mobile - MODIFICADO: text-sm para achicar -->
+        <!-- Párrafo Mobile -->
         <p
           class="block lg:hidden text-sm text-gray-600 dark:text-gray-300 mb-4 leading-relaxed max-w-md mx-auto px-2 break-words">
           {{ c.hero.subtitleMobile || c.hero.subtitle }}
         </p>
 
-        <!-- ═══ CARRUSEL MOBILE CORREGIDO ═══ -->
-        <div class="block lg:hidden w-full max-w-[100vw] mb-6 select-none overflow-hidden"
+        <!-- ═══ CARRUSEL MOBILE (1 SLIDE A LA VEZ) ═══ -->
+        <div class="block lg:hidden w-full max-w-full mb-6 select-none overflow-hidden"
           aria-label="Galería de soluciones Arecofix">
 
-          <!-- INDICADORES MOVIDOS ARRIBA DEL SLIDER -->
+          <!-- 1. INDICADORES ARRIBA -->
           @if (c.hero.slides && c.hero.slides.length > 1) {
           <div class="flex items-center justify-center gap-2 mb-3" role="tablist" aria-label="Indicadores del carrusel">
             @for (slide of c.hero.slides; track $index) {
@@ -80,43 +79,46 @@
           </div>
           }
 
-          <!-- Contenedor estricto -->
+          <!-- 2. CONTENEDOR DEL SLIDER (Estructura limpia de 100%) -->
           <div class="relative w-full overflow-hidden py-1">
-            <div class="flex transition-transform duration-500 ease-out gap-3 w-full min-w-0"
-              [style.transform]="getTransformStyle()" (touchstart)="onTouchStart($event)"
-              (touchend)="onTouchEnd($event)">
+            <!-- Track SIN gap. Usamos translateX(-100%) exacto -->
+            <div class="flex transition-transform duration-500 ease-out w-full" [style.transform]="getTransformStyle()"
+              (touchstart)="onTouchStart($event)" (touchend)="onTouchEnd($event)">
 
               @for (slide of (c.hero.slides || []); track $index) {
-              <!-- Usamos w-[85vw] para que el ancho dependa de la pantalla -->
-              <div
-                class="shrink-0 w-[85vw] max-w-[85vw] rounded-xl overflow-hidden border border-gray-200/90 dark:border-[#183616] bg-white dark:bg-[#1A1A40] shadow-lg ring-1 ring-black/5 dark:ring-white/10 text-left">
-                <!-- Barra superior mockup -->
+              <!-- Slide: shrink-0 w-full, con padding interno para que no toque los bordes -->
+              <div class="shrink-0 w-full px-2">
                 <div
-                  class="h-7 bg-gray-100/90 dark:bg-[#183616] border-b border-gray-200/80 dark:border-gray-800 flex items-center px-3 gap-1.5">
-                  <div class="w-2 h-2 rounded-full bg-red-400/80"></div>
-                  <div class="w-2 h-2 rounded-full bg-amber-400/80"></div>
-                  <div class="w-2 h-2 rounded-full bg-green-400/80"></div>
+                  class="w-full rounded-xl overflow-hidden border border-gray-200/90 dark:border-[#183616] bg-white dark:bg-[#1A1A40] shadow-lg ring-1 ring-black/5 dark:ring-white/10 text-left">
+                  <!-- Barra superior mockup -->
                   <div
-                    class="ml-2 flex-1 max-w-[130px] sm:max-w-[160px] bg-white dark:bg-[#1A1A40] rounded h-4 flex items-center px-2 border border-gray-200/60 dark:border-gray-800/80">
-                    <svg class="w-2.5 h-2.5 text-gray-400 mr-1.5 shrink-0" fill="none" stroke="currentColor"
-                      viewBox="0 0 24 24" aria-hidden="true">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                    </svg>
-                    <span class="text-[9px] text-gray-400 font-mono truncate">{{ slide.url }}</span>
+                    class="h-7 bg-gray-100/90 dark:bg-[#183616] border-b border-gray-200/80 dark:border-gray-800 flex items-center px-3 gap-1.5">
+                    <div class="w-2 h-2 rounded-full bg-red-400/80"></div>
+                    <div class="w-2 h-2 rounded-full bg-amber-400/80"></div>
+                    <div class="w-2 h-2 rounded-full bg-green-400/80"></div>
+                    <div
+                      class="ml-2 flex-1 max-w-[130px] sm:max-w-[160px] bg-white dark:bg-[#1A1A40] rounded h-4 flex items-center px-2 border border-gray-200/60 dark:border-gray-800/80">
+                      <svg class="w-2.5 h-2.5 text-gray-400 mr-1.5 shrink-0" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      <span class="text-[9px] text-gray-400 font-mono truncate">{{ slide.url }}</span>
+                    </div>
+                    @if (slide.tag) {
+                    <span
+                      class="ml-auto text-[9px] font-mono font-semibold px-2 py-0.5 rounded-full text-white shrink-0"
+                      style="background-color: var(--color-brand-secondary)">
+                      {{ slide.tag }}
+                    </span>
+                    }
                   </div>
-                  @if (slide.tag) {
-                  <span class="ml-auto text-[9px] font-mono font-semibold px-2 py-0.5 rounded-full text-white shrink-0"
-                    style="background-color: var(--color-brand-secondary)">
-                    {{ slide.tag }}
-                  </span>
-                  }
-                </div>
 
-                <!-- Mockup visual -->
-                <div class="relative w-full aspect-[16/10] overflow-hidden bg-gray-100 dark:bg-[#183616]">
-                  <img [src]="slide.image" [alt]="slide.imageAlt" [loading]="$index === 0 ? 'eager' : 'lazy'"
-                    class="w-full h-full object-cover object-top" />
+                  <!-- Mockup visual -->
+                  <div class="relative w-full aspect-[16/10] overflow-hidden bg-gray-100 dark:bg-[#183616]">
+                    <img [src]="slide.image" [alt]="slide.imageAlt" [loading]="$index === 0 ? 'eager' : 'lazy'"
+                      class="w-full h-full object-cover object-top" />
+                  </div>
                 </div>
               </div>
               }
@@ -146,7 +148,6 @@
       </div>
 
       <!-- Columna Derecha (Desktop Mockup) -->
-      <!-- MODIFICADO: Se agregó px-6 py-6 para dar margen interno y que las tarjetas no se corten -->
       <div class="lg:col-span-6 relative hidden lg:block min-w-0 px-6 py-6">
         <div
           class="relative rounded-xl overflow-hidden border border-gray-200 dark:border-[#183616] shadow-2xl bg-white dark:bg-[#1A1A40] ring-1 ring-gray-900/5 dark:ring-white/5 transition-transform duration-500 hover:scale-[1.02]">
@@ -169,7 +170,7 @@
             priority sizes="(min-width: 1280px) 50vw, 50vw" class="w-full h-auto object-cover" />
         </div>
 
-        <!-- Tarjetas flotantes (Desktop) - MODIFICADO: posiciones ajustadas a -bottom-2, -left-2 y -top-2, -right-2 -->
+        <!-- Tarjetas flotantes (Desktop) -->
         <div
           class="absolute -bottom-2 -left-2 bg-white dark:bg-[#1A1A40] border border-gray-200 dark:border-[#183616] p-4 rounded-xl shadow-xl flex items-center gap-3 animate-float motion-reduce:animate-none z-10"
           style="animation-delay: 1s">
@@ -200,7 +201,6 @@
 
 <!-- ═══════════════════════════════════════════════════════
        2. METRICS — Trust bar
-       NOTA: Se eliminó el bloque duplicado que tenías en tu código
   ═══════════════════════════════════════════════════════ -->
 @defer (on viewport; prefetch on idle) {
 <app-home-metrics [metrics]="c.metrics" />
@@ -210,9 +210,8 @@
 <div class="text-center py-12 text-sm text-red-500" role="alert">No se pudieron cargar las métricas.</div>
 }
 
-
 <!-- ═══════════════════════════════════════════════════════
-       3. PROJECTS — Cards anchas en desktop (oculto en mobile para no duplicar con carrusel)
+       3. PROJECTS — Cards anchas en desktop (oculto en mobile)
   ═══════════════════════════════════════════════════════ -->
 <section class="hidden lg:block py-24 md:py-32 bg-white dark:bg-[#0a0a0a]">
   <div class="container mx-auto px-4 max-w-screen-2xl">
@@ -226,7 +225,6 @@
       @for (item of c.projects.items; track item.title) {
       <a [routerLink]="item.link"
         class="group flex flex-col h-full rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#111] hover:border-emerald-500/50 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
-        <!-- Imagen más panorámica -->
         <div class="relative w-full aspect-[16/9] overflow-hidden bg-gray-200 dark:bg-[#1a1a1a]">
           <img [src]="item.image" [alt]="item.title"
             class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-700" />
@@ -241,26 +239,19 @@
             </svg>
           </div>
         </div>
-
         <div class="p-6 md:p-8 flex flex-col flex-grow">
           <div class="flex flex-wrap gap-2 mb-4">
             @for (tag of item.tags; track tag) {
             <span
-              class="px-2.5 py-1 text-[10px] font-mono uppercase tracking-widest bg-white dark:bg-[#0a0a0a] text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-800 rounded-md">
-              {{ tag }}
-            </span>
+              class="px-2.5 py-1 text-[10px] font-mono uppercase tracking-widest bg-white dark:bg-[#0a0a0a] text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-800 rounded-md">{{
+              tag }}</span>
             }
           </div>
-
           <h3
             class="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-emerald-500 transition-colors">
-            {{ item.title }}
-          </h3>
-
-          <p class="text-gray-600 dark:text-gray-400 leading-relaxed text-sm md:text-base mb-6 line-clamp-4">
-            {{ item.description }}
-          </p>
-
+            {{ item.title }}</h3>
+          <p class="text-gray-600 dark:text-gray-400 leading-relaxed text-sm md:text-base mb-6 line-clamp-4">{{
+            item.description }}</p>
           <div class="mt-auto pt-4 border-t border-gray-200 dark:border-gray-800 flex items-center justify-between">
             <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400 group-hover:underline">Ver Caso de
               Estudio</span>
@@ -288,7 +279,6 @@
         }}</h2>
       <p class="text-lg text-gray-600 dark:text-gray-400">{{ c.services.subtitle }}</p>
     </div>
-
     <div class="flex flex-wrap justify-center gap-6">
       @for (item of c.services.items; track item.title) {
       <div
@@ -304,7 +294,6 @@
     </div>
   </div>
 </section>
-
 
 <!-- ═══════════════════════════════════════════════════════
        6. METHODOLOGY — Cómo trabajamos
@@ -359,32 +348,21 @@
       <h2 class="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-4">{{ c.industries.title }}</h2>
       <p class="text-lg text-gray-600 dark:text-gray-400">{{ c.industries.subtitle }}</p>
     </div>
-
-    <!-- 1 → 2 → 4 columnas según breakpoint -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
       @for (item of c.industries.items; track item.title) {
       <div
         class="group flex flex-col h-full p-6 rounded-2xl bg-gray-50 dark:bg-[#111] border border-gray-200 dark:border-gray-800 hover:border-emerald-500/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-        <!-- Ícono arriba -->
         <div
           class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform duration-300">
           <i [class]="item.icon" aria-hidden="true"></i>
         </div>
-        <!-- Título -->
-        <h3 class="text-base font-bold text-gray-900 dark:text-white mb-2 leading-tight">
-          {{ item.title }}
-        </h3>
-        <!-- Descripción -->
-        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed mb-4 flex-grow">
-          {{ item.description }}
-        </p>
-        <!-- Pills de ejemplos -->
+        <h3 class="text-base font-bold text-gray-900 dark:text-white mb-2 leading-tight">{{ item.title }}</h3>
+        <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed mb-4 flex-grow">{{ item.description }}</p>
         <div class="flex flex-wrap gap-1.5 mt-auto pt-3 border-t border-gray-200 dark:border-gray-800">
           @for (example of item.examples; track example) {
           <span
-            class="px-2 py-0.5 text-[9px] font-mono uppercase tracking-wider bg-white dark:bg-[#0a0a0a] text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-800 rounded">
-            {{ example }}
-          </span>
+            class="px-2 py-0.5 text-[9px] font-mono uppercase tracking-wider bg-white dark:bg-[#0a0a0a] text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-800 rounded">{{
+            example }}</span>
           }
         </div>
       </div>
@@ -419,11 +397,9 @@
           </div>
         </div>
       </div>
-
       <div class="lg:col-span-7 order-1 lg:order-2">
         <h2 class="text-3xl md:text-4xl font-black text-gray-900 dark:text-white mb-3">{{ c.github.title }}</h2>
         <p class="text-lg text-gray-600 dark:text-gray-400 mb-8">{{ c.github.subtitle }}</p>
-
         <div class="flex gap-8 mb-8">
           <div>
             <div class="flex items-center gap-1.5 mb-1">
@@ -440,7 +416,6 @@
             <div class="text-2xl font-black text-gray-900 dark:text-white leading-none">{{ c.github.forks }}</div>
           </div>
         </div>
-
         <div
           class="bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 rounded-xl p-5 shadow-sm hover:border-emerald-500/50 transition-colors">
           <div class="flex items-center gap-2 mb-2 text-blue-600 dark:text-blue-400 font-mono font-bold text-sm">
@@ -464,7 +439,6 @@
         </div>
       </div>
     </div>
-
     <div class="max-w-6xl mx-auto pt-16 border-t border-gray-200 dark:border-gray-800/50">
       <div class="text-center mb-8">
         <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">{{ c.techStack.title }}</h3>
@@ -499,7 +473,6 @@
       </h2>
       <p class="text-lg text-gray-600 dark:text-gray-400">Resolvé tus dudas antes de dar el siguiente paso.</p>
     </div>
-
     <div class="grid md:grid-cols-2 gap-6 items-start">
       @for (item of c.faq.items; track item.question) {
       <details
@@ -539,15 +512,11 @@
     <div class="absolute inset-0 bg-gradient-to-br from-emerald-950/95 via-emerald-900/90 to-emerald-950/95"></div>
   </div>
   }
-
   <div class="container mx-auto px-4 max-w-6xl relative z-10">
-    <!-- Header -->
     <div class="text-center mb-14 max-w-3xl mx-auto">
       <h2 class="text-3xl md:text-5xl font-black mb-4">{{ c.quote.title }}</h2>
       <p class="text-emerald-200 text-lg">{{ c.quote.subtitle }}</p>
     </div>
-
-    <!-- 4 respuestas rápidas -->
     <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
       @for (faq of c.quote.faqs; track faq.question) {
       <div class="bg-emerald-900/40 backdrop-blur-sm border border-emerald-800/50 rounded-2xl p-5">
@@ -560,11 +529,8 @@
       </div>
       }
     </div>
-
-    <!-- Multi-step form -->
     <div
       class="max-w-2xl mx-auto bg-emerald-950/70 backdrop-blur-sm p-6 sm:p-10 rounded-3xl border border-emerald-800/50 shadow-2xl">
-      <!-- Progress indicator -->
       <div class="flex items-center justify-center gap-2 mb-8" role="progressbar" [attr.aria-valuenow]="currentStep()"
         aria-valuemin="1" aria-valuemax="3">
         @for (s of [1, 2, 3]; track s) {
@@ -576,8 +542,6 @@
         <div class="h-1.5 rounded-full w-full bg-emerald-400 transition-all duration-300"></div>
         }
       </div>
-
-      <!-- ═══ STEP 1: ¿Qué necesitás? ═══ -->
       @if (currentStep() === 1) {
       <div class="animate-in">
         <p class="text-emerald-300 text-xs font-mono uppercase tracking-widest mb-2">{{ c.quote.steps.stepLabel }} 1 / 3
@@ -605,8 +569,6 @@
         </div>
       </div>
       }
-
-      <!-- ═══ STEP 2: ¿Qué tan grande? ═══ -->
       @if (currentStep() === 2) {
       <div class="animate-in">
         <p class="text-emerald-300 text-xs font-mono uppercase tracking-widest mb-2">{{ c.quote.steps.stepLabel }} 2 / 3
@@ -633,34 +595,27 @@
           }
         </div>
         <button type="button" (click)="goBack()"
-          class="mt-6 text-emerald-300 hover:text-white text-sm font-semibold flex items-center gap-1 transition-colors">
-          ← {{ c.quote.steps.backLabel }}
-        </button>
+          class="mt-6 text-emerald-300 hover:text-white text-sm font-semibold flex items-center gap-1 transition-colors">←
+          {{ c.quote.steps.backLabel }}</button>
       </div>
       }
-
-      <!-- ═══ STEP 3: Teléfono ═══ -->
       @if (currentStep() === 3) {
       <div class="animate-in">
         <p class="text-emerald-300 text-xs font-mono uppercase tracking-widest mb-2">{{ c.quote.steps.stepLabel }} 3 / 3
         </p>
         <h3 class="text-2xl font-black text-white mb-2">{{ c.quote.steps.contactQuestion }}</h3>
         <p class="text-emerald-300/80 text-sm mb-6">{{ c.quote.steps.contactHint }}</p>
-
         <input type="tel" inputmode="tel" autocomplete="tel" [value]="phoneInput()" (input)="onPhoneInput($event)"
           [placeholder]="c.quote.steps.phonePlaceholder"
           class="w-full px-5 py-4 rounded-xl bg-emerald-900/60 border-2 border-emerald-700/50 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 text-white placeholder-emerald-400/40 transition-all text-lg font-mono"
           [class.border-red-400]="submitError()" [attr.aria-invalid]="!!submitError()" />
-
         @if (submitError()) {
         <p class="text-red-300 text-sm mt-2 font-medium" role="alert">{{ submitError() }}</p>
         }
-
         <div class="mt-6 flex flex-col sm:flex-row gap-3">
           <button type="button" (click)="goBack()"
-            class="px-5 py-3 border border-emerald-700/50 text-emerald-200 font-semibold rounded-xl hover:bg-emerald-900/60 transition-colors">
-            ← {{ c.quote.steps.backLabel }}
-          </button>
+            class="px-5 py-3 border border-emerald-700/50 text-emerald-200 font-semibold rounded-xl hover:bg-emerald-900/60 transition-colors">←
+            {{ c.quote.steps.backLabel }}</button>
           <button type="button" (click)="submitQuote()" [disabled]="isSubmitting()"
             class="flex-1 inline-flex items-center justify-center gap-2 px-8 py-3 bg-white text-emerald-950 font-bold rounded-xl hover:bg-emerald-50 disabled:opacity-60 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
             @if (isSubmitting()) {
@@ -676,8 +631,6 @@
         </div>
       </div>
       }
-
-      <!-- ═══ STEP 4: Success ═══ -->
       @if (currentStep() === 4) {
       <div class="text-center animate-in">
         <div class="w-20 h-20 rounded-full bg-emerald-500/20 flex items-center justify-center mx-auto mb-6">
@@ -696,13 +649,11 @@
             {{ c.quote.steps.successCta }}
           </a>
           <button type="button" (click)="resetForm()"
-            class="px-6 py-3 border border-emerald-700/50 text-emerald-200 font-semibold rounded-xl hover:bg-emerald-900/60 transition-colors">
-            ← {{ c.quote.steps.backLabel }}
-          </button>
+            class="px-6 py-3 border border-emerald-700/50 text-emerald-200 font-semibold rounded-xl hover:bg-emerald-900/60 transition-colors">←
+            {{ c.quote.steps.backLabel }}</button>
         </div>
       </div>
       }
-
     </div>
   </div>
 </section>

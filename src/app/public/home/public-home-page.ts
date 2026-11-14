@@ -65,6 +65,11 @@ export class PublicHomePage implements OnInit, OnDestroy {
   private autoPlayTimer: ReturnType<typeof setInterval> | null = null;
   private touchStartX = 0;
 
+  // Helper para saber cuántos slides hay (por defecto 1)
+  private get maxSlides(): number {
+    return this.content().hero.slides?.length || 1;
+  }
+
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       this.startAutoPlay();
@@ -77,8 +82,10 @@ export class PublicHomePage implements OnInit, OnDestroy {
 
   startAutoPlay(): void {
     this.stopAutoPlay();
+    if (this.maxSlides <= 1) return; // No hacer autoplay si solo hay 1
+
     this.autoPlayTimer = setInterval(() => {
-      this.activeMobileSlide.update(curr => (curr === 0 ? 1 : 0));
+      this.activeMobileSlide.update(curr => (curr + 1) % this.maxSlides);
     }, 4000);
   }
 
@@ -90,9 +97,11 @@ export class PublicHomePage implements OnInit, OnDestroy {
   }
 
   goToSlide(index: number): void {
-    this.activeMobileSlide.set(index);
-    if (isPlatformBrowser(this.platformId)) {
-      this.startAutoPlay();
+    if (index >= 0 && index < this.maxSlides) {
+      this.activeMobileSlide.set(index);
+      if (isPlatformBrowser(this.platformId)) {
+        this.startAutoPlay(); // Reiniciar timer al interactuar
+      }
     }
   }
 
@@ -105,24 +114,28 @@ export class PublicHomePage implements OnInit, OnDestroy {
   onTouchEnd(e: TouchEvent): void {
     if (!e.changedTouches?.length) return;
     const diff = this.touchStartX - e.changedTouches[0].clientX;
+
+    // Umbral de 40px para considerar un swipe
     if (Math.abs(diff) > 40) {
+      const current = this.activeMobileSlide();
       if (diff > 0) {
-        // Swiped left -> slide 1
-        this.activeMobileSlide.set(1);
+        // Swipe izquierda -> siguiente slide
+        this.goToSlide((current + 1) % this.maxSlides);
       } else {
-        // Swiped right -> slide 0
-        this.activeMobileSlide.set(0);
+        // Swipe derecha -> slide anterior
+        this.goToSlide((current - 1 + this.maxSlides) % this.maxSlides);
       }
     }
+
     if (isPlatformBrowser(this.platformId)) {
-      this.startAutoPlay();
+      this.startAutoPlay(); // Reanudar timer
     }
   }
 
+  // ¡EL CAMBIO CLAVE! El track ocupa 100% del ancho y el slide 100%.
+  // TranslateX(-100%) mueve exactamente un slide.
   getTransformStyle(): string {
-    return this.activeMobileSlide() === 0
-      ? 'translateX(0%)'
-      : 'translateX(calc(-88% - 12px + 12%))';
+    return `translateX(-${this.activeMobileSlide() * 100}%)`;
   }
 
   // ── Multi-step quote form ────────────────────────────
