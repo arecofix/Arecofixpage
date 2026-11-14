@@ -20,17 +20,18 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'pnpm' # ⬅️ NUEVO: Acelera la instalación
-
+      # ⬇️ CORREGIDO: pnpm se instala ANTES que setup-node
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9
-          run_install: false # Se instala en el paso siguiente
+          run_install: false
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
@@ -46,13 +47,11 @@ jobs:
           RES=$(curl -fsS https://arecofix-d1-failover.ezequielenrico15.workers.dev/health)
           echo "Worker Response: $RES"
           
-          # 1. Validar que el worker esté operativo (esto SÍ rompe el pipeline si falla)
           if ! echo "$RES" | jq -e '.status == "ok"' > /dev/null; then
             echo "❌ Worker D1 no está operativo (status != ok)."
             exit 1
           fi
           
-          # 2. Validar frescura (solo advierte, no rompe)
           if echo "$RES" | jq -e '.stale == true' > /dev/null; then
             echo "⚠️ ADVERTENCIA: El worker D1 tiene datos 'stale' (desactualizados)."
             echo "No se cancela el pipeline, pero revisá el Cron Trigger de Cloudflare."
@@ -74,17 +73,18 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'pnpm'
-
+      # ⬇️ CORREGIDO: pnpm se instala ANTES que setup-node
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9
           run_install: false
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
@@ -92,7 +92,6 @@ jobs:
       - name: Build Production SSR
         env:
           NODE_OPTIONS: "--max_old_space_size=6144"
-          # VS Code marca esto en amarillo porque no ve los secrets, es un falso positivo.
           TURNSTILE_SITE_KEY: ${{ secrets.TURNSTILE_SITE_KEY || '1x00000000000000000000AA' }}
           TRIAL_ENABLED: 'false'
         run: pnpm run build
@@ -121,7 +120,6 @@ jobs:
 
       - name: Setup SSH Key
         env:
-          # VS Code warning: falso positivo, el secret existe en GitHub.
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           mkdir -p ~/.ssh
@@ -147,17 +145,18 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 22
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'pnpm'
-
+      # ⬇️ CORREGIDO: pnpm se instala ANTES que setup-node
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9
           run_install: false
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
@@ -203,7 +202,6 @@ jobs:
     name: "🚢 Deploy to Production (Manual Approval Gate)"
     runs-on: ubuntu-latest
     needs: verify_staging
-    # ⬇️ CORREGIDO: Formato de objeto para que VS Code no tire error
     environment:
       name: production
       url: https://arecofix.com.ar
