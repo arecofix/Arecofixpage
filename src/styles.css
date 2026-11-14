@@ -93,16 +93,21 @@
 }
 
 .dark {
-  --base-100: #1A1A40; /* Fondo Oscuro oficial */
-  --base-200: #183616; /* Superficie (Cards, Navbar) */
-  --base-300: #183616; /* Card BG */
+  --base-100: #1A1A40;
+  /* Fondo Oscuro oficial */
+  --base-200: #183616;
+  /* Superficie (Cards, Navbar) */
+  --base-300: #183616;
+  /* Card BG */
   --base-content: #BDC0C1;
 }
 
 /* Global Styles */
+/* Cambia el clip por hidden y asegura el max-width */
 html,
 body {
-  overflow-x: clip;
+  overflow-x: hidden;
+  max-width: 100vw;
   width: 100%;
   min-height: 100%;
   font-family: var(--font-body);
@@ -144,7 +149,8 @@ h6 {
 /* Glassmorphism Utilities */
 /* Glassmorphism Utilities */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.7); /* Light mode default */
+  background: rgba(255, 255, 255, 0.7);
+  /* Light mode default */
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(0, 0, 0, 0.1);
@@ -158,7 +164,8 @@ h6 {
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.8); /* Light mode default */
+  background: rgba(255, 255, 255, 0.8);
+  /* Light mode default */
   backdrop-filter: blur(12px);
   border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
@@ -169,7 +176,8 @@ h6 {
 }
 
 .dark .glass-card {
-  background: rgba(30, 41, 59, 0.7); /* Dark slate */
+  background: rgba(30, 41, 59, 0.7);
+  /* Dark slate */
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   color: white;
@@ -178,7 +186,8 @@ h6 {
 .glass-card:hover {
   transform: translateY(-5px) translateZ(0);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-  border-color: rgba(78, 160, 54, 0.5); /* Brand Green Border on Hover */
+  border-color: rgba(78, 160, 54, 0.5);
+  /* Brand Green Border on Hover */
 }
 
 .text-gradient {
@@ -200,9 +209,11 @@ h6 {
   0% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-10px);
   }
+
   100% {
     transform: translateY(0px);
   }
@@ -215,9 +226,19 @@ h6 {
 
 /* Slow pulse for background decorations */
 @keyframes pulseSlow {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(1.05); }
+
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05);
+  }
 }
+
 .animate-pulse-slow {
   animation: pulseSlow 8s ease-in-out infinite;
   will-change: opacity, transform;
@@ -225,6 +246,7 @@ h6 {
 
 /* Reduce motion for users who prefer it + improves perf on low-end devices */
 @media (prefers-reduced-motion: reduce) {
+
   .animate-float,
   .animate-pulse-slow,
   .animate-fade-in-up,
@@ -245,14 +267,14 @@ h6 {
   }
 }
 
-.dropdown-content li > a,
-.dropdown-content li > button,
-.dropdown-content li > span {
+.dropdown-content li>a,
+.dropdown-content li>button,
+.dropdown-content li>span {
   color: var(--base-content);
 }
 
-.dropdown-content li > a:hover,
-.dropdown-content li > button:hover {
+.dropdown-content li>a:hover,
+.dropdown-content li>button:hover {
   background-color: var(--color-brand-blue);
   color: white;
 }
@@ -268,54 +290,45 @@ h6 {
   color: var(--color-hc-text);
 }
 
-.high-contrast
-  :where(
-    .text-gray-900,
-    .text-gray-800,
-    .text-gray-700,
-    .text-gray-600,
-    .text-gray-500,
-    .text-gray-400,
-    .text-gray-300,
-    .text-gray-200,
-    .text-gray-100,
-    .text-white,
-    .text-black,
-    .text-slate-900,
-    .text-slate-800,
-    .text-slate-700,
-    .text-slate-600,
-    .text-slate-500,
-    .text-slate-400
-  ) {
+.high-contrast :where(.text-gray-900,
+  .text-gray-800,
+  .text-gray-700,
+  .text-gray-600,
+  .text-gray-500,
+  .text-gray-400,
+  .text-gray-300,
+  .text-gray-200,
+  .text-gray-100,
+  .text-white,
+  .text-black,
+  .text-slate-900,
+  .text-slate-800,
+  .text-slate-700,
+  .text-slate-600,
+  .text-slate-500,
+  .text-slate-400) {
   color: var(--color-hc-text);
 }
 
-.high-contrast
-  :where(
-    .text-indigo-600,
-    .text-indigo-500,
-    .text-indigo-400,
-    .text-indigo-300,
-    .text-blue-600,
-    .text-purple-600,
-    .text-blue-400,
-    .text-cyan-300
-  ) {
+.high-contrast :where(.text-indigo-600,
+  .text-indigo-500,
+  .text-indigo-400,
+  .text-indigo-300,
+  .text-blue-600,
+  .text-purple-600,
+  .text-blue-400,
+  .text-cyan-300) {
   color: var(--color-hc-accent);
 }
 
-.high-contrast
-  :where(
-    .bg-white,
-    .bg-gray-50,
-    .bg-gray-100,
-    .bg-gray-800,
-    .bg-gray-900,
-    .bg-slate-900,
-    .bg-slate-800,
-    .bg-black
-  ) {
+.high-contrast :where(.bg-white,
+  .bg-gray-50,
+  .bg-gray-100,
+  .bg-gray-800,
+  .bg-gray-900,
+  .bg-slate-900,
+  .bg-slate-800,
+  .bg-black) {
   background-color: black !important;
   border: 1px solid white !important;
 }
@@ -338,15 +351,12 @@ h6 {
   color: black !important;
 }
 
-.high-contrast
-  :where(
-    .blur-3xl,
-    .bg-gradient-to-br,
-    .bg-gradient-to-t,
-    .bg-gradient-to-r,
-    .bg-gradient-to-b,
-    .bg-clip-text
-  ) {
+.high-contrast :where(.blur-3xl,
+  .bg-gradient-to-br,
+  .bg-gradient-to-t,
+  .bg-gradient-to-r,
+  .bg-gradient-to-b,
+  .bg-clip-text) {
   background: none !important;
   -webkit-text-fill-color: var(--color-hc-text) !important;
 }
@@ -438,7 +448,7 @@ h6 {
 .grecaptcha-badge,
 .gcr-badge,
 iframe[title*="recaptcha"],
-body > div[style*="z-index"][style*="fixed"] > div > iframe[src*="google"] {
+body>div[style*="z-index"][style*="fixed"]>div>iframe[src*="google"] {
   visibility: hidden !important;
   display: none !important;
   opacity: 0 !important;
@@ -456,7 +466,7 @@ iframe[src*="google"][style*="bottom"] {
 }
 
 /* Fix: Hide default details marker to avoid double arrows */
-details > summary::-webkit-details-marker {
+details>summary::-webkit-details-marker {
   display: none;
 }
 
@@ -468,6 +478,7 @@ details > summary::-webkit-details-marker {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -480,6 +491,7 @@ details > summary::-webkit-details-marker {
     opacity: 0;
     transform: translateY(-30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -488,28 +500,40 @@ details > summary::-webkit-details-marker {
 
 .animate-fade-in-up {
   animation: fadeInUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  
+
 }
 
 .animate-fade-in-down {
   animation: fadeInDown 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  
+
 }
 
 /* Simple Fade In */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
+
 .animate-fade-in {
   animation: fadeIn 0.2s ease-out forwards;
 }
 
 /* Slide In from Left (mobile drawer) */
 @keyframes slideInLeft {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(0); }
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
 }
+
 .animate-slide-in-left {
   animation: slideInLeft 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
@@ -521,12 +545,14 @@ details > summary::-webkit-details-marker {
     transform: scaleY(0);
     transform-origin: top;
   }
+
   to {
     opacity: 1;
     transform: scaleY(1);
     transform-origin: top;
   }
 }
+
 .animate-accordion-open {
   animation: accordionOpen 0.25s ease-out forwards;
   overflow: hidden;
@@ -535,9 +561,11 @@ details > summary::-webkit-details-marker {
 .delay-100 {
   animation-delay: 100ms;
 }
+
 .delay-200 {
   animation-delay: 200ms;
 }
+
 .delay-300 {
   animation-delay: 300ms;
 }
@@ -546,6 +574,7 @@ details > summary::-webkit-details-marker {
 .hover-scale {
   transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
+
 .hover-scale:hover {
   transform: scale(1.05);
 }
@@ -556,6 +585,7 @@ details > summary::-webkit-details-marker {
     transform 0.3s ease,
     box-shadow 0.3s ease;
 }
+
 .hover-lift:hover {
   transform: translateY(-4px);
   box-shadow:
@@ -567,12 +597,10 @@ details > summary::-webkit-details-marker {
 .btn-premium {
   @apply relative overflow-hidden font-bold transition-all duration-300 ease-out;
   background-size: 200% auto;
-  background-image: linear-gradient(
-    to right,
-    #2563eb 0%,
-    #3b82f6 51%,
-    #1d4ed8 100%
-  );
+  background-image: linear-gradient(to right,
+      #2563eb 0%,
+      #3b82f6 51%,
+      #1d4ed8 100%);
   color: white;
   border: none;
   box-shadow: 0 4px 15px 0 rgba(37, 99, 235, 0.4);
@@ -598,6 +626,7 @@ details > summary::-webkit-details-marker {
   0% {
     background-position: 0% 50%;
   }
+
   100% {
     background-position: 100% 50%;
   }
@@ -607,6 +636,7 @@ details > summary::-webkit-details-marker {
 .card-modern {
   @apply bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm transition-all duration-300;
 }
+
 .card-modern:hover {
   @apply shadow-xl border-blue-500/30;
   transform: translateY(-4px);
@@ -616,6 +646,7 @@ details > summary::-webkit-details-marker {
 /* iOS Safari automatically zooms in on inputs with a font-size smaller than 16px.
    This rule ensures all inputs on mobile have at least 16px font-size to prevent this behavior. */
 @media screen and (max-width: 768px) {
+
   input,
   select,
   textarea {
@@ -632,7 +663,7 @@ details > summary::-webkit-details-marker {
 .scrollable-container {
   /* Enable smooth scrolling momentum on iOS */
   -webkit-overflow-scrolling: touch;
-  
+
   /* Prevent overscroll bounce from causing layout shift */
   overscroll-behavior-x: contain;
   overscroll-behavior-y: auto;
@@ -645,6 +676,7 @@ details > summary::-webkit-details-marker {
 
 /* Ensure touch events work correctly on iOS */
 @supports (touch-action: manipulation) {
+
   .overflow-x-auto,
   [class*="overflow-x"] {
     touch-action: pan-x pan-y pinch-zoom;
@@ -653,6 +685,7 @@ details > summary::-webkit-details-marker {
 
 /* Additional Safari-specific fixes for smooth scrolling */
 @supports (-webkit-touch-callout: none) {
+
   /* iOS specific */
   .overflow-x-auto,
   [class*="overflow-x"],
@@ -661,7 +694,7 @@ details > summary::-webkit-details-marker {
     user-select: none;
     -webkit-user-drag: none;
   }
-  
+
   /* Enable momentum scrolling */
   .overflow-x-auto * {
     -webkit-tap-highlight-color: transparent;
@@ -676,13 +709,18 @@ react-mfe-app {
 
 /* Ocultar widgets flotantes globales en p�ginas espec�ficas */
 body.hide-floating-widgets react-mfe-app,
-body.hide-floating-widgets app-accessibility-sidebar > button,
+body.hide-floating-widgets app-accessibility-sidebar>button,
 body.hide-floating-widgets .floating-whatsapp {
   display: none !important;
 }
 
-body.hide-floating-widgets app-whatsapp-button { display: none !important; }
-body.hide-floating-widgets app-ai-chatbot { display: none !important; }
+body.hide-floating-widgets app-whatsapp-button {
+  display: none !important;
+}
+
+body.hide-floating-widgets app-ai-chatbot {
+  display: none !important;
+}
 
 
 
@@ -699,8 +737,17 @@ body.hide-floating-widgets app-ai-chatbot { display: none !important; }
 
 
 /* Global Chromium Font Detach Bug Fix */
-i[class*='fa-'] { position: relative; z-index: 2; --fa-display: swap; }
-.btn, .w-12.h-12.flex { position: relative; z-index: 1; }
+i[class*='fa-'] {
+  position: relative;
+  z-index: 2;
+  --fa-display: swap;
+}
+
+.btn,
+.w-12.h-12.flex {
+  position: relative;
+  z-index: 1;
+}
 
 /* Stencil Logo Text Styles */
 .stencil-logo {
@@ -757,8 +804,8 @@ cdk-virtual-scroll-viewport,
   opacity: 1 !important;
 }
 
-body.waw-panel-open app-accessibility-sidebar > button,
-body.accessibility-sidebar-open app-accessibility-sidebar > button {
+body.waw-panel-open app-accessibility-sidebar>button,
+body.accessibility-sidebar-open app-accessibility-sidebar>button {
   display: none !important;
   opacity: 0 !important;
   visibility: hidden !important;
@@ -816,8 +863,3 @@ a.footer-link {
   display: inline-flex !important;
   align-items: center !important;
 }
-
-
-
-
-

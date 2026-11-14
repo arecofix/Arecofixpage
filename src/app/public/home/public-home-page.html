@@ -5,28 +5,35 @@
        1. HERO — Split con dashboard window + floating cards
   ═══════════════════════════════════════════════════════ -->
 <section id="hero" aria-labelledby="hero-title"
-  class="relative min-h-0 lg:min-h-[85vh] lg:flex lg:items-center pt-20 pb-8 lg:pt-28 lg:pb-24 overflow-hidden text-gray-900 dark:text-[#e2e8f0] transition-colors duration-300"
-  style="font-family: 'Montserrat', system-ui, sans-serif">
+  class="relative w-full max-w-[100vw] overflow-hidden min-h-0 lg:min-h-[85vh] lg:flex lg:items-center pt-12 pb-32 lg:pt-28 lg:pb-24 text-gray-900 dark:text-[#e2e8f0] transition-colors duration-300"
+  style="font-family: var(--font-body)">
+
+  <!-- Fondo Grid -->
   <div
     class="pointer-events-none absolute inset-0 z-0 text-gray-900 dark:text-white opacity-[0.035] dark:opacity-[0.05]"
     style="background-image: linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px); background-size: 56px 56px; mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black 20%, transparent 90%); -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black 20%, transparent 90%);"
     aria-hidden="true"></div>
 
+  <!-- Resplandor Verde de fondo -->
   <div
     class="pointer-events-none absolute -top-40 right-0 w-[600px] h-[600px] rounded-full blur-[140px] opacity-[0.07] motion-reduce:opacity-[0.04]"
-    style="background-color: var(--bp, #15803d)" aria-hidden="true"></div>
+    style="background-color: var(--color-brand-primary)" aria-hidden="true"></div>
 
-  <div class="container mx-auto px-4 relative z-30">
-    <div class="grid lg:grid-cols-12 items-center gap-10 lg:gap-16">
-      <div class="lg:col-span-6 text-center lg:text-left">
+  <div class="container mx-auto px-4 relative z-30 w-full max-w-[100vw] overflow-hidden">
+    <div class="grid lg:grid-cols-12 items-center gap-10 lg:gap-16 w-full min-w-0">
+
+      <!-- Columna Izquierda (Textos, Carrusel y Botones) -->
+      <div class="lg:col-span-6 text-center lg:text-left min-w-0 w-full overflow-hidden lg:overflow-visible">
+
+        <!-- Badge Disponible -->
         <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2 mb-4 lg:mb-7">
           <div
-            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111] shadow-sm">
+            class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-gray-200 dark:border-[#183616] bg-white dark:bg-[#1A1A40] shadow-sm">
             <span class="relative flex w-1.5 h-1.5" aria-hidden="true">
               <span class="absolute inline-flex w-full h-full rounded-full opacity-75 animate-ping"
-                style="background-color: var(--bp, #15803d)"></span>
+                style="background-color: var(--color-brand-primary)"></span>
               <span class="relative inline-flex w-1.5 h-1.5 rounded-full"
-                style="background-color: var(--bp, #15803d)"></span>
+                style="background-color: var(--color-brand-primary)"></span>
             </span>
             <span class="text-[11px] font-mono uppercase tracking-wide text-gray-700 dark:text-gray-300">
               {{ c.hero.availableForProjects }}
@@ -34,115 +41,121 @@
           </div>
         </div>
 
+        <!-- Título con break-words y max-w-full estricto -->
         <h1 id="hero-title"
-          class="text-2xl sm:text-3xl lg:text-5xl xl:text-[3.25rem] font-black mb-3 lg:mb-6 leading-snug lg:leading-[1.05] tracking-tight text-gray-900 dark:text-white">
+          class="w-full max-w-full text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-[3.25rem] font-black mb-4 lg:mb-6 leading-tight tracking-tight text-gray-900 dark:text-white break-words"
+          style="font-family: var(--font-heading)">
           {{ c.hero.title }}
         </h1>
 
-        <!-- Párrafo Desktop (directo y conciso) -->
-        <p class="hidden lg:block text-base sm:text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
+        <!-- Párrafo Desktop -->
+        <p
+          class="hidden lg:block text-base sm:text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
           {{ c.hero.subtitle }}
         </p>
 
-        <!-- Párrafo Mobile (corto, máx 3-4 líneas, completo) -->
-        <p class="block lg:hidden text-sm text-gray-600 dark:text-gray-300 mb-4 leading-relaxed max-w-md mx-auto">
+        <!-- Párrafo Mobile (Usa el texto corto exacto del TS) -->
+        <p
+          class="block lg:hidden text-base sm:text-lg text-gray-600 dark:text-gray-300 mb-6 leading-relaxed max-w-lg mx-auto px-2 break-words">
           {{ c.hero.subtitleMobile || c.hero.subtitle }}
         </p>
 
-        <!-- Carrusel horizontal exclusivo Mobile (debajo del párrafo, arriba de los botones) -->
-        <div class="block lg:hidden w-full mb-5 select-none" aria-label="Galería de soluciones Arecofix">
+        <!-- ═══ CARRUSEL MOBILE CORREGIDO ═══ -->
+        <div class="block lg:hidden w-full max-w-[100vw] mb-6 select-none overflow-hidden"
+          aria-label="Galería de soluciones Arecofix">
+          <!-- Contenedor estricto -->
           <div class="relative w-full overflow-hidden py-1">
-            <div
-              class="flex transition-transform duration-500 ease-out gap-3"
-              [style.transform]="getTransformStyle()"
-              (touchstart)="onTouchStart($event)"
+            <!-- Flex container que no se estira más que la pantalla -->
+            <div class="flex transition-transform duration-500 ease-out gap-3 w-full min-w-0"
+              [style.transform]="getTransformStyle()" (touchstart)="onTouchStart($event)"
               (touchend)="onTouchEnd($event)">
 
               @for (slide of (c.hero.slides || []); track $index) {
+              <!-- Usamos w-[85vw] para que el ancho dependa de la pantalla, no del padre -->
+              <div
+                class="shrink-0 w-[85vw] max-w-[85vw] rounded-xl overflow-hidden border border-gray-200/90 dark:border-[#183616] bg-white dark:bg-[#1A1A40] shadow-lg ring-1 ring-black/5 dark:ring-white/10 text-left">
+                <!-- Barra superior mockup -->
                 <div
-                  class="shrink-0 w-[88%] rounded-xl overflow-hidden border border-gray-200/90 dark:border-gray-800 bg-white dark:bg-[#0d0d0d] shadow-lg ring-1 ring-black/5 dark:ring-white/10 text-left">
-                  <!-- Barra superior mockup -->
-                  <div class="h-7 bg-gray-100/90 dark:bg-[#141414] border-b border-gray-200/80 dark:border-gray-800 flex items-center px-3 gap-1.5">
-                    <div class="w-2 h-2 rounded-full bg-red-400/80"></div>
-                    <div class="w-2 h-2 rounded-full bg-amber-400/80"></div>
-                    <div class="w-2 h-2 rounded-full bg-green-400/80"></div>
-                    <div class="ml-2 flex-1 max-w-[130px] sm:max-w-[160px] bg-white dark:bg-[#1f1f1f] rounded h-4 flex items-center px-2 border border-gray-200/60 dark:border-gray-800/80">
-                      <svg class="w-2.5 h-2.5 text-gray-400 mr-1.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                      <span class="text-[9px] text-gray-400 font-mono truncate">{{ slide.url }}</span>
-                    </div>
-                    @if (slide.tag) {
-                      <span class="ml-auto text-[9px] font-mono font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0">
-                        {{ slide.tag }}
-                      </span>
-                    }
+                  class="h-7 bg-gray-100/90 dark:bg-[#183616] border-b border-gray-200/80 dark:border-gray-800 flex items-center px-3 gap-1.5">
+                  <div class="w-2 h-2 rounded-full bg-red-400/80"></div>
+                  <div class="w-2 h-2 rounded-full bg-amber-400/80"></div>
+                  <div class="w-2 h-2 rounded-full bg-green-400/80"></div>
+                  <div
+                    class="ml-2 flex-1 max-w-[130px] sm:max-w-[160px] bg-white dark:bg-[#1A1A40] rounded h-4 flex items-center px-2 border border-gray-200/60 dark:border-gray-800/80">
+                    <svg class="w-2.5 h-2.5 text-gray-400 mr-1.5 shrink-0" fill="none" stroke="currentColor"
+                      viewBox="0 0 24 24" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    <span class="text-[9px] text-gray-400 font-mono truncate">{{ slide.url }}</span>
                   </div>
-
-                  <!-- Mockup visual del sistema -->
-                  <div class="relative w-full aspect-[16/10] overflow-hidden bg-gray-100 dark:bg-[#111]">
-                    <img
-                      [src]="slide.image"
-                      [alt]="slide.imageAlt"
-                      width="600"
-                      height="375"
-                      [loading]="$index === 0 ? 'eager' : 'lazy'"
-                      class="w-full h-full object-cover object-top" />
-                  </div>
+                  @if (slide.tag) {
+                  <span class="ml-auto text-[9px] font-mono font-semibold px-2 py-0.5 rounded-full text-white shrink-0"
+                    style="background-color: var(--color-brand-secondary)">
+                    {{ slide.tag }}
+                  </span>
+                  }
                 </div>
+
+                <!-- Mockup visual (Sin width ni height fijos) -->
+                <div class="relative w-full aspect-[16/10] overflow-hidden bg-gray-100 dark:bg-[#183616]">
+                  <img [src]="slide.image" [alt]="slide.imageAlt" [loading]="$index === 0 ? 'eager' : 'lazy'"
+                    class="w-full h-full object-cover object-top" />
+                </div>
+              </div>
               }
             </div>
           </div>
 
-          <!-- Indicadores de puntos debajo del carrusel -->
+          <!-- Indicadores -->
           @if (c.hero.slides && c.hero.slides.length > 1) {
-            <div class="flex items-center justify-center gap-2 mt-2.5 mb-3" role="tablist" aria-label="Indicadores del carrusel">
-              @for (slide of c.hero.slides; track $index) {
-                <button
-                  type="button"
-                  role="tab"
-                  [attr.aria-selected]="activeMobileSlide() === $index"
-                  [attr.aria-label]="'Ver slide ' + ($index + 1)"
-                  (click)="goToSlide($index)"
-                  class="h-2 rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 cursor-pointer"
-                  [class.w-6]="activeMobileSlide() === $index"
-                  [class.bg-emerald-500]="activeMobileSlide() === $index"
-                  [class.w-2]="activeMobileSlide() !== $index"
-                  [class.bg-gray-400]="activeMobileSlide() !== $index"
-                  [class.dark:bg-gray-600]="activeMobileSlide() !== $index">
-                </button>
-              }
-            </div>
+          <div class="flex items-center justify-center gap-2 mt-2.5 mb-3" role="tablist"
+            aria-label="Indicadores del carrusel">
+            @for (slide of c.hero.slides; track $index) {
+            <button type="button" role="tab" [attr.aria-selected]="activeMobileSlide() === $index"
+              [attr.aria-label]="'Ver slide ' + ($index + 1)" (click)="goToSlide($index)"
+              class="h-2 rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4CAA47] cursor-pointer"
+              [class.w-6]="activeMobileSlide() === $index" [class.bg-brand-primary]="activeMobileSlide() === $index"
+              [class.w-2]="activeMobileSlide() !== $index" [class.bg-gray-400]="activeMobileSlide() !== $index"
+              [class.dark:bg-gray-600]="activeMobileSlide() !== $index">
+            </button>
+            }
+          </div>
           }
         </div>
 
-        <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-2.5 sm:gap-3 w-full max-w-sm sm:max-w-none mx-auto lg:mx-0">
+        <!-- Botones CTA con tu paleta de colores -->
+        <div class="flex flex-col gap-4 w-full max-w-full sm:flex-row sm:gap-3 sm:w-auto sm:max-w-none mx-auto lg:mx-0">
           <a routerLink="/contacto"
-            class="w-full sm:w-auto group flex items-center justify-center gap-2 px-6 py-3 text-white rounded-lg font-semibold text-base shadow-lg transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5 min-h-[50px] min-w-[200px]"
-            style="background-color: var(--bp, #15803d)">
+            class="w-full max-w-full sm:w-auto group flex items-center justify-center gap-2 px-6 py-4 text-white rounded-xl font-bold text-base shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 text-center"
+            style="background-color: var(--color-brand-primary);"
+            onmouseover="this.style.backgroundColor='var(--color-brand-primary-hover)'"
+            onmouseout="this.style.backgroundColor='var(--color-brand-primary)'">
             {{ c.hero.ctaPrimary }}
-            <svg class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none"
+            <svg class="w-4 h-4 shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" fill="none"
               stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
           </a>
           <a routerLink="/portfolio"
-            class="w-full sm:w-auto flex items-center justify-center px-6 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#111] text-gray-900 dark:text-white rounded-lg font-semibold text-base hover:bg-gray-50 dark:hover:bg-[#1a1a1a] transition-colors min-h-[50px] min-w-[200px]">
+            class="w-full max-w-full sm:w-auto flex items-center justify-center px-6 py-4 border border-[#BDC0C1] dark:border-[#183616] bg-white dark:bg-[#1A1A40] text-gray-900 dark:text-white rounded-xl font-bold text-base hover:bg-gray-50 dark:hover:bg-[#183616] transition-colors text-center">
             {{ c.hero.ctaSecondary }}
           </a>
         </div>
+
       </div>
 
-      <div class="lg:col-span-6 relative hidden lg:block">
+      <!-- Columna Derecha (Desktop Mockup) -->
+      <div class="lg:col-span-6 relative hidden lg:block min-w-0">
         <div
-          class="relative rounded-xl overflow-hidden border border-gray-200 dark:border-gray-800 shadow-2xl bg-white dark:bg-[#0a0a0a] ring-1 ring-gray-900/5 dark:ring-white/5 transition-transform duration-500 hover:scale-[1.02]">
+          class="relative rounded-xl overflow-hidden border border-gray-200 dark:border-[#183616] shadow-2xl bg-white dark:bg-[#1A1A40] ring-1 ring-gray-900/5 dark:ring-white/5 transition-transform duration-500 hover:scale-[1.02]">
           <div
-            class="h-9 bg-gray-100 dark:bg-[#111] border-b border-gray-200 dark:border-gray-800 flex items-center px-4 gap-1.5">
+            class="h-9 bg-gray-100 dark:bg-[#183616] border-b border-gray-200 dark:border-gray-800 flex items-center px-4 gap-1.5">
             <div class="w-3 h-3 rounded-full bg-red-400/80"></div>
             <div class="w-3 h-3 rounded-full bg-amber-400/80"></div>
             <div class="w-3 h-3 rounded-full bg-green-400/80"></div>
             <div
-              class="ml-4 flex-1 max-w-[200px] bg-white dark:bg-[#1a1a1a] rounded-md h-5 flex items-center px-3 border border-gray-200 dark:border-gray-800">
+              class="ml-4 flex-1 max-w-[200px] bg-white dark:bg-[#1A1A40] rounded-md h-5 flex items-center px-3 border border-gray-200 dark:border-gray-800">
               <svg class="w-3 h-3 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                 aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -155,11 +168,12 @@
             priority sizes="(min-width: 1280px) 50vw, 50vw" class="w-full h-auto object-cover" />
         </div>
 
+        <!-- Tarjetas flotantes (Desktop) -->
         <div
-          class="absolute -bottom-6 -left-6 bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 p-4 rounded-xl shadow-xl flex items-center gap-3 animate-float motion-reduce:animate-none z-10"
+          class="absolute -bottom-6 -left-6 bg-white dark:bg-[#1A1A40] border border-gray-200 dark:border-[#183616] p-4 rounded-xl shadow-xl flex items-center gap-3 animate-float motion-reduce:animate-none z-10"
           style="animation-delay: 1s">
-          <div
-            class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+          <div class="w-10 h-10 rounded-full flex items-center justify-center text-white"
+            style="background-color: var(--color-brand-primary)">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
             </svg>
@@ -172,12 +186,13 @@
         </div>
 
         <div
-          class="absolute -top-6 -right-6 bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 p-3 rounded-xl shadow-xl flex items-center gap-3 animate-float motion-reduce:animate-none z-10">
+          class="absolute -top-6 -right-6 bg-white dark:bg-[#1A1A40] border border-gray-200 dark:border-[#183616] p-3 rounded-xl shadow-xl flex items-center gap-3 animate-float motion-reduce:animate-none z-10">
           <div class="text-2xl font-black text-gray-900 dark:text-white">{{ c.hero.uptimeValue }}</div>
           <div class="text-[10px] leading-tight text-gray-500 dark:text-gray-400 font-mono uppercase max-w-[70px]">{{
             c.hero.uptimeLabel }}</div>
         </div>
       </div>
+
     </div>
   </div>
 </section>
@@ -192,6 +207,19 @@
 } @error {
 <div class="text-center py-12 text-sm text-red-500" role="alert">No se pudieron cargar las métricas.</div>
 }
+
+
+<!-- ═══════════════════════════════════════════════════════
+       2. METRICS — Trust bar
+  ═══════════════════════════════════════════════════════ -->
+@defer (on viewport; prefetch on idle) {
+<app-home-metrics [metrics]="c.metrics" />
+} @placeholder {
+<div class="h-32 bg-white dark:bg-[#183616] animate-pulse motion-reduce:animate-none" aria-hidden="true"></div>
+} @error {
+<div class="text-center py-12 text-sm text-red-500" role="alert">No se pudieron cargar las métricas.</div>
+}
+
 
 <!-- ═══════════════════════════════════════════════════════
        3. PROJECTS — Cards anchas en desktop (oculto en mobile para no duplicar con carrusel)
