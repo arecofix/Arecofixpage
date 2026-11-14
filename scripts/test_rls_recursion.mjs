@@ -9,14 +9,60 @@
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 import path from 'path';
+import fs from 'fs';
 
-dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+// ─────────────────────────────────────────────────────────
+// Carga de variables de entorno
+// ─────────────────────────────────────────────────────────
+// En local: carga desde .env si existe.
+// En CI (GitHub Actions): no hay .env, las variables vienen inyectadas
+// por `env:` en el workflow desde los Secrets.
+const envPath = path.resolve(process.cwd(), '.env');
+if (fs.existsSync(envPath)) {
+  dotenv.config({ path: envPath });
+  console.log('[RLS Audit] Loaded .env file from disk.');
+} else {
+  console.log('[RLS Audit] No .env file found. Reading from process.env (CI mode).');
+}
 
-const SUPABASE_URL = process.env.SUPABASE_URL || 'https://db.arecofix.com.ar';
-const SUPABASE_KEY = process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY;
+// ─────────────────────────────────────────────────────────
+// Resolución de variables con fallbacks múltiples
+// ─────────────────────────────────────────────────────────
+const SUPABASE_URL =
+  process.env.SUPABASE_URL ||
+  process.env.VITE_SUPABASE_URL ||
+  'https://db.arecofix.com.ar';
 
+const SUPABASE_KEY =
+  process.env.SUPABASE_KEY ||
+  process.env.SUPABASE_ANON_KEY ||
+  process.env.VITE_SUPABASE_KEY ||
+  process.env.ANON_KEY;
+
+// ─────────────────────────────────────────────────────────
+// Diagnóstico (sin exponer valores sensibles)
+// ─────────────────────────────────────────────────────────
+console.log('[RLS Audit] Environment diagnostics:');
+console.log(`  - SUPABASE_URL defined:       ${!!process.env.SUPABASE_URL}`);
+console.log(`  - SUPABASE_KEY defined:       ${!!process.env.SUPABASE_KEY}`);
+console.log(`  - SUPABASE_ANON_KEY defined:  ${!!process.env.SUPABASE_ANON_KEY}`);
+console.log(`  - ANON_KEY defined:           ${!!process.env.ANON_KEY}`);
+console.log(`  - GITHUB_ACTIONS:             ${process.env.GITHUB_ACTIONS || 'false'}`);
+
+// ─────────────────────────────────────────────────────────
+// Validación de credenciales
+// ─────────────────────────────────────────────────────────
 if (!SUPABASE_KEY) {
+  console.error('');
   console.error('[FATAL] Missing SUPABASE_KEY or SUPABASE_ANON_KEY in environment.');
+  console.error('[FATAL] Local: ensure .env has SUPABASE_KEY.');
+  console.error('[FATAL] CI: ensure GitHub Secret SUPABASE_KEY is set and injected via env:');
+  console.error('');
+  process.exit(1);
+}
+
+if (!SUPABASE_URL) {
+  console.error('[FATAL] Missing SUPABASE_URL in environment.');
   process.exit(1);
 }
 
@@ -39,11 +85,13 @@ const CRITICAL_TABLES = [
 ];
 
 async function testRecursion() {
+  console.log('');
   console.log('======================================================');
   console.log('🛡️  ARECOFIX AUTOMATED RLS ANTI-RECURSION AUDIT GATE');
   console.log(`📡 Target URL: ${SUPABASE_URL}`);
   console.log(`⏰ Timestamp:  ${new Date().toISOString()}`);
-  console.log('======================================================\n');
+  console.log('======================================================');
+  console.log('');
 
   let failureCount = 0;
 
@@ -72,7 +120,7 @@ async function testRecursion() {
           continue;
         }
 
-        // Minor permission or schema notices are non-fatal as long as depth limit is not exceeded
+        // Avisos menores (permisos, schema) no son fatales mientras no se exceda el depth limit
         console.log(`⚠️  Notice (${status || 400}) [${elapsed}ms]: ${error.message}`);
       } else {
         console.log(`✔ OK (Status: ${status || 200}) [${elapsed}ms]`);
@@ -84,7 +132,7 @@ async function testRecursion() {
     }
   }
 
-  // Evaluate core RPC function
+  // Evaluación de la función RPC crítica
   process.stdout.write('Evaluating RPC [get_current_tenant_id]... ');
   try {
     const { data, error, status } = await supabase.rpc('get_current_tenant_id');
@@ -99,7 +147,8 @@ async function testRecursion() {
     failureCount++;
   }
 
-  console.log('\n------------------------------------------------------');
+  console.log('');
+  console.log('------------------------------------------------------');
   if (failureCount > 0) {
     console.error(`🚨 AUDIT GATE FAILED: ${failureCount} table(s) exhibit RLS recursion or critical failures!`);
     process.exit(1);
