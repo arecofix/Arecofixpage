@@ -4,8 +4,9 @@
 <!-- ═══════════════════════════════════════════════════════
        1. HERO — Split con dashboard window + floating cards
   ═══════════════════════════════════════════════════════ -->
+<!-- MODIFICADO: pt-32 en mobile para que no lo tape el navbar, pb-24 para no generar tanto espacio al final -->
 <section id="hero" aria-labelledby="hero-title"
-  class="relative w-full max-w-[100vw] overflow-hidden min-h-0 lg:min-h-[85vh] lg:flex lg:items-center pt-12 pb-32 lg:pt-28 lg:pb-24 text-gray-900 dark:text-[#e2e8f0] transition-colors duration-300"
+  class="relative w-full max-w-[100vw] overflow-hidden min-h-0 lg:min-h-[85vh] lg:flex lg:items-center pt-32 pb-24 lg:pt-28 lg:pb-24 text-gray-900 dark:text-[#e2e8f0] transition-colors duration-300"
   style="font-family: var(--font-body)">
 
   <!-- Fondo Grid -->
@@ -41,9 +42,9 @@
           </div>
         </div>
 
-        <!-- Título con break-words y max-w-full estricto -->
+        <!-- Título - MODIFICADO: text-2xl en mobile para achicar -->
         <h1 id="hero-title"
-          class="w-full max-w-full text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-[3.25rem] font-black mb-4 lg:mb-6 leading-tight tracking-tight text-gray-900 dark:text-white break-words"
+          class="w-full max-w-full text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-[3.25rem] font-black mb-3 lg:mb-6 leading-tight tracking-tight text-gray-900 dark:text-white break-words"
           style="font-family: var(--font-heading)">
           {{ c.hero.title }}
         </h1>
@@ -54,24 +55,39 @@
           {{ c.hero.subtitle }}
         </p>
 
-        <!-- Párrafo Mobile (Usa el texto corto exacto del TS) -->
+        <!-- Párrafo Mobile - MODIFICADO: text-sm para achicar -->
         <p
-          class="block lg:hidden text-base sm:text-lg text-gray-600 dark:text-gray-300 mb-6 leading-relaxed max-w-lg mx-auto px-2 break-words">
+          class="block lg:hidden text-sm text-gray-600 dark:text-gray-300 mb-4 leading-relaxed max-w-md mx-auto px-2 break-words">
           {{ c.hero.subtitleMobile || c.hero.subtitle }}
         </p>
 
         <!-- ═══ CARRUSEL MOBILE CORREGIDO ═══ -->
         <div class="block lg:hidden w-full max-w-[100vw] mb-6 select-none overflow-hidden"
           aria-label="Galería de soluciones Arecofix">
+
+          <!-- INDICADORES MOVIDOS ARRIBA DEL SLIDER -->
+          @if (c.hero.slides && c.hero.slides.length > 1) {
+          <div class="flex items-center justify-center gap-2 mb-3" role="tablist" aria-label="Indicadores del carrusel">
+            @for (slide of c.hero.slides; track $index) {
+            <button type="button" role="tab" [attr.aria-selected]="activeMobileSlide() === $index"
+              [attr.aria-label]="'Ver slide ' + ($index + 1)" (click)="goToSlide($index)"
+              class="h-2 rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4CAA47] cursor-pointer"
+              [class.w-6]="activeMobileSlide() === $index" [class.bg-brand-primary]="activeMobileSlide() === $index"
+              [class.w-2]="activeMobileSlide() !== $index" [class.bg-gray-400]="activeMobileSlide() !== $index"
+              [class.dark:bg-gray-600]="activeMobileSlide() !== $index">
+            </button>
+            }
+          </div>
+          }
+
           <!-- Contenedor estricto -->
           <div class="relative w-full overflow-hidden py-1">
-            <!-- Flex container que no se estira más que la pantalla -->
             <div class="flex transition-transform duration-500 ease-out gap-3 w-full min-w-0"
               [style.transform]="getTransformStyle()" (touchstart)="onTouchStart($event)"
               (touchend)="onTouchEnd($event)">
 
               @for (slide of (c.hero.slides || []); track $index) {
-              <!-- Usamos w-[85vw] para que el ancho dependa de la pantalla, no del padre -->
+              <!-- Usamos w-[85vw] para que el ancho dependa de la pantalla -->
               <div
                 class="shrink-0 w-[85vw] max-w-[85vw] rounded-xl overflow-hidden border border-gray-200/90 dark:border-[#183616] bg-white dark:bg-[#1A1A40] shadow-lg ring-1 ring-black/5 dark:ring-white/10 text-left">
                 <!-- Barra superior mockup -->
@@ -97,7 +113,7 @@
                   }
                 </div>
 
-                <!-- Mockup visual (Sin width ni height fijos) -->
+                <!-- Mockup visual -->
                 <div class="relative w-full aspect-[16/10] overflow-hidden bg-gray-100 dark:bg-[#183616]">
                   <img [src]="slide.image" [alt]="slide.imageAlt" [loading]="$index === 0 ? 'eager' : 'lazy'"
                     class="w-full h-full object-cover object-top" />
@@ -106,26 +122,10 @@
               }
             </div>
           </div>
-
-          <!-- Indicadores -->
-          @if (c.hero.slides && c.hero.slides.length > 1) {
-          <div class="flex items-center justify-center gap-2 mt-2.5 mb-3" role="tablist"
-            aria-label="Indicadores del carrusel">
-            @for (slide of c.hero.slides; track $index) {
-            <button type="button" role="tab" [attr.aria-selected]="activeMobileSlide() === $index"
-              [attr.aria-label]="'Ver slide ' + ($index + 1)" (click)="goToSlide($index)"
-              class="h-2 rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#4CAA47] cursor-pointer"
-              [class.w-6]="activeMobileSlide() === $index" [class.bg-brand-primary]="activeMobileSlide() === $index"
-              [class.w-2]="activeMobileSlide() !== $index" [class.bg-gray-400]="activeMobileSlide() !== $index"
-              [class.dark:bg-gray-600]="activeMobileSlide() !== $index">
-            </button>
-            }
-          </div>
-          }
         </div>
 
-        <!-- Botones CTA con tu paleta de colores -->
-        <div class="flex flex-col gap-4 w-full max-w-full sm:flex-row sm:gap-3 sm:w-auto sm:max-w-none mx-auto lg:mx-0">
+        <!-- Botones CTA -->
+        <div class="flex flex-col gap-3 w-full max-w-full sm:flex-row sm:gap-3 sm:w-auto sm:max-w-none mx-auto lg:mx-0">
           <a routerLink="/contacto"
             class="w-full max-w-full sm:w-auto group flex items-center justify-center gap-2 px-6 py-4 text-white rounded-xl font-bold text-base shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 text-center"
             style="background-color: var(--color-brand-primary);"
@@ -146,7 +146,8 @@
       </div>
 
       <!-- Columna Derecha (Desktop Mockup) -->
-      <div class="lg:col-span-6 relative hidden lg:block min-w-0">
+      <!-- MODIFICADO: Se agregó px-6 py-6 para dar margen interno y que las tarjetas no se corten -->
+      <div class="lg:col-span-6 relative hidden lg:block min-w-0 px-6 py-6">
         <div
           class="relative rounded-xl overflow-hidden border border-gray-200 dark:border-[#183616] shadow-2xl bg-white dark:bg-[#1A1A40] ring-1 ring-gray-900/5 dark:ring-white/5 transition-transform duration-500 hover:scale-[1.02]">
           <div
@@ -168,9 +169,9 @@
             priority sizes="(min-width: 1280px) 50vw, 50vw" class="w-full h-auto object-cover" />
         </div>
 
-        <!-- Tarjetas flotantes (Desktop) -->
+        <!-- Tarjetas flotantes (Desktop) - MODIFICADO: posiciones ajustadas a -bottom-2, -left-2 y -top-2, -right-2 -->
         <div
-          class="absolute -bottom-6 -left-6 bg-white dark:bg-[#1A1A40] border border-gray-200 dark:border-[#183616] p-4 rounded-xl shadow-xl flex items-center gap-3 animate-float motion-reduce:animate-none z-10"
+          class="absolute -bottom-2 -left-2 bg-white dark:bg-[#1A1A40] border border-gray-200 dark:border-[#183616] p-4 rounded-xl shadow-xl flex items-center gap-3 animate-float motion-reduce:animate-none z-10"
           style="animation-delay: 1s">
           <div class="w-10 h-10 rounded-full flex items-center justify-center text-white"
             style="background-color: var(--color-brand-primary)">
@@ -186,7 +187,7 @@
         </div>
 
         <div
-          class="absolute -top-6 -right-6 bg-white dark:bg-[#1A1A40] border border-gray-200 dark:border-[#183616] p-3 rounded-xl shadow-xl flex items-center gap-3 animate-float motion-reduce:animate-none z-10">
+          class="absolute -top-2 -right-2 bg-white dark:bg-[#1A1A40] border border-gray-200 dark:border-[#183616] p-3 rounded-xl shadow-xl flex items-center gap-3 animate-float motion-reduce:animate-none z-10">
           <div class="text-2xl font-black text-gray-900 dark:text-white">{{ c.hero.uptimeValue }}</div>
           <div class="text-[10px] leading-tight text-gray-500 dark:text-gray-400 font-mono uppercase max-w-[70px]">{{
             c.hero.uptimeLabel }}</div>
@@ -199,18 +200,7 @@
 
 <!-- ═══════════════════════════════════════════════════════
        2. METRICS — Trust bar
-  ═══════════════════════════════════════════════════════ -->
-@defer (on viewport; prefetch on idle) {
-<app-home-metrics [metrics]="c.metrics" />
-} @placeholder {
-<div class="h-32 bg-white dark:bg-[#183616] animate-pulse motion-reduce:animate-none" aria-hidden="true"></div>
-} @error {
-<div class="text-center py-12 text-sm text-red-500" role="alert">No se pudieron cargar las métricas.</div>
-}
-
-
-<!-- ═══════════════════════════════════════════════════════
-       2. METRICS — Trust bar
+       NOTA: Se eliminó el bloque duplicado que tenías en tu código
   ═══════════════════════════════════════════════════════ -->
 @defer (on viewport; prefetch on idle) {
 <app-home-metrics [metrics]="c.metrics" />
@@ -225,9 +215,7 @@
        3. PROJECTS — Cards anchas en desktop (oculto en mobile para no duplicar con carrusel)
   ═══════════════════════════════════════════════════════ -->
 <section class="hidden lg:block py-24 md:py-32 bg-white dark:bg-[#0a0a0a]">
-  <!-- Contenedor ampliado -->
   <div class="container mx-auto px-4 max-w-screen-2xl">
-
     <div class="text-center mb-16 max-w-3xl mx-auto">
       <h2 class="text-3xl md:text-5xl font-black text-gray-900 dark:text-white mb-4 tracking-tight">{{ c.projects.title
         }}</h2>
@@ -238,7 +226,6 @@
       @for (item of c.projects.items; track item.title) {
       <a [routerLink]="item.link"
         class="group flex flex-col h-full rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-[#111] hover:border-emerald-500/50 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
-
         <!-- Imagen más panorámica -->
         <div class="relative w-full aspect-[16/9] overflow-hidden bg-gray-200 dark:bg-[#1a1a1a]">
           <img [src]="item.image" [alt]="item.title"
@@ -378,24 +365,20 @@
       @for (item of c.industries.items; track item.title) {
       <div
         class="group flex flex-col h-full p-6 rounded-2xl bg-gray-50 dark:bg-[#111] border border-gray-200 dark:border-gray-800 hover:border-emerald-500/50 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-
         <!-- Ícono arriba -->
         <div
           class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform duration-300">
           <i [class]="item.icon" aria-hidden="true"></i>
         </div>
-
         <!-- Título -->
         <h3 class="text-base font-bold text-gray-900 dark:text-white mb-2 leading-tight">
           {{ item.title }}
         </h3>
-
-        <!-- Descripción (flex-grow para empujar los pills al fondo) -->
+        <!-- Descripción -->
         <p class="text-xs text-gray-600 dark:text-gray-400 leading-relaxed mb-4 flex-grow">
           {{ item.description }}
         </p>
-
-        <!-- Pills de ejemplos ancladas al fondo -->
+        <!-- Pills de ejemplos -->
         <div class="flex flex-wrap gap-1.5 mt-auto pt-3 border-t border-gray-200 dark:border-gray-800">
           @for (example of item.examples; track example) {
           <span
@@ -404,7 +387,6 @@
           </span>
           }
         </div>
-
       </div>
       }
     </div>
@@ -425,7 +407,6 @@
             class="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-700" />
           <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/40 pointer-events-none"
             aria-hidden="true"></div>
-
           <div
             class="absolute top-4 left-4 inline-flex items-center gap-2 px-3 py-1.5 bg-white/95 dark:bg-[#0a0a0a]/95 backdrop-blur-md border border-gray-200 dark:border-gray-700 rounded-full shadow-xl">
             <svg class="w-3.5 h-3.5 text-gray-900 dark:text-white" viewBox="0 0 24 24" fill="currentColor"
@@ -519,14 +500,12 @@
       <p class="text-lg text-gray-600 dark:text-gray-400">Resolvé tus dudas antes de dar el siguiente paso.</p>
     </div>
 
-    <!-- Grid de 2 columnas -->
     <div class="grid md:grid-cols-2 gap-6 items-start">
       @for (item of c.faq.items; track item.question) {
       <details
         class="group bg-white dark:bg-[#111] border border-gray-200 dark:border-gray-800 rounded-2xl p-6 cursor-pointer hover:border-emerald-500/50 transition-colors">
         <summary class="flex justify-between items-center font-bold text-gray-900 dark:text-white text-base list-none">
           {{ item.question }}
-          <!-- Ícono que rota y cambia a color esmeralda -->
           <span
             class="w-8 h-8 rounded-full bg-gray-100 dark:bg-[#0a0a0a] flex items-center justify-center text-gray-500 group-open:bg-emerald-100 group-open:text-emerald-600 dark:group-open:bg-emerald-900/30 dark:group-open:text-emerald-400 transition-all">
             <i class="fas fa-chevron-down text-sm transition-transform duration-300 group-open:rotate-180"></i>
@@ -562,7 +541,6 @@
   }
 
   <div class="container mx-auto px-4 max-w-6xl relative z-10">
-
     <!-- Header -->
     <div class="text-center mb-14 max-w-3xl mx-auto">
       <h2 class="text-3xl md:text-5xl font-black mb-4">{{ c.quote.title }}</h2>
@@ -586,7 +564,6 @@
     <!-- Multi-step form -->
     <div
       class="max-w-2xl mx-auto bg-emerald-950/70 backdrop-blur-sm p-6 sm:p-10 rounded-3xl border border-emerald-800/50 shadow-2xl">
-
       <!-- Progress indicator -->
       <div class="flex items-center justify-center gap-2 mb-8" role="progressbar" [attr.aria-valuenow]="currentStep()"
         aria-valuemin="1" aria-valuemax="3">
