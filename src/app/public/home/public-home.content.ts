@@ -6,10 +6,19 @@
 //   INTERFACES
 // ─────────────────────────────────────────────────────────
 
+export interface HeroSlide {
+  image: string;
+  imageAlt: string;
+  url: string;
+  tag?: string;
+  title?: string;
+}
+
 export interface HeroContent {
   availableForProjects: string;
   title: string;
   subtitle: string;
+  subtitleMobile?: string;
   ctaPrimary: string;
   ctaSecondary: string;
   imageAlt: string;
@@ -18,6 +27,7 @@ export interface HeroContent {
   statusValue: string;
   uptimeValue: string;
   uptimeLabel: string;
+  slides?: HeroSlide[];
 }
 
 export interface MetricItem {
@@ -175,7 +185,9 @@ export const HOME_CONTENT: Record<'en' | 'es', HomeContent> = {
       availableForProjects: 'Available for new projects',
       title: 'IT Consulting. Tailored technology solving your business challenges.',
       subtitle:
-        'If you feel you waste time jotting data everywhere or using software that nobody understands, we solve it for you. We build a unique, ultra-easy-to-use system for you with zero jargon. Whether your business is small or large, we deliver a tool so you keep everything organized and scale smoothly. We handle the system, you focus on sales.',
+        'If you lose time with confusing software or scattered spreadsheets, we build custom, intuitive solutions tailored for your business. We handle the tech so you can focus on scaling sales.',
+      subtitleMobile:
+        'If you lose time with confusing software, we build custom, easy-to-use systems designed for scalable growth.',
       ctaPrimary: 'Book a free consultation',
       ctaSecondary: 'See how we can help',
       imageAlt: 'Arecofix dashboard preview with real-time project metrics',
@@ -184,6 +196,22 @@ export const HOME_CONTENT: Record<'en' | 'es', HomeContent> = {
       statusValue: '100% Operational',
       uptimeValue: '99.9%',
       uptimeLabel: 'Guaranteed Uptime',
+      slides: [
+        {
+          image: 'assets/img/services/software-illustration.webp',
+          imageAlt: 'Arecofix dashboard preview with real-time project metrics',
+          url: 'app.arecofix.com',
+          tag: 'Main Dashboard',
+          title: 'Real-time metrics & management',
+        },
+        {
+          image: 'assets/img/gsm/are.webp',
+          imageAlt: 'Operations and business intelligence panel',
+          url: 'panel.arecofix.com',
+          tag: 'Operations Panel',
+          title: 'Total business operational control',
+        },
+      ],
     },
 
     metrics: {
@@ -204,7 +232,7 @@ export const HOME_CONTENT: Record<'en' | 'es', HomeContent> = {
         {
           title: 'ZARX — C4ISR Civil Defense & Emergency Response System',
           description:
-            'Tactical platform that turns crisis uncertainty into actionable information. ZARX integrates real-time geolocation, secure communication and critical infrastructure monitoring (fires, IoT) in a single interface. Built to work even when the network fails (offline-first), it enables civil defense and security forces to coordinate resources and save lives with precise data in seconds, not hours.',
+            'platform that turns crisis uncertainty into actionable information. ZARX integrates real-time geolocation, secure communication and critical infrastructure monitoring (fires, IoT) in a single interface. Built to work even when the network fails (offline-first), it enables civil defense and security forces to coordinate resources and save lives with precise data in seconds, not hours.',
           image: 'assets/img/gsm/zarx.webp',
           tags: ['C4ISR', 'Offline-First', 'Angular', 'Supabase'],
           link: '/portfolio',
@@ -574,7 +602,9 @@ export const HOME_CONTENT: Record<'en' | 'es', HomeContent> = {
       title:
         'Consultoría IT. Tecnología a medida que resuelve los problemas de tu negocio.',
       subtitle:
-        'Si sentís que perdés tiempo anotando datos por todos lados o usando programas que no se entienden, nosotros te lo resolvemos. Armamos un sistema único para vos, súper fácil de usar y sin palabras raras. No importa si tu negocio es chico o grande: te entregamos una herramienta para que tengas todo ordenado y puedas crecer sin volverte loco. Nosotros nos ocupamos del sistema, vos de tus ventas.',
+        'Si sentís que perdés tiempo con programas que no se entienden o anotando datos por todos lados, te desarrollamos un sistema a medida: fácil de usar, sin tecnicismos y pensado para escalar. Nosotros nos ocupamos de la tecnología, vos de tus ventas.',
+      subtitleMobile:
+        'Si sentís que perdés tiempo con programas que no se entienden, nosotros te desarrollamos un sistema a medida, fácil de usar y pensado para que crezcas de forma escalable.',
       ctaPrimary: 'Agendar una asesoría gratuita',
       ctaSecondary: 'Descubrir cómo pueden ayudarme',
       imageAlt:
@@ -584,6 +614,23 @@ export const HOME_CONTENT: Record<'en' | 'es', HomeContent> = {
       statusValue: '100% Operativo',
       uptimeValue: '99.9%',
       uptimeLabel: 'Uptime Garantizado',
+      slides: [
+        {
+          image: 'assets/img/services/software-illustration.webp',
+          imageAlt:
+            'Vista previa del dashboard de Arecofix con métricas de proyectos en tiempo real',
+          url: 'app.arecofix.com',
+          tag: 'Dashboard Principal',
+          title: 'Gestión y métricas en tiempo real',
+        },
+        {
+          image: 'assets/img/gsm/are.webp',
+          imageAlt: 'Panel integral de operaciones y business intelligence',
+          url: 'panel.arecofix.com',
+          tag: 'Panel de Operaciones',
+          title: 'Operaciones centralizadas y analíticas',
+        },
+      ],
     },
 
     metrics: {
@@ -604,8 +651,8 @@ export const HOME_CONTENT: Record<'en' | 'es', HomeContent> = {
         {
           title: 'ZARX — Sistema C4ISR de Defensa Civil y Respuesta a Emergencias',
           description:
-            'Plataforma táctica que convierte la incertidumbre de una crisis en un flujo de información accionable. ZARX integra geolocalización en tiempo real, comunicación segura y monitoreo de infraestructura crítica (incendios, IoT) en una sola interfaz. Diseñada para funcionar incluso cuando la red falla (offline-first), permite a defensa civil y fuerzas de seguridad coordinar recursos y salvar vidas con datos precisos en segundos, no en horas.',
-          image: 'assets/img/gsm/zarx.png',
+            'Plataforma que convierte la incertidumbre de una crisis en un flujo de información accionable. ZARX integra geolocalización en tiempo real, comunicación segura y monitoreo de infraestructura crítica (inundaciones, IoT) en una sola interfaz. Diseñada para funcionar incluso cuando la red falla (offline-first), permite a defensa civil y fuerzas de seguridad coordinar recursos y salvar vidas con datos precisos en segundos, no en horas.',
+          image: 'assets/img/gsm/zarx.webp',
           tags: ['C4ISR', 'Offline-First', 'Angular', 'Supabase'],
           link: '/portfolio',
         },
@@ -613,7 +660,7 @@ export const HOME_CONTENT: Record<'en' | 'es', HomeContent> = {
           title: 'Dashboard Integral de Negocio (ERP & BI)',
           description:
             'Centro de comando unificado que centraliza operaciones, finanzas y atención al cliente en una sola pantalla. Diseñado para escalar negocios con múltiples sucursales, unificando E-commerce, Servicio Técnico, Academia y Caja en tiempo real con métricas accionables.',
-          image: 'assets/img/projects/panel.png',
+          image: 'assets/img/gsm/are.webp',
           tags: ['Java', 'Spring Boot', 'Angular'],
           link: '/portfolio',
         },

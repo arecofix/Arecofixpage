@@ -2,9 +2,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   inject,
+  OnDestroy,
+  OnInit,
+  PLATFORM_ID,
   signal,
 } from '@angular/core';
-import { NgOptimizedImage } from '@angular/common';
+import { isPlatformBrowser, NgOptimizedImage } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs/operators';
@@ -39,7 +42,8 @@ type StepNumber = 1 | 2 | 3 | 4;
   templateUrl: './public-home-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PublicHomePage {
+export class PublicHomePage implements OnInit, OnDestroy {
+  private readonly platformId = inject(PLATFORM_ID);
   private readonly preferences = inject(PreferencesService);
   private readonly contactService = inject(ContactService);
   private readonly notifications = inject(NotificationService);
@@ -55,6 +59,71 @@ export class PublicHomePage {
     ),
     { initialValue: HOME_CONTENT.es },
   );
+
+  // ── Mobile Hero Carousel ────────────────────────────
+  readonly activeMobileSlide = signal<number>(0);
+  private autoPlayTimer: ReturnType<typeof setInterval> | null = null;
+  private touchStartX = 0;
+
+  ngOnInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      this.startAutoPlay();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.stopAutoPlay();
+  }
+
+  startAutoPlay(): void {
+    this.stopAutoPlay();
+    this.autoPlayTimer = setInterval(() => {
+      this.activeMobileSlide.update(curr => (curr === 0 ? 1 : 0));
+    }, 4000);
+  }
+
+  stopAutoPlay(): void {
+    if (this.autoPlayTimer) {
+      clearInterval(this.autoPlayTimer);
+      this.autoPlayTimer = null;
+    }
+  }
+
+  goToSlide(index: number): void {
+    this.activeMobileSlide.set(index);
+    if (isPlatformBrowser(this.platformId)) {
+      this.startAutoPlay();
+    }
+  }
+
+  onTouchStart(e: TouchEvent): void {
+    if (!e.touches?.length) return;
+    this.touchStartX = e.touches[0].clientX;
+    this.stopAutoPlay();
+  }
+
+  onTouchEnd(e: TouchEvent): void {
+    if (!e.changedTouches?.length) return;
+    const diff = this.touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) {
+        // Swiped left -> slide 1
+        this.activeMobileSlide.set(1);
+      } else {
+        // Swiped right -> slide 0
+        this.activeMobileSlide.set(0);
+      }
+    }
+    if (isPlatformBrowser(this.platformId)) {
+      this.startAutoPlay();
+    }
+  }
+
+  getTransformStyle(): string {
+    return this.activeMobileSlide() === 0
+      ? 'translateX(0%)'
+      : 'translateX(calc(-88% - 12px + 12%))';
+  }
 
   // ── Multi-step quote form ────────────────────────────
   readonly currentStep = signal<StepNumber>(1);

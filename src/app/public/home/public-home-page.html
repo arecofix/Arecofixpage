@@ -5,7 +5,7 @@
        1. HERO — Split con dashboard window + floating cards
   ═══════════════════════════════════════════════════════ -->
 <section id="hero" aria-labelledby="hero-title"
-  class="relative min-h-[85vh] flex items-center pt-20 pb-16 lg:pt-28 lg:pb-24 overflow-hidden text-gray-900 dark:text-[#e2e8f0] transition-colors duration-300"
+  class="relative min-h-0 lg:min-h-[85vh] lg:flex lg:items-center pt-20 pb-8 lg:pt-28 lg:pb-24 overflow-hidden text-gray-900 dark:text-[#e2e8f0] transition-colors duration-300"
   style="font-family: 'Montserrat', system-ui, sans-serif">
   <div
     class="pointer-events-none absolute inset-0 z-0 text-gray-900 dark:text-white opacity-[0.035] dark:opacity-[0.05]"
@@ -19,7 +19,7 @@
   <div class="container mx-auto px-4 relative z-30">
     <div class="grid lg:grid-cols-12 items-center gap-10 lg:gap-16">
       <div class="lg:col-span-6 text-center lg:text-left">
-        <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2 mb-7">
+        <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2 mb-4 lg:mb-7">
           <div
             class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#111] shadow-sm">
             <span class="relative flex w-1.5 h-1.5" aria-hidden="true">
@@ -35,17 +35,90 @@
         </div>
 
         <h1 id="hero-title"
-          class="text-3xl sm:text-4xl lg:text-5xl xl:text-[3.25rem] font-black mb-6 leading-[1.05] tracking-tight text-gray-900 dark:text-white">
+          class="text-2xl sm:text-3xl lg:text-5xl xl:text-[3.25rem] font-black mb-3 lg:mb-6 leading-snug lg:leading-[1.05] tracking-tight text-gray-900 dark:text-white">
           {{ c.hero.title }}
         </h1>
 
-        <p class="text-base sm:text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
+        <!-- Párrafo Desktop (directo y conciso) -->
+        <p class="hidden lg:block text-base sm:text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
           {{ c.hero.subtitle }}
         </p>
 
-        <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3">
+        <!-- Párrafo Mobile (corto, máx 3-4 líneas, completo) -->
+        <p class="block lg:hidden text-sm text-gray-600 dark:text-gray-300 mb-4 leading-relaxed max-w-md mx-auto">
+          {{ c.hero.subtitleMobile || c.hero.subtitle }}
+        </p>
+
+        <!-- Carrusel horizontal exclusivo Mobile (debajo del párrafo, arriba de los botones) -->
+        <div class="block lg:hidden w-full mb-5 select-none" aria-label="Galería de soluciones Arecofix">
+          <div class="relative w-full overflow-hidden py-1">
+            <div
+              class="flex transition-transform duration-500 ease-out gap-3"
+              [style.transform]="getTransformStyle()"
+              (touchstart)="onTouchStart($event)"
+              (touchend)="onTouchEnd($event)">
+
+              @for (slide of (c.hero.slides || []); track $index) {
+                <div
+                  class="shrink-0 w-[88%] rounded-xl overflow-hidden border border-gray-200/90 dark:border-gray-800 bg-white dark:bg-[#0d0d0d] shadow-lg ring-1 ring-black/5 dark:ring-white/10 text-left">
+                  <!-- Barra superior mockup -->
+                  <div class="h-7 bg-gray-100/90 dark:bg-[#141414] border-b border-gray-200/80 dark:border-gray-800 flex items-center px-3 gap-1.5">
+                    <div class="w-2 h-2 rounded-full bg-red-400/80"></div>
+                    <div class="w-2 h-2 rounded-full bg-amber-400/80"></div>
+                    <div class="w-2 h-2 rounded-full bg-green-400/80"></div>
+                    <div class="ml-2 flex-1 max-w-[130px] sm:max-w-[160px] bg-white dark:bg-[#1f1f1f] rounded h-4 flex items-center px-2 border border-gray-200/60 dark:border-gray-800/80">
+                      <svg class="w-2.5 h-2.5 text-gray-400 mr-1.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      <span class="text-[9px] text-gray-400 font-mono truncate">{{ slide.url }}</span>
+                    </div>
+                    @if (slide.tag) {
+                      <span class="ml-auto text-[9px] font-mono font-semibold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0">
+                        {{ slide.tag }}
+                      </span>
+                    }
+                  </div>
+
+                  <!-- Mockup visual del sistema -->
+                  <div class="relative w-full aspect-[16/10] overflow-hidden bg-gray-100 dark:bg-[#111]">
+                    <img
+                      [src]="slide.image"
+                      [alt]="slide.imageAlt"
+                      width="600"
+                      height="375"
+                      [loading]="$index === 0 ? 'eager' : 'lazy'"
+                      class="w-full h-full object-cover object-top" />
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Indicadores de puntos debajo del carrusel -->
+          @if (c.hero.slides && c.hero.slides.length > 1) {
+            <div class="flex items-center justify-center gap-2 mt-2.5 mb-3" role="tablist" aria-label="Indicadores del carrusel">
+              @for (slide of c.hero.slides; track $index) {
+                <button
+                  type="button"
+                  role="tab"
+                  [attr.aria-selected]="activeMobileSlide() === $index"
+                  [attr.aria-label]="'Ver slide ' + ($index + 1)"
+                  (click)="goToSlide($index)"
+                  class="h-2 rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 cursor-pointer"
+                  [class.w-6]="activeMobileSlide() === $index"
+                  [class.bg-emerald-500]="activeMobileSlide() === $index"
+                  [class.w-2]="activeMobileSlide() !== $index"
+                  [class.bg-gray-400]="activeMobileSlide() !== $index"
+                  [class.dark:bg-gray-600]="activeMobileSlide() !== $index">
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-2.5 sm:gap-3 w-full max-w-sm sm:max-w-none mx-auto lg:mx-0">
           <a routerLink="/contacto"
-            class="group inline-flex items-center justify-center gap-2 px-7 py-3.5 text-white rounded-lg font-semibold text-base shadow-lg transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5 min-h-[52px] min-w-[200px]"
+            class="w-full sm:w-auto group flex items-center justify-center gap-2 px-6 py-3 text-white rounded-lg font-semibold text-base shadow-lg transition-all duration-200 hover:shadow-xl hover:-translate-y-0.5 min-h-[50px] min-w-[200px]"
             style="background-color: var(--bp, #15803d)">
             {{ c.hero.ctaPrimary }}
             <svg class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-0.5" fill="none"
@@ -54,7 +127,7 @@
             </svg>
           </a>
           <a routerLink="/portfolio"
-            class="inline-flex items-center justify-center px-7 py-3.5 border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#111] text-gray-900 dark:text-white rounded-lg font-semibold text-base hover:bg-gray-50 dark:hover:bg-[#1a1a1a] transition-colors min-h-[52px] min-w-[200px]">
+            class="w-full sm:w-auto flex items-center justify-center px-6 py-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#111] text-gray-900 dark:text-white rounded-lg font-semibold text-base hover:bg-gray-50 dark:hover:bg-[#1a1a1a] transition-colors min-h-[50px] min-w-[200px]">
             {{ c.hero.ctaSecondary }}
           </a>
         </div>
@@ -121,9 +194,9 @@
 }
 
 <!-- ═══════════════════════════════════════════════════════
-       3. PROJECTS — Cards anchas en desktop
+       3. PROJECTS — Cards anchas en desktop (oculto en mobile para no duplicar con carrusel)
   ═══════════════════════════════════════════════════════ -->
-<section class="py-24 md:py-32 bg-white dark:bg-[#0a0a0a]">
+<section class="hidden lg:block py-24 md:py-32 bg-white dark:bg-[#0a0a0a]">
   <!-- Contenedor ampliado -->
   <div class="container mx-auto px-4 max-w-screen-2xl">
 
