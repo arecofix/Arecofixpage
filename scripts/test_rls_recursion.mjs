@@ -114,7 +114,7 @@ async function testRecursion() {
           status === 413 ||
           status >= 500
         ) {
-          console.log(`❌ FAILED (Status: ${status}) in ${elapsed}ms`);
+          console.log(` FAILED (Status: ${status}) in ${elapsed}ms`);
           console.error(`   [CRITICAL RECURSION ERROR]: ${errorMsg}`);
           failureCount++;
           continue;
