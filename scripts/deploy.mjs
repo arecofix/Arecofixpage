@@ -174,7 +174,7 @@ async function main() {
   } finally {
     // Limpieza de archivo temporal local
     if (fs.existsSync(archiveLocalPath)) {
-      try { fs.unlinkSync(archiveLocalPath); } catch {}
+      try { fs.unlinkSync(archiveLocalPath); } catch { }
     }
   }
 }
